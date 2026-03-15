@@ -4,50 +4,6 @@
 #include <Engine/Scripting/Scripting.h>
 
 // ============================================================================
-//  Scripting type registrations
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(
-    AudioBankAsset,
-    SerializableScriptingObject,
-    AudioSystemEditor,
-    "AudioSystemEditor.AudioBankAsset",
-    nullptr,
-    nullptr);
-
-IMPLEMENT_SCRIPTING_TYPE(
-    AudioTriggerAsset,
-    SerializableScriptingObject,
-    AudioSystemEditor,
-    "AudioSystemEditor.AudioTriggerAsset",
-    nullptr,
-    nullptr);
-
-IMPLEMENT_SCRIPTING_TYPE(
-    AudioRtpcAsset,
-    SerializableScriptingObject,
-    AudioSystemEditor,
-    "AudioSystemEditor.AudioRtpcAsset",
-    nullptr,
-    nullptr);
-
-IMPLEMENT_SCRIPTING_TYPE(
-    AudioSwitchStateAsset,
-    SerializableScriptingObject,
-    AudioSystemEditor,
-    "AudioSystemEditor.AudioSwitchStateAsset",
-    nullptr,
-    nullptr);
-
-IMPLEMENT_SCRIPTING_TYPE(
-    AudioEnvironmentAsset,
-    SerializableScriptingObject,
-    AudioSystemEditor,
-    "AudioSystemEditor.AudioEnvironmentAsset",
-    nullptr,
-    nullptr);
-
-// ============================================================================
 //  Constructors
 // ============================================================================
 

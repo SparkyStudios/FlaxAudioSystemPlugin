@@ -15,13 +15,6 @@
 AudioSystemDataID AudioListenerComponent::_nextListenerId = 2000;
 
 // ============================================================================
-//  Scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(AudioListenerComponent, AudioSystemComponent,
-    AudioSystem, "AudioSystem.AudioListenerComponent", nullptr, nullptr);
-
-// ============================================================================
 //  OnEnable
 // ============================================================================
 
@@ -136,7 +129,7 @@ AudioSystemTransform AudioListenerComponent::ComputeCurrentTransform() const
     // the current position, divided by the elapsed frame time.
     Vector3 velocity = Vector3::Zero;
     const float dt = Time::GetDeltaTime();
-    if (_hasLastTransform && dt > ZERO_TOLERANCE)
+    if (_hasLastTransform && dt > ZeroTolerance)
         velocity = (pos - _lastTransform.Position) / dt;
 
     result.Position = pos;

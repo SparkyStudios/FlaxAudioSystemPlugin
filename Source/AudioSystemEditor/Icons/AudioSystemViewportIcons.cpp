@@ -3,7 +3,7 @@
 #include <Engine/Core/Log.h>
 #include <Engine/Core/Types/String.h>
 #include <Engine/Engine/Globals.h>
-#include <Engine/Platform/File.h>
+#include <Engine/Platform/FileSystem.h>
 
 // ============================================================================
 //  Internal helpers
@@ -22,7 +22,7 @@ String AudioSystemViewportIcons::ResolveIconPath(const Char* relativePath)
 
 void AudioSystemViewportIcons::ValidateIconFile(const Char* componentName, const String& absolutePath)
 {
-    if (!File::Exists(absolutePath))
+    if (!FileSystem::FileExists(absolutePath))
     {
         LOG(Warning,
             "[AudioSystemViewportIcons] Icon file for {0} not found: {1}. "

@@ -4,8 +4,6 @@
 #include "AudioSystemPlugin.h"
 #include "Core/AudioSystem.h"
 
-IMPLEMENT_SCRIPTING_TYPE(AudioSystemPlugin, GamePlugin, AudioSystem, "AudioSystem.AudioSystemPlugin", nullptr, nullptr);
-
 AudioSystemPlugin::AudioSystemPlugin(const SpawnParams& params)
     : GamePlugin(params)
 {

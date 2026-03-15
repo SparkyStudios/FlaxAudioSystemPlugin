@@ -1,15 +1,9 @@
 #include <Engine/Core/Log.h>
 
 #include "AudioSwitchStateComponent.h"
+#include "AudioProxyComponent.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
-
-// ============================================================================
-//  Scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(AudioSwitchStateComponent, AudioSystemProxyDependentComponent,
-    AudioSystem, "AudioSystem.AudioSwitchStateComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnEnable

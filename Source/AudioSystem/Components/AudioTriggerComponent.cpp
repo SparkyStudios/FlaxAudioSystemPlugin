@@ -8,15 +8,9 @@
 
 #include "AudioTriggerComponent.h"
 #include "AudioListenerComponent.h"
+#include "AudioProxyComponent.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
-
-// ============================================================================
-//  Scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(AudioTriggerComponent, AudioSystemProxyDependentComponent,
-    AudioSystem, "AudioSystem.AudioTriggerComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnEnable
@@ -382,7 +376,7 @@ void AudioTriggerComponent::ComputeObstructionOcclusion(float& outObstruction, f
     const Vector3 delta       = listenerPos - sourcePos;
     const float   distance    = delta.Length();
 
-    if (distance < ZERO_TOLERANCE)
+    if (distance < ZeroTolerance)
         return;
 
     const Vector3 direction = delta / distance;

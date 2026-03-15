@@ -7,13 +7,6 @@
 #include "AudioTriggerComponent.h"
 
 // ============================================================================
-//  AudioAnimEvent — scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(AudioAnimEvent, AnimEvent,
-    AudioSystem, "AudioSystem.AudioAnimEvent", nullptr, nullptr);
-
-// ============================================================================
 //  AudioAnimEvent — OnEvent
 // ============================================================================
 
@@ -58,13 +51,6 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
     LOG(Warning, "[AudioAnimEvent] OnEvent: No sibling AudioTriggerComponent with PlayTriggerName '{0}' found on Actor '{1}'.",
         TriggerName, actor->GetName());
 }
-
-// ============================================================================
-//  AudioAnimationComponent — scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(AudioAnimationComponent, AudioSystemProxyDependentComponent,
-    AudioSystem, "AudioSystem.AudioAnimationComponent", nullptr, nullptr);
 
 // ============================================================================
 //  AudioAnimationComponent — OnEnable

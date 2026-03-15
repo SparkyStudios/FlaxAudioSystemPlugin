@@ -15,13 +15,6 @@
 AudioSystemDataID AudioProxyComponent::_nextEntityId = 1000;
 
 // ============================================================================
-//  Scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(AudioProxyComponent, AudioSystemComponent,
-    AudioSystem, "AudioSystem.AudioProxyComponent", nullptr, nullptr);
-
-// ============================================================================
 //  OnEnable
 // ============================================================================
 
@@ -148,7 +141,7 @@ AudioSystemTransform AudioProxyComponent::ComputeCurrentTransform() const
     // the current position, divided by the elapsed frame time.
     Vector3 velocity = Vector3::Zero;
     const float dt = Time::GetDeltaTime();
-    if (_hasLastTransform && dt > ZERO_TOLERANCE)
+    if (_hasLastTransform && dt > ZeroTolerance)
         velocity = (pos - _lastTransform.Position) / dt;
 
     result.Position = pos;

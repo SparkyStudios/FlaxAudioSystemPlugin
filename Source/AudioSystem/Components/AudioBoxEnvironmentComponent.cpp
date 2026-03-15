@@ -7,13 +7,6 @@
 #include "AudioProxyComponent.h"
 
 // ============================================================================
-//  Scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(AudioBoxEnvironmentComponent, AudioSystemEnvironmentComponent,
-    AudioSystem, "AudioSystem.AudioBoxEnvironmentComponent", nullptr, nullptr);
-
-// ============================================================================
 //  OnUpdate
 // ============================================================================
 

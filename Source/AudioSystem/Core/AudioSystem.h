@@ -121,12 +121,12 @@ public:
 
     void LoadConfiguration(StringView file);
 
+    AudioSystem();
+    ~AudioSystem();
+
 private:
     friend class AudioThread;
     friend class AudioTranslationLayer;
-
-    AudioSystem();
-    ~AudioSystem();
 
     // Non-copyable, non-movable.
     AudioSystem(const AudioSystem&) = delete;

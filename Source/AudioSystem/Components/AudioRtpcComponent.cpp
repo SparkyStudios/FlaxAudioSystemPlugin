@@ -1,15 +1,9 @@
 #include <Engine/Core/Log.h>
 
 #include "AudioRtpcComponent.h"
+#include "AudioProxyComponent.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
-
-// ============================================================================
-//  Scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(AudioRtpcComponent, AudioSystemProxyDependentComponent,
-    AudioSystem, "AudioSystem.AudioRtpcComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnEnable

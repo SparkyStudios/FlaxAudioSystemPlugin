@@ -16,18 +16,6 @@
 #include "Preferences/AudioSystemPreferences.h"
 
 // ============================================================================
-//  Scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(
-    AudioSystemEditorPlugin,
-    EditorPlugin,
-    AudioSystemEditor,
-    "AudioSystemEditor.AudioSystemEditorPlugin",
-    nullptr,
-    nullptr);
-
-// ============================================================================
 //  Constructor
 // ============================================================================
 
@@ -41,12 +29,12 @@ AudioSystemEditorPlugin::AudioSystemEditorPlugin(const SpawnParams& params)
 }
 
 // ============================================================================
-//  InitializeEditor
+//  Initialize
 // ============================================================================
 
-void AudioSystemEditorPlugin::InitializeEditor()
+void AudioSystemEditorPlugin::Initialize()
 {
-    EditorPlugin::InitializeEditor();
+    EditorPlugin::Initialize();
 
     // ------------------------------------------------------------------
     // Step 1 — Load or create preferences
@@ -97,12 +85,12 @@ void AudioSystemEditorPlugin::InitializeEditor()
 }
 
 // ============================================================================
-//  DeinitializeEditor
+//  Deinitialize
 // ============================================================================
 
-void AudioSystemEditorPlugin::DeinitializeEditor()
+void AudioSystemEditorPlugin::Deinitialize()
 {
-    // Reverse the registration order from InitializeEditor().
+    // Reverse the registration order from Initialize().
 
     AudioAssetProxies::Unregister();
     AudioSystemBuildHook::Unregister();
@@ -120,7 +108,7 @@ void AudioSystemEditorPlugin::DeinitializeEditor()
 
     LOG(Info, "[AudioSystemEditorPlugin] Editor plugin deinitialised.");
 
-    EditorPlugin::DeinitializeEditor();
+    EditorPlugin::Deinitialize();
 }
 
 // ============================================================================

@@ -11,18 +11,6 @@
 #include "../../AudioSystem/Core/AudioSystem.h"
 
 // ============================================================================
-//  Scripting type registration
-// ============================================================================
-
-IMPLEMENT_SCRIPTING_TYPE(
-    AudioSystemPreferences,
-    SerializableScriptingObject,
-    AudioSystemEditor,
-    "AudioSystemEditor.AudioSystemPreferences",
-    nullptr,
-    nullptr);
-
-// ============================================================================
 //  Static state
 // ============================================================================
 
@@ -84,7 +72,7 @@ bool AudioSystemPreferences::LoadOrCreate()
 
     const String settingsPath = GetSettingsPath();
 
-    if (File::Exists(settingsPath))
+    if (FileSystem::FileExists(settingsPath))
     {
         // Read raw bytes from disk.
         Array<byte> fileData;

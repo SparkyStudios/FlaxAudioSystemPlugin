@@ -7,6 +7,7 @@
 
 #include "../ATL/AudioTranslationLayer.h"
 #include "AudioSystemRequests.h"
+#include "AudioWorldModule.h"
 
 // ============================================================================
 //  Forward declarations
@@ -105,6 +106,13 @@ public:
     void UpdateSound();
 
     // ========================================================================
+    //  World module
+    // ========================================================================
+
+    /// \return The scene-level audio world module (environment list, default listener).
+    AudioWorldModule& GetWorldModule();
+
+    // ========================================================================
     //  Configuration
     // ========================================================================
 
@@ -143,6 +151,7 @@ private:
 
     AudioThread*          _audioThread = nullptr;
     AudioTranslationLayer _atl;
+    AudioWorldModule      _worldModule;
 
     // Request queues: async, pending (swapped per-frame), and blocking (sync).
     Array<AudioRequest> _requestsQueue;

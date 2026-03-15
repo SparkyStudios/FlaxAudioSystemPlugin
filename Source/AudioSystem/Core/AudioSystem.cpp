@@ -263,7 +263,19 @@ void AudioSystem::UpdateSound()
     // 2. Wake the audio thread.
     _processingSignal.NotifyOne();
 
-    // 3. Callbacks are invoked on the audio thread during processing.
+    // 3. Update scene-level audio world state (environments, listener) after ATL.
+    _worldModule.Update();
+
+    // 4. Callbacks are invoked on the audio thread during processing.
+}
+
+// ============================================================================
+//  World module
+// ============================================================================
+
+AudioWorldModule& AudioSystem::GetWorldModule()
+{
+    return _worldModule;
 }
 
 // ============================================================================

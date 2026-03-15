@@ -4,11 +4,13 @@ using FlaxEngine;
 namespace AudioSystemEditor
 {
     /// <summary>
-    /// Main C# entry point for the AudioSystem editor plugin.
+    /// C# editor plugin for the AudioSystem.
     /// Orchestrates icons, asset proxies, toolbar, and menu registration,
     /// and wires up play-mode event callbacks.
+    /// Named differently from the C++ AudioSystemEditorPlugin to avoid
+    /// conflicting with the auto-generated partial class from C++ bindings.
     /// </summary>
-    public class AudioSystemEditorPlugin : EditorPlugin
+    public class AudioSystemEditorScriptingPlugin : EditorPlugin
     {
         private AudioSystemToolbar _toolbar;
         private AudioSystemIcons _icons;

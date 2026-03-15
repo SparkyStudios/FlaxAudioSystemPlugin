@@ -77,7 +77,7 @@ public:
 
     /// \return The unique listener ID assigned in OnEnable.
     ///         Returns INVALID_AUDIO_SYSTEM_ID before OnEnable has run.
-    API_FUNCTION() AudioSystemDataID GetListenerId() const;
+    API_FUNCTION() uint64 GetListenerId() const;
 
 private:
     // ========================================================================

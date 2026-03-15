@@ -1,5 +1,8 @@
 #pragma once
 
+#include <Engine/Core/Types/BaseTypes.h>
+#include <Engine/Core/Types/String.h>
+
 // ============================================================================
 //  AudioSystemViewportIcons
 //

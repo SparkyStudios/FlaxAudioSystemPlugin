@@ -9,7 +9,7 @@
 // ============================================================================
 
 IMPLEMENT_SCRIPTING_TYPE(AudioSwitchStateComponent, AudioSystemProxyDependentComponent,
-    "AudioSystem.AudioSwitchStateComponent", nullptr, nullptr);
+    AudioSystem, "AudioSystem.AudioSwitchStateComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnEnable

@@ -16,7 +16,8 @@
 
 IMPLEMENT_SCRIPTING_TYPE(
     AudioSystemPreferences,
-    ScriptingObject,
+    SerializableScriptingObject,
+    AudioSystemEditor,
     "AudioSystemEditor.AudioSystemPreferences",
     nullptr,
     nullptr);
@@ -32,7 +33,7 @@ AudioSystemPreferences* AudioSystemPreferences::_instance = nullptr;
 // ============================================================================
 
 AudioSystemPreferences::AudioSystemPreferences(const SpawnParams& params)
-    : ScriptingObject(params)
+    : SerializableScriptingObject(params)
 {
 }
 

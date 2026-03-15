@@ -1,5 +1,4 @@
 #include <Engine/Core/Log.h>
-#include <Engine/Platform/Thread.h>
 
 #include "AudioThread.h"
 #include "AudioSystem.h"

@@ -2,6 +2,8 @@
 
 #include <Engine/Scripting/Script.h>
 
+#include "../Core/AudioSystemData.h"
+
 // Forward declarations
 class AudioProxyComponent;
 
@@ -23,7 +25,7 @@ API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemComponent : public Script
 
 protected:
     /// Called every frame when the component is active. Must be implemented by subclasses.
-    virtual void OnUpdate() = 0;
+    void OnUpdate() override = 0;
 };
 
 // ============================================================================

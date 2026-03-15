@@ -144,7 +144,6 @@ API_ENUM() enum class AUDIOSYSTEM_API AudioSystemEventState : uint8
 /// \brief Opaque base for a middleware audio entity (e.g. a Wwise/FMOD game object).
 API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemEntityData : public ScriptingObject
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemEntityData);
 public:
     virtual ~AudioSystemEntityData() = default;
@@ -153,7 +152,6 @@ public:
 /// \brief Opaque base for a middleware listener descriptor.
 API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemListenerData : public ScriptingObject
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemListenerData);
 public:
     virtual ~AudioSystemListenerData() = default;
@@ -162,7 +160,6 @@ public:
 /// \brief Opaque base for a middleware trigger descriptor (event template / cue).
 API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemTriggerData : public ScriptingObject
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemTriggerData);
 public:
     virtual ~AudioSystemTriggerData() = default;
@@ -171,7 +168,6 @@ public:
 /// \brief Opaque base for a Real-Time Parameter Control (RTPC/parameter) descriptor.
 API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemRtpcData : public ScriptingObject
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemRtpcData);
 public:
     virtual ~AudioSystemRtpcData() = default;
@@ -180,7 +176,6 @@ public:
 /// \brief Opaque base for a switch-state descriptor (a specific value of a switch/state).
 API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemSwitchStateData : public ScriptingObject
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemSwitchStateData);
 public:
     virtual ~AudioSystemSwitchStateData() = default;
@@ -189,7 +184,6 @@ public:
 /// \brief Opaque base for an environment (aux bus / reverb send) descriptor.
 API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemEnvironmentData : public ScriptingObject
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemEnvironmentData);
 public:
     virtual ~AudioSystemEnvironmentData() = default;
@@ -198,7 +192,6 @@ public:
 /// \brief Opaque base for a running event/trigger instance owned by the middleware.
 API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemEventData : public ScriptingObject
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemEventData);
 public:
     virtual ~AudioSystemEventData() = default;
@@ -207,7 +200,6 @@ public:
 /// \brief Opaque base for an audio source (streaming source / voice) descriptor.
 API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemSourceData : public ScriptingObject
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemSourceData);
 public:
     virtual ~AudioSystemSourceData() = default;
@@ -216,7 +208,6 @@ public:
 /// \brief Opaque base for a sound bank descriptor.
 API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemBankData : public ScriptingObject
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemBankData);
 public:
     virtual ~AudioSystemBankData() = default;

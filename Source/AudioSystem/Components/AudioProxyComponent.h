@@ -52,7 +52,7 @@ public:
 
     /// \return The unique AudioSystemDataID assigned to this proxy.
     ///         Returns INVALID_AUDIO_SYSTEM_ID before OnEnable has run.
-    API_FUNCTION() AudioSystemDataID GetEntityId() const;
+    API_FUNCTION() uint64 GetEntityId() const;
 
     // ========================================================================
     //  Environment amounts
@@ -65,11 +65,11 @@ public:
     ///
     /// \param envId   ID of the environment (from AudioSystem::GetEnvironmentId).
     /// \param amount  Send amount in [0, 1].
-    API_FUNCTION() void SetEnvironmentAmount(AudioSystemDataID envId, float amount);
+    API_FUNCTION() void SetEnvironmentAmount(uint64 envId, float amount);
 
     /// \return The cached send amount for \p envId, or 0.0f if this proxy is
     ///         not currently inside that environment.
-    API_FUNCTION() float GetEnvironmentAmount(AudioSystemDataID envId) const;
+    API_FUNCTION() float GetEnvironmentAmount(uint64 envId) const;
 
 private:
     // ========================================================================

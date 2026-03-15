@@ -7,8 +7,8 @@
 //  Scripting type registration
 // ============================================================================
 
-IMPLEMENT_SCRIPTING_TYPE_NO_SPAWN(AudioSystemEnvironmentComponent, AudioSystemComponent,
-    "AudioSystem.AudioSystemEnvironmentComponent", nullptr, nullptr);
+IMPLEMENT_SCRIPTING_TYPE_NO_SPAWN_WITH_BASE(AudioSystemEnvironmentComponent, AudioSystemComponent,
+    AudioSystem, "AudioSystem.AudioSystemEnvironmentComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnEnable

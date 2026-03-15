@@ -9,7 +9,7 @@
 // ============================================================================
 
 IMPLEMENT_SCRIPTING_TYPE(AudioRtpcComponent, AudioSystemProxyDependentComponent,
-    "AudioSystem.AudioRtpcComponent", nullptr, nullptr);
+    AudioSystem, "AudioSystem.AudioRtpcComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnEnable

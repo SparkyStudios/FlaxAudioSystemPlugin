@@ -9,15 +9,15 @@
 //  AudioSystemComponent — scripting type registration
 // ============================================================================
 
-IMPLEMENT_SCRIPTING_TYPE_NO_SPAWN(AudioSystemComponent, Script,
-    "AudioSystem.AudioSystemComponent", nullptr, nullptr);
+IMPLEMENT_SCRIPTING_TYPE_NO_SPAWN_WITH_BASE(AudioSystemComponent, Script,
+    AudioSystem, "AudioSystem.AudioSystemComponent", nullptr, nullptr);
 
 // ============================================================================
 //  AudioSystemProxyDependentComponent — scripting type registration
 // ============================================================================
 
-IMPLEMENT_SCRIPTING_TYPE_NO_SPAWN(AudioSystemProxyDependentComponent, AudioSystemComponent,
-    "AudioSystem.AudioSystemProxyDependentComponent", nullptr, nullptr);
+IMPLEMENT_SCRIPTING_TYPE_NO_SPAWN_WITH_BASE(AudioSystemProxyDependentComponent, AudioSystemComponent,
+    AudioSystem, "AudioSystem.AudioSystemProxyDependentComponent", nullptr, nullptr);
 
 // ============================================================================
 //  AudioSystemProxyDependentComponent — OnEnable

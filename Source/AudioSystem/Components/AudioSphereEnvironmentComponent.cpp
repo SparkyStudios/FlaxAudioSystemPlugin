@@ -11,7 +11,7 @@
 // ============================================================================
 
 IMPLEMENT_SCRIPTING_TYPE(AudioSphereEnvironmentComponent, AudioSystemEnvironmentComponent,
-    "AudioSystem.AudioSphereEnvironmentComponent", nullptr, nullptr);
+    AudioSystem, "AudioSystem.AudioSphereEnvironmentComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnUpdate

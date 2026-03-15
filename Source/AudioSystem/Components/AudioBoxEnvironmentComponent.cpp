@@ -11,7 +11,7 @@
 // ============================================================================
 
 IMPLEMENT_SCRIPTING_TYPE(AudioBoxEnvironmentComponent, AudioSystemEnvironmentComponent,
-    "AudioSystem.AudioBoxEnvironmentComponent", nullptr, nullptr);
+    AudioSystem, "AudioSystem.AudioBoxEnvironmentComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnUpdate

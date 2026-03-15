@@ -2,7 +2,7 @@
 
 #include <Engine/Core/Collections/Array.h>
 #include <Engine/Core/Types/String.h>
-#include <Engine/Scripting/ScriptingObject.h>
+#include <Engine/Scripting/SerializableScriptingObject.h>
 
 // ============================================================================
 //  AudioSystemPreferences
@@ -18,7 +18,7 @@
 ///
 /// Serialised to <ProjectFolder>/Settings/AudioSystem.json.
 /// Provides master gain control and mute toggle synced to AudioSystem at runtime.
-API_CLASS() class AUDIOSYSTEMEDITOR_API AudioSystemPreferences : public ScriptingObject
+API_CLASS() class AUDIOSYSTEMEDITOR_API AudioSystemPreferences : public SerializableScriptingObject
 {
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE(AudioSystemPreferences);

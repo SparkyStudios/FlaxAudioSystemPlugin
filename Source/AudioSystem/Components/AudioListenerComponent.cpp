@@ -1,6 +1,6 @@
 #include <Engine/Core/Log.h>
 #include <Engine/Core/Math/Quaternion.h>
-#include <Engine/Core/Time.h>
+#include <Engine/Engine/Time.h>
 #include <Engine/Level/Actor.h>
 
 #include "AudioListenerComponent.h"
@@ -19,7 +19,7 @@ AudioSystemDataID AudioListenerComponent::_nextListenerId = 2000;
 // ============================================================================
 
 IMPLEMENT_SCRIPTING_TYPE(AudioListenerComponent, AudioSystemComponent,
-    "AudioSystem.AudioListenerComponent", nullptr, nullptr);
+    AudioSystem, "AudioSystem.AudioListenerComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnEnable

@@ -16,7 +16,7 @@
 // ============================================================================
 
 IMPLEMENT_SCRIPTING_TYPE(AudioTriggerComponent, AudioSystemProxyDependentComponent,
-    "AudioSystem.AudioTriggerComponent", nullptr, nullptr);
+    AudioSystem, "AudioSystem.AudioTriggerComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnEnable

@@ -1,7 +1,8 @@
 #pragma once
 
+#include <Engine/Core/Types/BaseTypes.h>
 #include <Engine/Core/Types/String.h>
-#include <Engine/Scripting/ScriptingObject.h>
+#include <Engine/Scripting/SerializableScriptingObject.h>
 
 // ============================================================================
 //  Audio content asset types
@@ -39,7 +40,7 @@
 // ----------------------------------------------------------------------------
 
 /// \brief Content asset that references a middleware sound bank directory.
-API_CLASS() class AUDIOSYSTEMEDITOR_API AudioBankAsset : public ScriptingObject
+API_CLASS() class AUDIOSYSTEMEDITOR_API AudioBankAsset : public SerializableScriptingObject
 {
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE(AudioBankAsset);
@@ -60,7 +61,7 @@ public:
 // ----------------------------------------------------------------------------
 
 /// \brief Content asset that holds a named audio trigger reference.
-API_CLASS() class AUDIOSYSTEMEDITOR_API AudioTriggerAsset : public ScriptingObject
+API_CLASS() class AUDIOSYSTEMEDITOR_API AudioTriggerAsset : public SerializableScriptingObject
 {
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE(AudioTriggerAsset);
@@ -80,7 +81,7 @@ public:
 // ----------------------------------------------------------------------------
 
 /// \brief Content asset that holds a named RTPC reference and value range.
-API_CLASS() class AUDIOSYSTEMEDITOR_API AudioRtpcAsset : public ScriptingObject
+API_CLASS() class AUDIOSYSTEMEDITOR_API AudioRtpcAsset : public SerializableScriptingObject
 {
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE(AudioRtpcAsset);
@@ -112,7 +113,7 @@ public:
 // ----------------------------------------------------------------------------
 
 /// \brief Content asset that identifies a specific state within a switch group.
-API_CLASS() class AUDIOSYSTEMEDITOR_API AudioSwitchStateAsset : public ScriptingObject
+API_CLASS() class AUDIOSYSTEMEDITOR_API AudioSwitchStateAsset : public SerializableScriptingObject
 {
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE(AudioSwitchStateAsset);
@@ -136,7 +137,7 @@ public:
 // ----------------------------------------------------------------------------
 
 /// \brief Content asset that holds a named audio environment reference.
-API_CLASS() class AUDIOSYSTEMEDITOR_API AudioEnvironmentAsset : public ScriptingObject
+API_CLASS() class AUDIOSYSTEMEDITOR_API AudioEnvironmentAsset : public SerializableScriptingObject
 {
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE(AudioEnvironmentAsset);

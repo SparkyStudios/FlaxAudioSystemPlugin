@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Engine/Threading/IRunnable.h>
+#include <Engine/Platform/Thread.h>
 
 // ============================================================================
 //  AudioThread
@@ -16,7 +17,6 @@
 // ============================================================================
 
 class AudioSystem;
-class Thread;
 
 /// \brief Runnable that drives the audio request processing loop on a
 ///        dedicated thread.

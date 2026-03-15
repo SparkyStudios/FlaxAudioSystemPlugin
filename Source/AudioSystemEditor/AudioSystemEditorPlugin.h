@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Engine/Plugins/EditorPlugin.h>
+#include <Engine/Scripting/Plugins/EditorPlugin.h>
 
 // ============================================================================
 //  AudioSystemEditorPlugin
@@ -20,7 +20,6 @@
 /// \brief Entry point for the AudioSystem editor plugin.
 API_CLASS() class AUDIOSYSTEMEDITOR_API AudioSystemEditorPlugin : public EditorPlugin
 {
-    API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE(AudioSystemEditorPlugin);
 
 public:

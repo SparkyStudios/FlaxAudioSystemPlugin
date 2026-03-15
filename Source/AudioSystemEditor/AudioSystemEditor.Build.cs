@@ -9,6 +9,5 @@ public class AudioSystemEditor : GameEditorModule
         BuildNativeCode = true;
         options.PublicDependencies.Add("AudioSystem");
         options.PublicDependencies.Add("Editor");
-        options.PublicDependencies.Add("EditorFramework");
     }
 }

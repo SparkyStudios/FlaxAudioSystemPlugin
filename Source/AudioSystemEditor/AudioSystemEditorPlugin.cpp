@@ -22,6 +22,7 @@
 IMPLEMENT_SCRIPTING_TYPE(
     AudioSystemEditorPlugin,
     EditorPlugin,
+    AudioSystemEditor,
     "AudioSystemEditor.AudioSystemEditorPlugin",
     nullptr,
     nullptr);

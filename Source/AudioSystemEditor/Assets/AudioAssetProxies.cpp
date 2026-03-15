@@ -9,35 +9,40 @@
 
 IMPLEMENT_SCRIPTING_TYPE(
     AudioBankAsset,
-    ScriptingObject,
+    SerializableScriptingObject,
+    AudioSystemEditor,
     "AudioSystemEditor.AudioBankAsset",
     nullptr,
     nullptr);
 
 IMPLEMENT_SCRIPTING_TYPE(
     AudioTriggerAsset,
-    ScriptingObject,
+    SerializableScriptingObject,
+    AudioSystemEditor,
     "AudioSystemEditor.AudioTriggerAsset",
     nullptr,
     nullptr);
 
 IMPLEMENT_SCRIPTING_TYPE(
     AudioRtpcAsset,
-    ScriptingObject,
+    SerializableScriptingObject,
+    AudioSystemEditor,
     "AudioSystemEditor.AudioRtpcAsset",
     nullptr,
     nullptr);
 
 IMPLEMENT_SCRIPTING_TYPE(
     AudioSwitchStateAsset,
-    ScriptingObject,
+    SerializableScriptingObject,
+    AudioSystemEditor,
     "AudioSystemEditor.AudioSwitchStateAsset",
     nullptr,
     nullptr);
 
 IMPLEMENT_SCRIPTING_TYPE(
     AudioEnvironmentAsset,
-    ScriptingObject,
+    SerializableScriptingObject,
+    AudioSystemEditor,
     "AudioSystemEditor.AudioEnvironmentAsset",
     nullptr,
     nullptr);
@@ -47,27 +52,27 @@ IMPLEMENT_SCRIPTING_TYPE(
 // ============================================================================
 
 AudioBankAsset::AudioBankAsset(const SpawnParams& params)
-    : ScriptingObject(params)
+    : SerializableScriptingObject(params)
 {
 }
 
 AudioTriggerAsset::AudioTriggerAsset(const SpawnParams& params)
-    : ScriptingObject(params)
+    : SerializableScriptingObject(params)
 {
 }
 
 AudioRtpcAsset::AudioRtpcAsset(const SpawnParams& params)
-    : ScriptingObject(params)
+    : SerializableScriptingObject(params)
 {
 }
 
 AudioSwitchStateAsset::AudioSwitchStateAsset(const SpawnParams& params)
-    : ScriptingObject(params)
+    : SerializableScriptingObject(params)
 {
 }
 
 AudioEnvironmentAsset::AudioEnvironmentAsset(const SpawnParams& params)
-    : ScriptingObject(params)
+    : SerializableScriptingObject(params)
 {
 }
 

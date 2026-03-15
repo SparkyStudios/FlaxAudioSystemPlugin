@@ -11,7 +11,7 @@
 // ============================================================================
 
 IMPLEMENT_SCRIPTING_TYPE(AudioAnimEvent, AnimEvent,
-    "AudioSystem.AudioAnimEvent", nullptr, nullptr);
+    AudioSystem, "AudioSystem.AudioAnimEvent", nullptr, nullptr);
 
 // ============================================================================
 //  AudioAnimEvent — OnEvent
@@ -64,7 +64,7 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
 // ============================================================================
 
 IMPLEMENT_SCRIPTING_TYPE(AudioAnimationComponent, AudioSystemProxyDependentComponent,
-    "AudioSystem.AudioAnimationComponent", nullptr, nullptr);
+    AudioSystem, "AudioSystem.AudioAnimationComponent", nullptr, nullptr);
 
 // ============================================================================
 //  AudioAnimationComponent — OnEnable

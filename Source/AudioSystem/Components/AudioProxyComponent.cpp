@@ -1,6 +1,6 @@
 #include <Engine/Core/Log.h>
 #include <Engine/Core/Math/Quaternion.h>
-#include <Engine/Core/Time.h>
+#include <Engine/Engine/Time.h>
 #include <Engine/Level/Actor.h>
 
 #include "AudioProxyComponent.h"
@@ -19,7 +19,7 @@ AudioSystemDataID AudioProxyComponent::_nextEntityId = 1000;
 // ============================================================================
 
 IMPLEMENT_SCRIPTING_TYPE(AudioProxyComponent, AudioSystemComponent,
-    "AudioSystem.AudioProxyComponent", nullptr, nullptr);
+    AudioSystem, "AudioSystem.AudioProxyComponent", nullptr, nullptr);
 
 // ============================================================================
 //  OnEnable

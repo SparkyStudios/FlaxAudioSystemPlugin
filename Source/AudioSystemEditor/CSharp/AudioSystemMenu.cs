@@ -35,6 +35,9 @@ namespace AudioSystemEditor
 
             _muteButton?.Dispose();
             _muteButton = null;
+
+            _menu?.Dispose();
+            _menu = null;
         }
 
         private void OnOpenSettings()

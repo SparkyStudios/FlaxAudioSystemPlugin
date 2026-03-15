@@ -30,7 +30,18 @@ namespace AudioSystemEditor.Editors
             _slider = sliderElement.Slider;
             _slider.Minimum = 0.0f;
             _slider.Maximum = 100.0f;
-            _slider.Value = 0.0f;
+
+            // Seed slider with the current live value
+            foreach (var value in Values)
+            {
+                if (value is AudioRtpcComponent rtpc)
+                {
+                    _slider.Value = rtpc.GetValue();
+                    _valueLabel.Text = $"Value: {rtpc.GetValue():F2}";
+                    break;
+                }
+            }
+
             _slider.ValueChanged += OnSliderChanged;
         }
 

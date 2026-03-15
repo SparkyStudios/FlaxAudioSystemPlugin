@@ -1,9 +1,5 @@
 using FlaxEngine;
 
-#if FLAX_EDITOR
-using AudioSystemEditor;
-#endif
-
 namespace AudioSystem
 {
     /// <summary>

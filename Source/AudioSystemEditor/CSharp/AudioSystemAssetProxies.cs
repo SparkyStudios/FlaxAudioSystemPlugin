@@ -1,3 +1,7 @@
+using FlaxEditor;
+using FlaxEditor.Content;
+using FlaxEngine;
+
 namespace AudioSystemEditor
 {
     /// <summary>
@@ -10,6 +14,15 @@ namespace AudioSystemEditor
         /// </summary>
         public void Register()
         {
+            Editor.Instance.ContentDatabase.AddProxy(new SpawnableJsonAssetProxy<AudioBankAsset>());
+            Editor.Instance.ContentDatabase.AddProxy(new SpawnableJsonAssetProxy<AudioTriggerAsset>());
+            Editor.Instance.ContentDatabase.AddProxy(new SpawnableJsonAssetProxy<AudioRtpcAsset>());
+            Editor.Instance.ContentDatabase.AddProxy(new SpawnableJsonAssetProxy<AudioSwitchStateAsset>());
+            Editor.Instance.ContentDatabase.AddProxy(new SpawnableJsonAssetProxy<AudioEnvironmentAsset>());
+
+            Editor.Instance.ContentDatabase.Rebuild(true);
+
+            Debug.Log("[AudioSystemAssetProxies] Asset proxies registered.");
         }
 
         /// <summary>
@@ -17,6 +30,7 @@ namespace AudioSystemEditor
         /// </summary>
         public void Unregister()
         {
+            // Proxies are cleaned up automatically when the editor shuts down
         }
     }
 }

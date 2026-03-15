@@ -32,7 +32,8 @@ void AudioListenerComponent::OnEnable()
     _hasLastTransform = false;
     _registeredAsDefault = false;
 
-    RegisterListenerRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::RegisterListener;
     req.EntityId = _listenerId;
     AudioSystem::Get()->SendRequest(std::move(req));
 
@@ -56,7 +57,8 @@ void AudioListenerComponent::OnUpdate()
     if (_hasLastTransform && current == _lastTransform)
         return;
 
-    UpdateListenerTransformRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::UpdateListenerTransform;
     req.EntityId  = _listenerId;
     req.Transform = current;
     AudioSystem::Get()->SendRequest(std::move(req));
@@ -80,7 +82,8 @@ void AudioListenerComponent::OnDisable()
         _registeredAsDefault = false;
     }
 
-    UnregisterListenerRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::UnregisterListener;
     req.EntityId = _listenerId;
     AudioSystem::Get()->SendRequest(std::move(req));
 

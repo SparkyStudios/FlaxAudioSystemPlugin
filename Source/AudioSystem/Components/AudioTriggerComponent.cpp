@@ -178,7 +178,8 @@ void AudioTriggerComponent::RequestLoad(bool sync)
 
     _state = AudioSystemTriggerState::Loading;
 
-    LoadTriggerRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::LoadTrigger;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _playTriggerId;
     req.Callback = [this](bool success)
@@ -217,7 +218,8 @@ void AudioTriggerComponent::RequestPlay(bool sync)
 
     _state = AudioSystemTriggerState::Starting;
 
-    ActivateTriggerRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::ActivateTrigger;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _playTriggerId;
     req.Callback = [this](bool success)
@@ -254,7 +256,8 @@ void AudioTriggerComponent::RequestStop(bool sync)
     if (_stopTriggerId != INVALID_AUDIO_SYSTEM_ID)
     {
         // Use the dedicated stop trigger.
-        ActivateTriggerRequest req;
+        AudioRequest req;
+        req.Type = AudioRequestType::ActivateTrigger;
         req.EntityId = entityId;
         req.ObjectId = _stopTriggerId;
         req.Callback = [this](bool success)
@@ -270,7 +273,8 @@ void AudioTriggerComponent::RequestStop(bool sync)
     else
     {
         // No stop trigger — send a raw StopEvent.
-        StopEventRequest req;
+        AudioRequest req;
+        req.Type = AudioRequestType::StopEvent;
         req.EntityId = entityId;
         req.ObjectId = _playTriggerId;
         req.Callback = [this](bool success)
@@ -299,7 +303,8 @@ void AudioTriggerComponent::RequestUnload(bool sync)
 
     _state = AudioSystemTriggerState::Unloading;
 
-    UnloadTriggerRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::UnloadTrigger;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _playTriggerId;
     req.Callback = [this](bool success)
@@ -342,7 +347,8 @@ void AudioTriggerComponent::UpdateObstructionOcclusion()
     if (_proxy == nullptr)
         return;
 
-    SetObstructionOcclusionRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::SetObstructionOcclusion;
     req.EntityId    = _proxy->GetEntityId();
     req.Obstruction = _currentObstruction;
     req.Occlusion   = _currentOcclusion;

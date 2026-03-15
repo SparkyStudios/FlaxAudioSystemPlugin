@@ -76,7 +76,8 @@ void AudioSwitchStateComponent::SetState(const StringView& stateName, bool sync)
 
     _currentStateName = stateName;
 
-    SetSwitchStateRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::SetSwitchState;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = stateId;
 

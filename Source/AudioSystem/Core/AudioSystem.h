@@ -38,6 +38,9 @@ public:
     /// \return The global AudioSystem instance. Creates it on first call.
     static AudioSystem* Get();
 
+    /// Destroy the global singleton. Must be called after Shutdown().
+    static void Destroy();
+
     // ========================================================================
     //  Lifecycle
     // ========================================================================
@@ -162,11 +165,22 @@ private:
     CriticalSection _pendingRequestsMutex;
     CriticalSection _blockingRequestsMutex;
 
+    // Callback queues: filled by the audio thread, drained on the main thread.
+    Array<AudioRequest> _pendingCallbacksQueue;
+    Array<AudioRequest> _blockingCallbacksQueue;
+
+    CriticalSection _pendingCallbacksMutex;
+    CriticalSection _blockingCallbacksMutex;
+
     // Signaling between the main thread and the audio thread.
     CriticalSection    _mainMutex;
     ConditionVariable  _mainSignal;
     CriticalSection    _processingMutex;
     ConditionVariable  _processingSignal;
+
+    /// Flag set by the audio thread after processing a blocking request.
+    /// Used together with _mainSignal to guard against spurious wakeups.
+    bool _blockingDone = false;
 
     bool _initialized = false;
     bool _masterPaused = false;

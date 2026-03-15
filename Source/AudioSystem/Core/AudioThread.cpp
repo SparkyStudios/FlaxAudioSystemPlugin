@@ -85,9 +85,6 @@ int32 AudioThread::Run()
             break;
 
         _audioSystem->UpdateInternal();
-
-        // Signal the main thread that blocking requests have been processed.
-        _audioSystem->_mainSignal.NotifyOne();
     }
 
     return 0;

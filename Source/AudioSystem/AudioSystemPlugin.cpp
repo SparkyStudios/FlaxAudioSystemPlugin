@@ -41,5 +41,7 @@ void AudioSystemPlugin::Deinitialize()
         audioSystem->Shutdown();
     }
 
+    AudioSystem::Destroy();
+
     GamePlugin::Deinitialize();
 }

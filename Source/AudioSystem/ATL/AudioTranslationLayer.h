@@ -141,6 +141,9 @@ private:
 
     AudioMiddleware* _middleware = nullptr;
 
+    /// Monotonically increasing event instance ID counter.
+    AudioSystemDataID _nextEventId = 1;
+
     ATLEntityMap      _entities;
     ATLListenerMap    _listeners;
     ATLTriggerMap     _triggers;

@@ -87,7 +87,8 @@ void AudioRtpcComponent::SetValue(float value, bool sync)
 
     _currentValue = value;
 
-    SetRtpcValueRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::SetRtpcValue;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _rtpcId;
     req.Value    = value;
@@ -116,7 +117,8 @@ void AudioRtpcComponent::ResetValue(bool sync)
         return;
     }
 
-    ResetRtpcValueRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::ResetRtpcValue;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _rtpcId;
 

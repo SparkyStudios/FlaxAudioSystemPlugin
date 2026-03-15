@@ -32,7 +32,8 @@ void AudioProxyComponent::OnEnable()
     _hasLastTransform = false;
 
     // Submit an async registration request to the audio system.
-    RegisterEntityRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::RegisterEntity;
     req.EntityId = _entityId;
     AudioSystem::Get()->SendRequest(std::move(req));
 }
@@ -50,7 +51,8 @@ void AudioProxyComponent::OnUpdate()
     if (_hasLastTransform && current == _lastTransform)
         return;
 
-    UpdateEntityTransformRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::UpdateEntityTransform;
     req.EntityId  = _entityId;
     req.Transform = current;
     AudioSystem::Get()->SendRequest(std::move(req));
@@ -68,7 +70,8 @@ void AudioProxyComponent::OnDisable()
     if (_entityId == INVALID_AUDIO_SYSTEM_ID)
         return;
 
-    UnregisterEntityRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::UnregisterEntity;
     req.EntityId = _entityId;
     AudioSystem::Get()->SendRequest(std::move(req));
 
@@ -105,7 +108,8 @@ void AudioProxyComponent::SetEnvironmentAmount(AudioSystemDataID envId, float am
 
     _environmentAmounts[envId] = amount;
 
-    SetEnvironmentAmountRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::SetEnvironmentAmount;
     req.EntityId = _entityId;
     req.ObjectId = envId;
     req.Amount   = amount;

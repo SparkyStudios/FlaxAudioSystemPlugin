@@ -19,6 +19,15 @@ AudioSystem* AudioSystem::Get()
     return _instance;
 }
 
+void AudioSystem::Destroy()
+{
+    if (_instance != nullptr)
+    {
+        Delete(_instance);
+        _instance = nullptr;
+    }
+}
+
 // ============================================================================
 //  Construction / Destruction
 // ============================================================================
@@ -87,6 +96,14 @@ void AudioSystem::Shutdown()
         ScopeLock lock(_blockingRequestsMutex);
         _blockingRequestsQueue.Clear();
     }
+    {
+        ScopeLock lock(_pendingCallbacksMutex);
+        _pendingCallbacksQueue.Clear();
+    }
+    {
+        ScopeLock lock(_blockingCallbacksMutex);
+        _blockingCallbacksQueue.Clear();
+    }
 
     LOG(Info, "[AudioSystem] Shutdown complete.");
 }
@@ -140,6 +157,11 @@ void AudioSystem::SendRequests(Array<AudioRequest>& requests)
 void AudioSystem::SendRequestSync(AudioRequest&& request)
 {
     {
+        ScopeLock lock(_mainMutex);
+        _blockingDone = false;
+    }
+
+    {
         ScopeLock lock(_blockingRequestsMutex);
         _blockingRequestsQueue.Add(MoveTemp(request));
     }
@@ -147,10 +169,14 @@ void AudioSystem::SendRequestSync(AudioRequest&& request)
     // Wake the audio thread to process the blocking request.
     _processingSignal.NotifyOne();
 
-    // Block until the audio thread signals completion.
-    _mainMutex.Lock();
-    _mainSignal.Wait(_mainMutex);
-    _mainMutex.Unlock();
+    // Block until the audio thread signals completion, guarding against spurious wakeups.
+    {
+        ScopeLock lock(_mainMutex);
+        while (!_blockingDone)
+        {
+            _mainSignal.Wait(_mainMutex);
+        }
+    }
 }
 
 // ============================================================================
@@ -234,7 +260,8 @@ void AudioSystem::SetListener(int32 index, Vector3 position, Vector3 forward, Ve
 {
     // Build a transform request for the listener at the given index.
     const AudioSystemDataID listenerId = static_cast<AudioSystemDataID>(index + 1);
-    UpdateListenerTransformRequest req;
+    AudioRequest req;
+    req.Type = AudioRequestType::UpdateListenerTransform;
     req.EntityId = listenerId;
     req.Transform.Position = position;
     req.Transform.Forward = forward;
@@ -263,10 +290,34 @@ void AudioSystem::UpdateSound()
     // 2. Wake the audio thread.
     _processingSignal.NotifyOne();
 
-    // 3. Update scene-level audio world state (environments, listener) after ATL.
-    _worldModule.Update();
+    // 3. Drain callback queues on the main thread.
+    {
+        Array<AudioRequest> pendingCallbacks;
+        {
+            ScopeLock lock(_pendingCallbacksMutex);
+            pendingCallbacks = MoveTemp(_pendingCallbacksQueue);
+        }
+        for (auto& cb : pendingCallbacks)
+        {
+            if (cb.Callback.IsBinded())
+                cb.Callback(cb.Success);
+        }
+    }
+    {
+        Array<AudioRequest> blockingCallbacks;
+        {
+            ScopeLock lock(_blockingCallbacksMutex);
+            blockingCallbacks = MoveTemp(_blockingCallbacksQueue);
+        }
+        for (auto& cb : blockingCallbacks)
+        {
+            if (cb.Callback.IsBinded())
+                cb.Callback(cb.Success);
+        }
+    }
 
-    // 4. Callbacks are invoked on the audio thread during processing.
+    // 4. Update scene-level audio world state (environments, listener) after ATL.
+    _worldModule.Update();
 }
 
 // ============================================================================
@@ -349,13 +400,20 @@ void AudioSystem::ProcessPendingRequests()
 
     for (auto& req : batch)
     {
-        // Extract the callback before moving the request into ProcessRequest.
+        // Extract the callback before processing so it survives the move.
         Function<void(bool)> callback = MoveTemp(req.Callback);
         const bool success = _atl.ProcessRequest(MoveTemp(req), false);
 
         if (callback.IsBinded())
         {
-            callback(success);
+            // Queue the callback for main-thread invocation instead of calling it here.
+            AudioRequest cbEntry;
+            cbEntry.Type = AudioRequestType::Shutdown; // Type is irrelevant for callbacks.
+            cbEntry.Success = success;
+            cbEntry.Callback = MoveTemp(callback);
+
+            ScopeLock lock(_pendingCallbacksMutex);
+            _pendingCallbacksQueue.Add(MoveTemp(cbEntry));
         }
     }
 }
@@ -368,6 +426,9 @@ void AudioSystem::ProcessBlockingRequests()
         batch = MoveTemp(_blockingRequestsQueue);
     }
 
+    if (batch.IsEmpty())
+        return;
+
     for (auto& req : batch)
     {
         Function<void(bool)> callback = MoveTemp(req.Callback);
@@ -375,7 +436,21 @@ void AudioSystem::ProcessBlockingRequests()
 
         if (callback.IsBinded())
         {
-            callback(success);
+            // Queue the callback for main-thread invocation instead of calling it here.
+            AudioRequest cbEntry;
+            cbEntry.Type = AudioRequestType::Shutdown; // Type is irrelevant for callbacks.
+            cbEntry.Success = success;
+            cbEntry.Callback = MoveTemp(callback);
+
+            ScopeLock lock(_blockingCallbacksMutex);
+            _blockingCallbacksQueue.Add(MoveTemp(cbEntry));
         }
     }
+
+    // Signal the main thread that blocking processing is complete.
+    {
+        ScopeLock lock(_mainMutex);
+        _blockingDone = true;
+    }
+    _mainSignal.NotifyOne();
 }

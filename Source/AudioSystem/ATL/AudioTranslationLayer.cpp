@@ -23,6 +23,13 @@ bool AudioTranslationLayer::Startup()
         return false;
     }
 
+    // Initialise the middleware backend before creating any entities.
+    if (!_middleware->Startup())
+    {
+        LOG(Error, "[ATL] Startup failed: middleware Startup() returned false.");
+        return false;
+    }
+
     // Create the global world entity used for non-spatial (2-D) sounds.
     AudioSystemEntityData* worldData = _middleware->CreateWorldEntity(WORLD_ENTITY_ID);
     if (worldData == nullptr)
@@ -339,8 +346,7 @@ bool AudioTranslationLayer::HandleUpdateEntityTransform(const AudioRequest& requ
         return false;
     }
 
-    const auto& transformReq = static_cast<const UpdateEntityTransformRequest&>(request);
-    return _middleware->SetEntityTransform(id, entity->pData, transformReq.Transform);
+    return _middleware->SetEntityTransform(id, entity->pData, request.Transform);
 }
 
 // ============================================================================
@@ -416,8 +422,7 @@ bool AudioTranslationLayer::HandleUpdateListenerTransform(const AudioRequest& re
         return false;
     }
 
-    const auto& transformReq = static_cast<const UpdateListenerTransformRequest&>(request);
-    return _middleware->SetListenerTransform(id, listener->pData, transformReq.Transform);
+    return _middleware->SetListenerTransform(id, listener->pData, request.Transform);
 }
 
 // ============================================================================
@@ -493,8 +498,7 @@ bool AudioTranslationLayer::HandleActivateTrigger(const AudioRequest& request)
     }
 
     // Track the event instance.
-    static AudioSystemDataID nextEventId = 1;
-    const AudioSystemDataID eventId = nextEventId++;
+    const AudioSystemDataID eventId = _nextEventId++;
 
     ATLEvent* atlEvent = New<ATLEvent>();
     atlEvent->Id = eventId;
@@ -521,6 +525,18 @@ bool AudioTranslationLayer::HandleStopEvent(const AudioRequest& request)
 
     if (atlEvent->pData != nullptr)
         _middleware->DestroyEventData(atlEvent->pData);
+
+    // Remove the event reference from the owning trigger's Events dictionary
+    // to prevent a dangling pointer.
+    for (auto& triggerKv : _triggers)
+    {
+        ATLTrigger* trigger = triggerKv.Value;
+        if (trigger != nullptr && trigger->Events.ContainsKey(eventId))
+        {
+            trigger->Events.Remove(eventId);
+            break;
+        }
+    }
 
     _events.Remove(eventId);
     Delete(atlEvent);
@@ -574,8 +590,7 @@ bool AudioTranslationLayer::HandleSetRtpcValue(const AudioRequest& request)
         return false;
     }
 
-    const auto& rtpcReq = static_cast<const SetRtpcValueRequest&>(request);
-    return _middleware->SetRtpc(entityId, rtpc->pData, rtpcReq.Value);
+    return _middleware->SetRtpc(entityId, rtpc->pData, request.Value);
 }
 
 bool AudioTranslationLayer::HandleResetRtpcValue(const AudioRequest& request)
@@ -618,8 +633,7 @@ bool AudioTranslationLayer::HandleSetObstructionOcclusion(const AudioRequest& re
         return false;
     }
 
-    const auto& ooReq = static_cast<const SetObstructionOcclusionRequest&>(request);
-    return _middleware->SetObstructionAndOcclusion(entityId, entity->pData, ooReq.Obstruction, ooReq.Occlusion);
+    return _middleware->SetObstructionAndOcclusion(entityId, entity->pData, request.Obstruction, request.Occlusion);
 }
 
 bool AudioTranslationLayer::HandleSetEnvironmentAmount(const AudioRequest& request)
@@ -634,8 +648,7 @@ bool AudioTranslationLayer::HandleSetEnvironmentAmount(const AudioRequest& reque
         return false;
     }
 
-    const auto& envReq = static_cast<const SetEnvironmentAmountRequest&>(request);
-    return _middleware->SetEnvironmentAmount(entityId, env->pData, envReq.Amount);
+    return _middleware->SetEnvironmentAmount(entityId, env->pData, request.Amount);
 }
 
 // ============================================================================

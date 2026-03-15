@@ -34,8 +34,8 @@ namespace AudioSystemEditor
             _menu = new AudioSystemMenu();
             _menu.Register();
 
-            Editor.Instance.StateMachine.PlayingState.ScenePlaying += OnPlayModeBegin;
-            Editor.Instance.StateMachine.PlayingState.SceneStopPlay += OnPlayModeEnd;
+            Editor.PlayModeBegin += OnPlayModeBegin;
+            Editor.PlayModeEnd += OnPlayModeEnd;
 
             Debug.Log("[AudioSystemEditor] C# editor plugin initialized.");
         }
@@ -43,8 +43,8 @@ namespace AudioSystemEditor
         /// <inheritdoc />
         public override void DeinitializeEditor()
         {
-            Editor.Instance.StateMachine.PlayingState.ScenePlaying -= OnPlayModeBegin;
-            Editor.Instance.StateMachine.PlayingState.SceneStopPlay -= OnPlayModeEnd;
+            Editor.PlayModeBegin -= OnPlayModeBegin;
+            Editor.PlayModeEnd -= OnPlayModeEnd;
 
             _menu?.Unregister();
             _menu = null;

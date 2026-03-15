@@ -11,7 +11,7 @@ namespace AudioSystemEditor.Editors
     [CustomEditor(typeof(AudioRtpcComponent)), DefaultEditor]
     public class AudioRtpcEditor : GenericEditor
     {
-        private Slider _slider;
+        private SliderElement _sliderElement;
         private Label _valueLabel;
 
         public override void Initialize(LayoutElementsContainer layout)
@@ -27,34 +27,32 @@ namespace AudioSystemEditor.Editors
             _valueLabel = group.Label("Value: 0.0").Label;
             _valueLabel.AutoHeight = true;
 
-            var sliderElement = group.Slider();
-            _slider = sliderElement.Slider;
-            _slider.Minimum = 0.0f;
-            _slider.Maximum = 100.0f;
+            _sliderElement = group.Slider();
+            _sliderElement.SetLimits(new RangeAttribute(0.0f, 100.0f));
 
             // Seed slider with the current live value
             foreach (var value in Values)
             {
                 if (value is AudioRtpcComponent rtpc)
                 {
-                    _slider.Value = rtpc.GetValue();
+                    _sliderElement.Value = rtpc.GetValue();
                     _valueLabel.Text = $"Value: {rtpc.GetValue():F2}";
                     break;
                 }
             }
 
-            _slider.ValueChanged += OnSliderChanged;
+            _sliderElement.Slider.ValueChanged += OnSliderChanged;
         }
 
         private void OnSliderChanged()
         {
-            if (_slider == null) return;
+            if (_sliderElement == null) return;
 
             foreach (var value in Values)
             {
                 if (value is AudioRtpcComponent rtpc)
                 {
-                    rtpc.SetValue(_slider.Value);
+                    rtpc.SetValue(_sliderElement.Value);
                 }
             }
         }

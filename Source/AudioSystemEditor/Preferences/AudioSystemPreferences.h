@@ -61,7 +61,7 @@ public:
     void Save() const;
 
     /// \return The global singleton instance. May be null before LoadOrCreate() succeeds.
-    static AudioSystemPreferences* Get();
+    API_FUNCTION() static AudioSystemPreferences* Get();
 
 private:
     /// Returns the absolute path to the settings JSON file.

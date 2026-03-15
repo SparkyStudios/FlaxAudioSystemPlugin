@@ -1,0 +1,7 @@
+# Flax Engine output
+/Cache/
+/Binaries/
+/Logs/
+/.vs/
+/.idea/
+/Output/

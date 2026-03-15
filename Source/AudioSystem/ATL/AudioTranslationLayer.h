@@ -2,9 +2,9 @@
 
 #include <Engine/Core/Types/DateTime.h>
 #include <Engine/Core/Types/StringView.h>
-#include <Engine/Core/Types/Variant.h>
 
 #include "../Core/AudioMiddleware.h"
+#include "../Core/AudioSystemRequests.h"
 #include "AudioTranslationLayerData.h"
 
 // ============================================================================
@@ -16,8 +16,7 @@
 //  Responsibilities:
 //    - Maintain typed maps of all ATL control objects (entities, listeners,
 //      triggers, events, RTPCs, switch-states, environments, banks).
-//    - Translate logical audio requests (Variant-tagged) into concrete
-//      AudioMiddleware calls.
+//    - Translate typed AudioRequest structs into concrete AudioMiddleware calls.
 //    - Provide O(1) ID lookups by hashed name for every control type.
 //
 //  Constraints:
@@ -64,22 +63,22 @@ public:
     /// Passing nullptr is valid and will cause Startup() to fail gracefully.
     void SetMiddleware(AudioMiddleware* middleware);
 
+    /// \return The currently bound middleware, or nullptr if none is set.
+    AudioMiddleware* GetMiddleware() const { return _middleware; }
+
     // ========================================================================
     //  Request dispatch
     //
     //  Called from AudioSystem::UpdateInternal() on the audio thread.
-    //  Dispatches a typed request Variant to the appropriate middleware method
+    //  Dispatches a typed AudioRequest to the appropriate middleware method
     //  and updates the ATL maps accordingly.
-    //
-    //  NOTE (Phase 5): The concrete request types are defined in Phase 5.
-    //  This method is a stub until that phase is complete.
     // ========================================================================
 
     /// Dispatch a typed audio request to the middleware.
-    /// \param request  Tagged Variant produced by the audio-request queue.
+    /// \param request  Typed request from the audio-request queue.
     /// \param sync     true if the caller expects a synchronous result.
     /// \return true if the request was handled successfully.
-    bool ProcessRequest(Variant&& request, bool sync);
+    bool ProcessRequest(AudioRequest&& request, bool sync);
 
     // ========================================================================
     //  Control ID lookup by hashed name
@@ -115,6 +114,26 @@ private:
     /// Destroy and free every object in every ATL map. Does not call any
     /// middleware teardown — use Shutdown() for the full teardown sequence.
     void ClearAllMaps();
+
+    // -- Request handlers (one per AudioRequestType) -------------------------
+    bool HandleRegisterEntity(const AudioRequest& request);
+    bool HandleUnregisterEntity(const AudioRequest& request);
+    bool HandleUpdateEntityTransform(const AudioRequest& request);
+    bool HandleRegisterListener(const AudioRequest& request);
+    bool HandleUnregisterListener(const AudioRequest& request);
+    bool HandleUpdateListenerTransform(const AudioRequest& request);
+    bool HandleLoadTrigger(const AudioRequest& request);
+    bool HandleActivateTrigger(const AudioRequest& request);
+    bool HandleStopEvent(const AudioRequest& request);
+    bool HandleStopAllEvents(const AudioRequest& request);
+    bool HandleUnloadTrigger(const AudioRequest& request);
+    bool HandleSetRtpcValue(const AudioRequest& request);
+    bool HandleResetRtpcValue(const AudioRequest& request);
+    bool HandleSetSwitchState(const AudioRequest& request);
+    bool HandleSetObstructionOcclusion(const AudioRequest& request);
+    bool HandleSetEnvironmentAmount(const AudioRequest& request);
+    bool HandleLoadBank(const AudioRequest& request);
+    bool HandleUnloadBank(const AudioRequest& request);
 
     // ========================================================================
     //  State

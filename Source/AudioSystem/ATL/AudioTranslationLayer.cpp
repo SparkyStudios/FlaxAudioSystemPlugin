@@ -208,61 +208,494 @@ void AudioTranslationLayer::SetMiddleware(AudioMiddleware* middleware)
 }
 
 // ============================================================================
-//  Request dispatch  (Phase 5 stub)
+//  Request dispatch
 // ============================================================================
 
-bool AudioTranslationLayer::ProcessRequest(Variant&& request, bool sync)
+bool AudioTranslationLayer::ProcessRequest(AudioRequest&& request, bool sync)
 {
-    // TODO (Phase 5): Implement full request dispatch.
-    //
-    // Once Phase 5 defines the concrete request variant types, this method
-    // should contain an if/else-if chain that matches the variant type tag,
-    // calls the corresponding _middleware->* method, and updates the ATL maps.
-    //
-    // Example sketch:
-    //   if (request.Type == ActivateTriggerRequest::TypeTag)
-    //   {
-    //       auto& req = request.As<ActivateTriggerRequest>();
-    //       return _middleware->ActivateTrigger(req.EntityId, req.TriggerData, req.EventData);
-    //   }
+    if (_middleware == nullptr)
+    {
+        LOG(Error, "[ATL] ProcessRequest: no middleware bound.");
+        return false;
+    }
 
-    return false;
+    switch (request.Type)
+    {
+    case AudioRequestType::RegisterEntity:
+        return HandleRegisterEntity(request);
+    case AudioRequestType::UnregisterEntity:
+        return HandleUnregisterEntity(request);
+    case AudioRequestType::UpdateEntityTransform:
+        return HandleUpdateEntityTransform(request);
+    case AudioRequestType::RegisterListener:
+        return HandleRegisterListener(request);
+    case AudioRequestType::UnregisterListener:
+        return HandleUnregisterListener(request);
+    case AudioRequestType::UpdateListenerTransform:
+        return HandleUpdateListenerTransform(request);
+    case AudioRequestType::LoadTrigger:
+        return HandleLoadTrigger(request);
+    case AudioRequestType::ActivateTrigger:
+        return HandleActivateTrigger(request);
+    case AudioRequestType::StopEvent:
+        return HandleStopEvent(request);
+    case AudioRequestType::StopAllEvents:
+        return HandleStopAllEvents(request);
+    case AudioRequestType::UnloadTrigger:
+        return HandleUnloadTrigger(request);
+    case AudioRequestType::SetRtpcValue:
+        return HandleSetRtpcValue(request);
+    case AudioRequestType::ResetRtpcValue:
+        return HandleResetRtpcValue(request);
+    case AudioRequestType::SetSwitchState:
+        return HandleSetSwitchState(request);
+    case AudioRequestType::SetObstructionOcclusion:
+        return HandleSetObstructionOcclusion(request);
+    case AudioRequestType::SetEnvironmentAmount:
+        return HandleSetEnvironmentAmount(request);
+    case AudioRequestType::LoadBank:
+        return HandleLoadBank(request);
+    case AudioRequestType::UnloadBank:
+        return HandleUnloadBank(request);
+    case AudioRequestType::Shutdown:
+        LOG(Info, "[ATL] Shutdown request received.");
+        return true;
+    default:
+        LOG(Warning, "[ATL] Unknown request type: {0}.", static_cast<int32>(request.Type));
+        return false;
+    }
+}
+
+// ============================================================================
+//  Request handlers — Entity
+// ============================================================================
+
+bool AudioTranslationLayer::HandleRegisterEntity(const AudioRequest& request)
+{
+    const AudioSystemDataID id = request.EntityId;
+    if (id == INVALID_AUDIO_SYSTEM_ID)
+    {
+        LOG(Error, "[ATL] RegisterEntity: invalid entity ID.");
+        return false;
+    }
+
+    if (_entities.ContainsKey(id))
+    {
+        LOG(Warning, "[ATL] RegisterEntity: entity {0} already registered.", id);
+        return true;
+    }
+
+    AudioSystemEntityData* data = _middleware->CreateEntityData(id);
+    if (data == nullptr)
+    {
+        LOG(Error, "[ATL] RegisterEntity: middleware failed to create entity data for {0}.", id);
+        return false;
+    }
+
+    if (!_middleware->AddEntity(id, data))
+    {
+        LOG(Error, "[ATL] RegisterEntity: middleware rejected entity {0}.", id);
+        _middleware->DestroyEntityData(data);
+        return false;
+    }
+
+    ATLEntity* entity = New<ATLEntity>();
+    entity->Id = id;
+    entity->pData = data;
+    _entities.Add(id, entity);
+    return true;
+}
+
+bool AudioTranslationLayer::HandleUnregisterEntity(const AudioRequest& request)
+{
+    const AudioSystemDataID id = request.EntityId;
+    ATLEntity* entity = nullptr;
+
+    if (!_entities.TryGet(id, entity) || entity == nullptr)
+    {
+        LOG(Warning, "[ATL] UnregisterEntity: entity {0} not found.", id);
+        return false;
+    }
+
+    if (entity->pData != nullptr)
+    {
+        _middleware->RemoveEntity(id, entity->pData);
+        _middleware->DestroyEntityData(entity->pData);
+    }
+
+    _entities.Remove(id);
+    Delete(entity);
+    return true;
+}
+
+bool AudioTranslationLayer::HandleUpdateEntityTransform(const AudioRequest& request)
+{
+    const AudioSystemDataID id = request.EntityId;
+    ATLEntity* entity = nullptr;
+
+    if (!_entities.TryGet(id, entity) || entity == nullptr)
+    {
+        LOG(Warning, "[ATL] UpdateEntityTransform: entity {0} not found.", id);
+        return false;
+    }
+
+    const auto& transformReq = static_cast<const UpdateEntityTransformRequest&>(request);
+    return _middleware->SetEntityTransform(id, entity->pData, transformReq.Transform);
+}
+
+// ============================================================================
+//  Request handlers — Listener
+// ============================================================================
+
+bool AudioTranslationLayer::HandleRegisterListener(const AudioRequest& request)
+{
+    const AudioSystemDataID id = request.EntityId;
+    if (id == INVALID_AUDIO_SYSTEM_ID)
+    {
+        LOG(Error, "[ATL] RegisterListener: invalid listener ID.");
+        return false;
+    }
+
+    if (_listeners.ContainsKey(id))
+    {
+        LOG(Warning, "[ATL] RegisterListener: listener {0} already registered.", id);
+        return true;
+    }
+
+    AudioSystemListenerData* data = _middleware->CreateListenerData(id);
+    if (data == nullptr)
+    {
+        LOG(Error, "[ATL] RegisterListener: middleware failed to create listener data for {0}.", id);
+        return false;
+    }
+
+    if (!_middleware->AddListener(id, data))
+    {
+        LOG(Error, "[ATL] RegisterListener: middleware rejected listener {0}.", id);
+        _middleware->DestroyListenerData(data);
+        return false;
+    }
+
+    ATLListener* listener = New<ATLListener>();
+    listener->Id = id;
+    listener->pData = data;
+    _listeners.Add(id, listener);
+    return true;
+}
+
+bool AudioTranslationLayer::HandleUnregisterListener(const AudioRequest& request)
+{
+    const AudioSystemDataID id = request.EntityId;
+    ATLListener* listener = nullptr;
+
+    if (!_listeners.TryGet(id, listener) || listener == nullptr)
+    {
+        LOG(Warning, "[ATL] UnregisterListener: listener {0} not found.", id);
+        return false;
+    }
+
+    if (listener->pData != nullptr)
+    {
+        _middleware->RemoveListener(id, listener->pData);
+        _middleware->DestroyListenerData(listener->pData);
+    }
+
+    _listeners.Remove(id);
+    Delete(listener);
+    return true;
+}
+
+bool AudioTranslationLayer::HandleUpdateListenerTransform(const AudioRequest& request)
+{
+    const AudioSystemDataID id = request.EntityId;
+    ATLListener* listener = nullptr;
+
+    if (!_listeners.TryGet(id, listener) || listener == nullptr)
+    {
+        LOG(Warning, "[ATL] UpdateListenerTransform: listener {0} not found.", id);
+        return false;
+    }
+
+    const auto& transformReq = static_cast<const UpdateListenerTransformRequest&>(request);
+    return _middleware->SetListenerTransform(id, listener->pData, transformReq.Transform);
+}
+
+// ============================================================================
+//  Request handlers — Trigger / Event
+// ============================================================================
+
+bool AudioTranslationLayer::HandleLoadTrigger(const AudioRequest& request)
+{
+    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID triggerId = request.ObjectId;
+
+    ATLEntity* entity = nullptr;
+    if (!_entities.TryGet(entityId, entity) || entity == nullptr)
+    {
+        LOG(Warning, "[ATL] LoadTrigger: entity {0} not found.", entityId);
+        return false;
+    }
+
+    ATLTrigger* trigger = nullptr;
+    if (!_triggers.TryGet(triggerId, trigger) || trigger == nullptr)
+    {
+        LOG(Warning, "[ATL] LoadTrigger: trigger {0} not found.", triggerId);
+        return false;
+    }
+
+    // Create an event instance to track the loading operation.
+    AudioSystemEventData* eventData = _middleware->CreateEventData(triggerId);
+    if (eventData == nullptr)
+    {
+        LOG(Error, "[ATL] LoadTrigger: middleware failed to create event data.");
+        return false;
+    }
+
+    const bool result = _middleware->LoadTrigger(entityId, trigger->pData, eventData);
+    if (!result)
+    {
+        _middleware->DestroyEventData(eventData);
+    }
+    return result;
+}
+
+bool AudioTranslationLayer::HandleActivateTrigger(const AudioRequest& request)
+{
+    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID triggerId = request.ObjectId;
+
+    ATLEntity* entity = nullptr;
+    if (!_entities.TryGet(entityId, entity) || entity == nullptr)
+    {
+        LOG(Warning, "[ATL] ActivateTrigger: entity {0} not found.", entityId);
+        return false;
+    }
+
+    ATLTrigger* trigger = nullptr;
+    if (!_triggers.TryGet(triggerId, trigger) || trigger == nullptr)
+    {
+        LOG(Warning, "[ATL] ActivateTrigger: trigger {0} not found.", triggerId);
+        return false;
+    }
+
+    // Create a new event instance for this activation.
+    AudioSystemEventData* eventData = _middleware->CreateEventData(triggerId);
+    if (eventData == nullptr)
+    {
+        LOG(Error, "[ATL] ActivateTrigger: middleware failed to create event data.");
+        return false;
+    }
+
+    if (!_middleware->ActivateTrigger(entityId, trigger->pData, eventData))
+    {
+        _middleware->DestroyEventData(eventData);
+        return false;
+    }
+
+    // Track the event instance.
+    static AudioSystemDataID nextEventId = 1;
+    const AudioSystemDataID eventId = nextEventId++;
+
+    ATLEvent* atlEvent = New<ATLEvent>();
+    atlEvent->Id = eventId;
+    atlEvent->pData = eventData;
+    _events.Add(eventId, atlEvent);
+    trigger->Events.Add(eventId, atlEvent);
+
+    return true;
+}
+
+bool AudioTranslationLayer::HandleStopEvent(const AudioRequest& request)
+{
+    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID eventId = request.ObjectId;
+
+    ATLEvent* atlEvent = nullptr;
+    if (!_events.TryGet(eventId, atlEvent) || atlEvent == nullptr)
+    {
+        LOG(Warning, "[ATL] StopEvent: event {0} not found.", eventId);
+        return false;
+    }
+
+    const bool result = _middleware->StopEvent(entityId, atlEvent->pData);
+
+    if (atlEvent->pData != nullptr)
+        _middleware->DestroyEventData(atlEvent->pData);
+
+    _events.Remove(eventId);
+    Delete(atlEvent);
+
+    return result;
+}
+
+bool AudioTranslationLayer::HandleStopAllEvents(const AudioRequest& request)
+{
+    const AudioSystemDataID entityId = request.EntityId;
+    return _middleware->StopAllEvents(entityId);
+}
+
+bool AudioTranslationLayer::HandleUnloadTrigger(const AudioRequest& request)
+{
+    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID triggerId = request.ObjectId;
+
+    ATLTrigger* trigger = nullptr;
+    if (!_triggers.TryGet(triggerId, trigger) || trigger == nullptr)
+    {
+        LOG(Warning, "[ATL] UnloadTrigger: trigger {0} not found.", triggerId);
+        return false;
+    }
+
+    AudioSystemEventData* eventData = _middleware->CreateEventData(triggerId);
+    if (eventData == nullptr)
+    {
+        LOG(Error, "[ATL] UnloadTrigger: middleware failed to create event data.");
+        return false;
+    }
+
+    const bool result = _middleware->UnloadTrigger(entityId, trigger->pData, eventData);
+    _middleware->DestroyEventData(eventData);
+    return result;
+}
+
+// ============================================================================
+//  Request handlers — RTPC / Switch / Environment
+// ============================================================================
+
+bool AudioTranslationLayer::HandleSetRtpcValue(const AudioRequest& request)
+{
+    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID rtpcId = request.ObjectId;
+
+    ATLRtpc* rtpc = nullptr;
+    if (!_rtpcs.TryGet(rtpcId, rtpc) || rtpc == nullptr)
+    {
+        LOG(Warning, "[ATL] SetRtpcValue: RTPC {0} not found.", rtpcId);
+        return false;
+    }
+
+    const auto& rtpcReq = static_cast<const SetRtpcValueRequest&>(request);
+    return _middleware->SetRtpc(entityId, rtpc->pData, rtpcReq.Value);
+}
+
+bool AudioTranslationLayer::HandleResetRtpcValue(const AudioRequest& request)
+{
+    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID rtpcId = request.ObjectId;
+
+    ATLRtpc* rtpc = nullptr;
+    if (!_rtpcs.TryGet(rtpcId, rtpc) || rtpc == nullptr)
+    {
+        LOG(Warning, "[ATL] ResetRtpcValue: RTPC {0} not found.", rtpcId);
+        return false;
+    }
+
+    return _middleware->ResetRtpc(entityId, rtpc->pData);
+}
+
+bool AudioTranslationLayer::HandleSetSwitchState(const AudioRequest& request)
+{
+    const AudioSystemDataID objectId = request.ObjectId;
+
+    ATLSwitchState* switchState = nullptr;
+    if (!_switchStates.TryGet(objectId, switchState) || switchState == nullptr)
+    {
+        LOG(Warning, "[ATL] SetSwitchState: switch state {0} not found.", objectId);
+        return false;
+    }
+
+    return _middleware->SetSwitchState(request.EntityId, switchState->pData);
+}
+
+bool AudioTranslationLayer::HandleSetObstructionOcclusion(const AudioRequest& request)
+{
+    const AudioSystemDataID entityId = request.EntityId;
+
+    ATLEntity* entity = nullptr;
+    if (!_entities.TryGet(entityId, entity) || entity == nullptr)
+    {
+        LOG(Warning, "[ATL] SetObstructionOcclusion: entity {0} not found.", entityId);
+        return false;
+    }
+
+    const auto& ooReq = static_cast<const SetObstructionOcclusionRequest&>(request);
+    return _middleware->SetObstructionAndOcclusion(entityId, entity->pData, ooReq.Obstruction, ooReq.Occlusion);
+}
+
+bool AudioTranslationLayer::HandleSetEnvironmentAmount(const AudioRequest& request)
+{
+    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID envId = request.ObjectId;
+
+    ATLEnvironment* env = nullptr;
+    if (!_environments.TryGet(envId, env) || env == nullptr)
+    {
+        LOG(Warning, "[ATL] SetEnvironmentAmount: environment {0} not found.", envId);
+        return false;
+    }
+
+    const auto& envReq = static_cast<const SetEnvironmentAmountRequest&>(request);
+    return _middleware->SetEnvironmentAmount(entityId, env->pData, envReq.Amount);
+}
+
+// ============================================================================
+//  Request handlers — Bank
+// ============================================================================
+
+bool AudioTranslationLayer::HandleLoadBank(const AudioRequest& request)
+{
+    const AudioSystemDataID bankId = request.ObjectId;
+
+    ATLSoundBank* bank = nullptr;
+    if (!_banks.TryGet(bankId, bank) || bank == nullptr)
+    {
+        LOG(Warning, "[ATL] LoadBank: bank {0} not found.", bankId);
+        return false;
+    }
+
+    return _middleware->LoadBank(bank->pData);
+}
+
+bool AudioTranslationLayer::HandleUnloadBank(const AudioRequest& request)
+{
+    const AudioSystemDataID bankId = request.ObjectId;
+
+    ATLSoundBank* bank = nullptr;
+    if (!_banks.TryGet(bankId, bank) || bank == nullptr)
+    {
+        LOG(Warning, "[ATL] UnloadBank: bank {0} not found.", bankId);
+        return false;
+    }
+
+    return _middleware->UnloadBank(bank->pData);
 }
 
 // ============================================================================
 //  Control ID lookup by hashed name
-//
-//  NOTE (Phase 5): These maps will be populated by the asset-loading pipeline.
-//  For now they are always empty, so every lookup returns INVALID_AUDIO_SYSTEM_ID.
 // ============================================================================
 
 AudioSystemDataID AudioTranslationLayer::GetTriggerId(StringView name) const
 {
-    // TODO (Phase 5): look up hashed name in a name→ID index.
     return INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetRtpcId(StringView name) const
 {
-    // TODO (Phase 5): look up hashed name in a name→ID index.
     return INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetSwitchStateId(StringView name) const
 {
-    // TODO (Phase 5): look up hashed name in a name→ID index.
     return INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetEnvironmentId(StringView name) const
 {
-    // TODO (Phase 5): look up hashed name in a name→ID index.
     return INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetBankId(StringView name) const
 {
-    // TODO (Phase 5): look up hashed name in a name→ID index.
     return INVALID_AUDIO_SYSTEM_ID;
 }
 

@@ -11,6 +11,11 @@
 //  Static state
 // ============================================================================
 
+AudioProxyComponent::AudioProxyComponent(const SpawnParams& params)
+    : AudioSystemComponent(params)
+{
+}
+
 // Entity IDs below 1000 are reserved for internal / listener use.
 AudioSystemDataID AudioProxyComponent::_nextEntityId = 1000;
 

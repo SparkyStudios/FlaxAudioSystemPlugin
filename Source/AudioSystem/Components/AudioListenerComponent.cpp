@@ -11,6 +11,11 @@
 //  Static state
 // ============================================================================
 
+AudioListenerComponent::AudioListenerComponent(const SpawnParams& params)
+    : AudioSystemComponent(params)
+{
+}
+
 // Listener IDs start at 2000 to avoid collisions with entity IDs (from 1000).
 AudioSystemDataID AudioListenerComponent::_nextListenerId = 2000;
 

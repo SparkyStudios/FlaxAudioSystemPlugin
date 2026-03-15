@@ -12,6 +12,11 @@
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
+AudioTriggerComponent::AudioTriggerComponent(const SpawnParams& params)
+    : AudioSystemProxyDependentComponent(params)
+{
+}
+
 // ============================================================================
 //  OnEnable
 // ============================================================================

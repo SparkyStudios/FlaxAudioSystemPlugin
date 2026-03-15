@@ -1,0 +1,16 @@
+// This code was auto-generated. Do not modify it.
+
+#pragma once
+
+#define AUDIOSYSTEMEDITOR_NAME "AudioSystemEditor"
+#define AUDIOSYSTEMEDITOR_VERSION Version(1, 0)
+#define AUDIOSYSTEMEDITOR_VERSION_TEXT "1.0"
+#define AUDIOSYSTEMEDITOR_VERSION_MAJOR 1
+#define AUDIOSYSTEMEDITOR_VERSION_MINOR 0
+#define AUDIOSYSTEMEDITOR_VERSION_BUILD -1
+#define AUDIOSYSTEMEDITOR_VERSION_REVISION -1
+#define AUDIOSYSTEMEDITOR_COMPANY "Sparky Studios"
+#define AUDIOSYSTEMEDITOR_COPYRIGHT ""
+
+class BinaryModule;
+extern "C" AUDIOSYSTEMEDITOR_API BinaryModule* GetBinaryModuleAudioSystemEditor();

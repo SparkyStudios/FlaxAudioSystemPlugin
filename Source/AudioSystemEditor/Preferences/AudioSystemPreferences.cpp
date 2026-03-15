@@ -7,6 +7,7 @@
 #include <Engine/Platform/StringUtils.h>
 #include <Engine/Scripting/Scripting.h>
 #include <Engine/Serialization/JsonSerializer.h>
+#include <FlaxEngine.Gen.h>
 
 #include "../../AudioSystem/Core/AudioSystem.h"
 

@@ -6,6 +6,11 @@
 #include "AudioBoxEnvironmentComponent.h"
 #include "AudioProxyComponent.h"
 
+AudioBoxEnvironmentComponent::AudioBoxEnvironmentComponent(const SpawnParams& params)
+    : AudioSystemEnvironmentComponent(params)
+{
+}
+
 // ============================================================================
 //  OnUpdate
 // ============================================================================

@@ -5,6 +5,11 @@
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
+AudioRtpcComponent::AudioRtpcComponent(const SpawnParams& params)
+    : AudioSystemProxyDependentComponent(params)
+{
+}
+
 // ============================================================================
 //  OnEnable
 // ============================================================================

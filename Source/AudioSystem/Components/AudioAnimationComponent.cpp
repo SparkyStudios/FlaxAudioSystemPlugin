@@ -6,6 +6,11 @@
 #include "AudioAnimationComponent.h"
 #include "AudioTriggerComponent.h"
 
+AudioAnimEvent::AudioAnimEvent(const SpawnParams& params)
+    : AnimEvent(params)
+{
+}
+
 // ============================================================================
 //  AudioAnimEvent — OnEvent
 // ============================================================================
@@ -55,6 +60,11 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
 // ============================================================================
 //  AudioAnimationComponent — OnEnable
 // ============================================================================
+
+AudioAnimationComponent::AudioAnimationComponent(const SpawnParams& params)
+    : AudioSystemProxyDependentComponent(params)
+{
+}
 
 void AudioAnimationComponent::OnEnable()
 {

@@ -32,6 +32,8 @@ API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemEnvironmentComponent
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemEnvironmentComponent);
 
 public:
+    explicit AudioSystemEnvironmentComponent(const SpawnParams& params) : AudioSystemComponent(params) {}
+
     // ========================================================================
     //  Script lifecycle overrides
     // ========================================================================

@@ -23,6 +23,9 @@ API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemComponent : public Script
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemComponent);
 
+public:
+    explicit AudioSystemComponent(const SpawnParams& params) : Script(params) {}
+
 protected:
     /// Called every frame when the component is active. Must be implemented by subclasses.
     void OnUpdate() override = 0;
@@ -47,6 +50,8 @@ API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemProxyDependentComponent
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemProxyDependentComponent);
 
 public:
+    explicit AudioSystemProxyDependentComponent(const SpawnParams& params) : AudioSystemComponent(params) {}
+
     /// Called when this component becomes active.
     /// Locates the sibling AudioProxyComponent on the owner Actor.
     /// Disables itself (with a logged warning) if no proxy is found.

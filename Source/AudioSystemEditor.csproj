@@ -357,6 +357,11 @@
 
   <ItemGroup>
     <Compile Include="\Users\na2axl\Projects\SparkyStudios\FlaxSamples\ThirdPersonShooterTemplate\Plugins\FlaxAudioSystemPlugin\Source\AudioSystemEditor.Gen.cs" />
+    <Compile Include="\Users\na2axl\Projects\SparkyStudios\FlaxSamples\ThirdPersonShooterTemplate\Plugins\FlaxAudioSystemPlugin\Source\AudioSystemEditor\CSharp\AudioSystemAssetProxies.cs" />
+    <Compile Include="\Users\na2axl\Projects\SparkyStudios\FlaxSamples\ThirdPersonShooterTemplate\Plugins\FlaxAudioSystemPlugin\Source\AudioSystemEditor\CSharp\AudioSystemEditorPlugin.cs" />
+    <Compile Include="\Users\na2axl\Projects\SparkyStudios\FlaxSamples\ThirdPersonShooterTemplate\Plugins\FlaxAudioSystemPlugin\Source\AudioSystemEditor\CSharp\AudioSystemIcons.cs" />
+    <Compile Include="\Users\na2axl\Projects\SparkyStudios\FlaxSamples\ThirdPersonShooterTemplate\Plugins\FlaxAudioSystemPlugin\Source\AudioSystemEditor\CSharp\AudioSystemMenu.cs" />
+    <Compile Include="\Users\na2axl\Projects\SparkyStudios\FlaxSamples\ThirdPersonShooterTemplate\Plugins\FlaxAudioSystemPlugin\Source\AudioSystemEditor\CSharp\AudioSystemToolbar.cs" />
   </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Game.Mac.Debug|x64' " >
     <Compile Visible="false" Include="\Users\na2axl\Projects\SparkyStudios\FlaxSamples\ThirdPersonShooterTemplate\Plugins\FlaxAudioSystemPlugin\Cache\Intermediate\AudioSystemTarget\Mac\x64\Debug\AudioSystem\AudioSystem.Bindings.Gen.cs" />

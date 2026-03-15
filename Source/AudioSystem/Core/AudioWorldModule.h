@@ -2,12 +2,9 @@
 
 #include <Engine/Core/Collections/Array.h>
 
-// ============================================================================
-//  Forward declarations
-//  (Full definitions provided in Phase 7 component headers.)
-// ============================================================================
+#include "../Components/AudioSystemEnvironmentComponent.h"
 
-class AudioSystemEnvironmentComponent;
+// Forward declarations
 class AudioListenerComponent;
 
 // ============================================================================

@@ -5,14 +5,14 @@
 // ============================================================================
 //  AudioSystemEditorPlugin
 //
-//  Entry point for the AudioSystem editor plugin.
+//  Entry point for the AudioSystem editor plugin (C++ side).
 //
-//  Initialize() bootstraps all editor sub-systems in this order:
+//  Initialize() bootstraps the C++ sub-systems in this order:
 //    1. Load (or create) AudioSystemPreferences.
-//    2. Register component viewport icons.
-//    3. Register toolbar actions.
-//    4. Subscribe to play-mode events to keep settings in sync.
-//    5. Subscribe to GameCooker.DeployFiles for bank copying.
+//    2. Subscribe to GameCooker.DeployFiles for bank copying.
+//
+//  All other editor features (toolbar, icons, asset proxies, play-mode events)
+//  are handled by the C# EditorPlugin layer.
 //
 //  Deinitialize() reverses all registrations in the opposite order.
 // ============================================================================
@@ -25,13 +25,4 @@ API_CLASS() class AUDIOSYSTEMEDITOR_API AudioSystemEditorPlugin : public EditorP
 public:
     void Initialize() override;
     void Deinitialize() override;
-
-private:
-    /// Called when the editor enters play mode. Pushes preference values
-    /// into the running AudioSystem so in-editor play mirrors real settings.
-    static void OnPlayModeBegin();
-
-    /// Called when the editor exits play mode. Re-applies preference values
-    /// to restore editor-mode audio state.
-    static void OnPlayModeEnd();
 };

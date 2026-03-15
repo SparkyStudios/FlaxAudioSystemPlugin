@@ -150,24 +150,3 @@ public:
     String EnvironmentName;
 };
 
-// ============================================================================
-//  AudioAssetProxies — registration helper
-//
-//  Call Register() from InitializeEditor() and Unregister() from
-//  DeinitializeEditor() to register the custom asset types with the Flax
-//  Content Browser.
-// ============================================================================
-
-class AUDIOSYSTEMEDITOR_API AudioAssetProxies
-{
-public:
-    /// Register all AudioSystem content asset types with the editor.
-    static void Register();
-
-    /// Unregister all AudioSystem content asset types from the editor.
-    static void Unregister();
-
-private:
-    AudioAssetProxies() = delete;
-    ~AudioAssetProxies() = delete;
-};

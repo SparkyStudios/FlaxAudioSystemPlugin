@@ -18,7 +18,7 @@ AudioSystemDataID AudioProxyComponent::_nextEntityId = 1000;
 //  Scripting type registration
 // ============================================================================
 
-IMPLEMENT_SCRIPTING_TYPE(AudioProxyComponent, Script,
+IMPLEMENT_SCRIPTING_TYPE(AudioProxyComponent, AudioSystemComponent,
     "AudioSystem.AudioProxyComponent", nullptr, nullptr);
 
 // ============================================================================

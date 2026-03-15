@@ -2,9 +2,8 @@
 
 #include <Engine/Core/Collections/Dictionary.h>
 #include <Engine/Core/Math/Vector3.h>
-#include <Engine/Scripting/Script.h>
 
-#include "../Core/AudioSystemData.h"
+#include "AudioSystemComponent.h"
 
 // ============================================================================
 //  AudioProxyComponent
@@ -28,7 +27,7 @@
 /// changes to the audio middleware via the AudioSystem request queue.
 /// Environment components update per-environment send amounts via
 /// SetEnvironmentAmount / GetEnvironmentAmount.
-API_CLASS() class AUDIOSYSTEM_API AudioProxyComponent : public Script
+API_CLASS() class AUDIOSYSTEM_API AudioProxyComponent : public AudioSystemComponent
 {
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE(AudioProxyComponent);

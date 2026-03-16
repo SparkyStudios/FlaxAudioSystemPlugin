@@ -48,6 +48,7 @@ float AudioBoxEnvironmentComponent::GetEnvironmentAmount(const AudioProxyCompone
 // ============================================================================
 
 #if USE_EDITOR
+#include <Engine/Core/Math/Color.h>
 #include <Engine/Debug/DebugDraw.h>
 
 static constexpr float WiresDimAlpha = 0.35f;
@@ -56,16 +57,28 @@ void AudioBoxEnvironmentComponent::OnDebugDraw()
 {
     const Color dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
 
-    DEBUG_DRAW_WIRE_BOX(OrientedBoundingBox(HalfExtents, GetTransform()), dimColor, 0, true);
-    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(GetPosition(), MaxDistance), dimColor, 0, true);
+    OrientedBoundingBox box;
+    OrientedBoundingBox::CreateCentered(Vector3::Zero, HalfExtents * 2.0f, box);
+    box.Transform(GetTransform());
+
+    DEBUG_DRAW_WIRE_BOX(box, dimColor, 0, true);
+
+    if (MaxDistance > 0.0f)
+        DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(GetPosition(), MaxDistance), dimColor, 0, true);
 
     Actor::OnDebugDraw();
 }
 
 void AudioBoxEnvironmentComponent::OnDebugDrawSelected()
 {
-    DEBUG_DRAW_WIRE_BOX(OrientedBoundingBox(HalfExtents, GetTransform()), EnvironmentColor, 0, false);
-    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(GetPosition(), MaxDistance), EnvironmentColor, 0, false);
+    OrientedBoundingBox box;
+    OrientedBoundingBox::CreateCentered(Vector3::Zero, HalfExtents * 2.0f, box);
+    box.Transform(GetTransform());
+
+    DEBUG_DRAW_WIRE_BOX(box, EnvironmentColor, 0, false);
+
+    if (MaxDistance > 0.0f)
+        DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(GetPosition(), MaxDistance), EnvironmentColor, 0, false);
 
     Actor::OnDebugDrawSelected();
 }

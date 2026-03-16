@@ -19,10 +19,10 @@ void AudioSystemProxyDependentComponent::OnEnable()
         return;
     }
 
-    _proxy = owner->GetScript<AudioProxyComponent>();
+    _proxy = Cast<AudioProxyComponent>(owner);
     if (_proxy == nullptr)
     {
-        LOG(Warning, "[AudioSystemProxyDependentComponent] OnEnable: no sibling AudioProxyComponent found on Actor '{0}'. Component will be disabled.",
+        LOG(Warning, "[AudioSystemProxyDependentComponent] OnEnable: owner Actor '{0}' is not an AudioProxyComponent. Attach this script to an AudioProxyComponent actor.",
             owner->GetName());
         SetEnabled(false);
         return;

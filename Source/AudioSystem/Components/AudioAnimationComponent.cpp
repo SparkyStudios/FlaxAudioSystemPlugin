@@ -29,9 +29,18 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
         return;
     }
 
-    // First, check whether there is an AudioAnimationComponent on this actor
+    // Audio scripts (AudioAnimationComponent, AudioTriggerComponent) live on
+    // the AudioProxyComponent Actor, which is the parent of the AnimatedModel.
+    Actor* proxyActor = actor->GetParent();
+    if (proxyActor == nullptr)
+    {
+        LOG(Warning, "[AudioAnimEvent] OnEvent: AnimatedModel '{0}' has no parent Actor.", actor->GetName());
+        return;
+    }
+
+    // First, check whether there is an AudioAnimationComponent on the proxy
     // that can remap the trigger name via EventTriggerMap.
-    AudioAnimationComponent* dispatcher = actor->GetScript<AudioAnimationComponent>();
+    AudioAnimationComponent* dispatcher = proxyActor->GetScript<AudioAnimationComponent>();
     if (dispatcher != nullptr)
     {
         dispatcher->DispatchEvent(TriggerName);
@@ -39,7 +48,7 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
     }
 
     // No dispatcher component — use TriggerName directly as PlayTriggerName.
-    const Array<Script*>& scripts = actor->Scripts;
+    const Array<Script*>& scripts = proxyActor->Scripts;
     for (Script* script : scripts)
     {
         AudioTriggerComponent* trigger = ScriptingObject::Cast<AudioTriggerComponent>(script);
@@ -53,8 +62,8 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
         }
     }
 
-    LOG(Warning, "[AudioAnimEvent] OnEvent: No sibling AudioTriggerComponent with PlayTriggerName '{0}' found on Actor '{1}'.",
-        TriggerName, actor->GetName());
+    LOG(Warning, "[AudioAnimEvent] OnEvent: No AudioTriggerComponent with PlayTriggerName '{0}' found on proxy Actor '{1}'.",
+        TriggerName, proxyActor->GetName());
 }
 
 // ============================================================================

@@ -9,7 +9,7 @@ using FlaxEngine.GUI;
 namespace AudioSystemEditor.Editors
 {
     [CustomEditor(typeof(AudioListenerComponent)), DefaultEditor]
-    public class AudioListenerEditor : GenericEditor
+    public class AudioListenerEditor : ActorEditor
     {
         private Label _statusLabel;
 

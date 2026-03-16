@@ -10,28 +10,30 @@ namespace AudioSystemEditor
     /// </summary>
     public class AudioSystemIcons
     {
-        // Path relative to the project root, pointing to the plugin's Content folder.
-        // Icons must be imported via the Flax Editor to create .flax texture assets.
         private const string IconsRoot = "Plugins/FlaxAudioSystemPlugin/Content/Editor/Icons/";
 
-        private static readonly (System.Type type, string iconName)[] ComponentIcons =
+        // Script-based components: icon registration only.
+        private static readonly (System.Type type, string iconName)[] ScriptIcons =
         {
-            (typeof(AudioProxyComponent),             "AudioProxyComponent128.flax"),
-            (typeof(AudioListenerComponent),          "AudioListenerComponent128.flax"),
-            (typeof(AudioTriggerComponent),           "AudioTriggerComponent128.flax"),
-            (typeof(AudioRtpcComponent),              "AudioRtpcComponent128.flax"),
-            (typeof(AudioSwitchStateComponent),       "AudioSwitchStateComponent128.flax"),
-            (typeof(AudioBoxEnvironmentComponent),    "AudioBoxEnvironmentComponent128.flax"),
-            (typeof(AudioSphereEnvironmentComponent), "AudioSphereEnvironmentComponent128.flax"),
-            (typeof(AudioAnimationComponent),         "AudioAnimationComponent128.flax"),
+            (typeof(AudioTriggerComponent),        "AudioTriggerComponent128.flax"),
+            (typeof(AudioRtpcComponent),           "AudioRtpcComponent128.flax"),
+            (typeof(AudioSwitchStateComponent),    "AudioSwitchStateComponent128.flax"),
+            (typeof(AudioAnimationComponent),      "AudioAnimationComponent128.flax"),
         };
 
-        /// <summary>
-        /// Loads and registers custom icons with the editor viewport.
-        /// </summary>
+        // Actor-based components: icon registration + scene graph node type.
+        private static readonly (System.Type type, string iconName, System.Type nodeType)[] ActorIcons =
+        {
+            (typeof(AudioProxyComponent),             "AudioProxyComponent128.flax",             typeof(AudioProxyNode)),
+            (typeof(AudioListenerComponent),          "AudioListenerComponent128.flax",          typeof(AudioListenerNode)),
+            (typeof(AudioBoxEnvironmentComponent),    "AudioBoxEnvironmentComponent128.flax",    typeof(AudioBoxEnvironmentNode)),
+            (typeof(AudioSphereEnvironmentComponent), "AudioSphereEnvironmentComponent128.flax", typeof(AudioSphereEnvironmentNode)),
+        };
+
         public void Register()
         {
-            foreach (var (type, iconName) in ComponentIcons)
+            // Register script icons.
+            foreach (var (type, iconName) in ScriptIcons)
             {
                 var texture = Content.LoadAsync<Texture>(IconsRoot + iconName);
                 if (texture == null)
@@ -39,20 +41,59 @@ namespace AudioSystemEditor
                     Debug.LogWarning($"[AudioSystemIcons] Icon not found: {IconsRoot}{iconName}");
                     continue;
                 }
-
                 ViewportIconsRenderer.AddCustomIcon(type, texture);
+            }
+
+            // Register actor icons + scene graph node types.
+            foreach (var (type, iconName, nodeType) in ActorIcons)
+            {
+                var texture = Content.LoadAsync<Texture>(IconsRoot + iconName);
+                if (texture == null)
+                {
+                    Debug.LogWarning($"[AudioSystemIcons] Icon not found: {IconsRoot}{iconName}");
+                    continue;
+                }
+                ViewportIconsRenderer.AddCustomIcon(type, texture);
+                SceneGraphFactory.CustomNodesTypes[type] = nodeType;
             }
 
             Debug.Log("[AudioSystemIcons] Viewport icons registered.");
         }
 
-        /// <summary>
-        /// Unloads and unregisters custom icons from the editor viewport.
-        /// ViewportIconsRenderer cleans up automatically on plugin deinit.
-        /// </summary>
         public void Unregister()
         {
-            // ViewportIconsRenderer cleans up automatically on plugin deinit
+            foreach (var (type, _, _) in ActorIcons)
+            {
+                SceneGraphFactory.CustomNodesTypes.Remove(type);
+            }
         }
+    }
+
+    // ========================================================================
+    //  Custom scene graph nodes for Actor-based audio components
+    // ========================================================================
+
+    [HideInEditor]
+    public sealed class AudioProxyNode : ActorNodeWithIcon
+    {
+        public AudioProxyNode(Actor actor) : base(actor) { }
+    }
+
+    [HideInEditor]
+    public sealed class AudioListenerNode : ActorNodeWithIcon
+    {
+        public AudioListenerNode(Actor actor) : base(actor) { }
+    }
+
+    [HideInEditor]
+    public sealed class AudioBoxEnvironmentNode : ActorNodeWithIcon
+    {
+        public AudioBoxEnvironmentNode(Actor actor) : base(actor) { }
+    }
+
+    [HideInEditor]
+    public sealed class AudioSphereEnvironmentNode : ActorNodeWithIcon
+    {
+        public AudioSphereEnvironmentNode(Actor actor) : base(actor) { }
     }
 }

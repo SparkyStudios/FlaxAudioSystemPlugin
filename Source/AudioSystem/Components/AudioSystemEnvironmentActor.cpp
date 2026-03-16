@@ -3,11 +3,6 @@
 #include "AudioSystemEnvironmentActor.h"
 #include "../Core/AudioSystem.h"
 
-AudioSystemEnvironmentActor::AudioSystemEnvironmentActor(const SpawnParams& params)
-    : Actor(params)
-{
-}
-
 // ============================================================================
 //  OnBeginPlay
 // ============================================================================

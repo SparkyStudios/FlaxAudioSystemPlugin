@@ -29,9 +29,10 @@ API_CLASS(Abstract, Attributes="ActorContextMenu(\"New/Audio\")")
 class AUDIOSYSTEM_API AudioSystemEnvironmentActor : public Actor
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCENE_OBJECT(AudioSystemEnvironmentActor);
+    DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemEnvironmentActor);
 
 public:
+    explicit AudioSystemEnvironmentActor(const SpawnParams& params) : Actor(params) {}
     // ========================================================================
     //  Serialised properties
     // ========================================================================

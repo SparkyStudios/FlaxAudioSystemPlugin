@@ -10,7 +10,9 @@ class AudioProxyComponent;
 // ============================================================================
 //  AudioSystemComponent — abstract base for all audio scripts
 //
-//  Every component in the AudioSystem derives from this class.
+//  Script-based audio components (trigger, RTPC, switch-state, animation)
+//  derive from this class. Actor-based components (proxy, listener,
+//  environment zones) derive directly from Actor or AudioSystemEnvironmentActor.
 //  It is never instantiated directly.
 // ============================================================================
 

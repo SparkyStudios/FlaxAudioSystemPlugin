@@ -1,13 +1,10 @@
 #pragma once
 
 #include <Engine/Core/Math/Vector3.h>
+#include <Engine/Level/Actor.h>
 #include <Engine/Scripting/ScriptingObjectReference.h>
 
-#include "AudioSystemComponent.h"
 #include "../Core/AudioSystemData.h"
-
-// Forward declarations
-class Actor;
 
 // ============================================================================
 //  AudioListenerComponent
@@ -17,24 +14,30 @@ class Actor;
 //  starting at 2000, separate from entity IDs).
 //
 //  Lifecycle:
-//    OnEnable  — allocates a listener ID and sends RegisterListenerRequest.
-//                If IsDefault is true, registers as the scene default listener.
-//    OnUpdate  — reads position/orientation from the override actors (or the
-//                owner Actor) and sends UpdateListenerTransformRequest if the
-//                transform changed.
-//    OnDisable — sends UnregisterListenerRequest and clears any default-listener
-//                registration.
+//    OnBeginPlay       — allocates a listener ID and sends RegisterListenerRequest.
+//                        If IsDefault is true, registers as the scene default listener.
+//                        Binds OnFrameUpdate to Scripting::Update.
+//    OnFrameUpdate     — reads position/orientation from the override actors (or this
+//                        Actor) and sends UpdateListenerTransformRequest if the
+//                        transform changed. Polls every frame when override actors are
+//                        active since OnTransformChanged only fires for THIS actor.
+//    OnTransformChanged — marks the transform dirty so OnFrameUpdate will flush it.
+//    OnEndPlay         — sends UnregisterListenerRequest, clears any default-listener
+//                        registration, and unbinds OnFrameUpdate.
 // ============================================================================
 
-/// \brief Attaches an audio listener to a Flax Actor.
+/// \brief An Actor that acts as an audio listener in the scene.
 ///
-/// The listener tracks the world-space transform of either the owner Actor or
-/// separate override actors for position and orientation, and propagates the
-/// result to the audio middleware each frame.
-API_CLASS() class AUDIOSYSTEM_API AudioListenerComponent : public AudioSystemComponent
+/// Place this actor in the scene tree (typically as a child of a Camera) to
+/// register a spatial listener with the audio middleware. The listener tracks
+/// the world-space transform of either this Actor or separate override actors
+/// for position and orientation, and propagates the result to the middleware
+/// each frame.
+API_CLASS(Attributes="ActorContextMenu(\"New/Audio/Audio Listener\")")
+class AUDIOSYSTEM_API AudioListenerComponent : public Actor
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCRIPTING_TYPE(AudioListenerComponent);
+    DECLARE_SCENE_OBJECT(AudioListenerComponent);
 
 public:
     // ========================================================================
@@ -47,42 +50,48 @@ public:
     bool IsDefault = false;
 
     /// Optional actor to use as the source of position data.
-    /// If null, the owner Actor's position is used instead.
-    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Override actor for position data. Uses the owner Actor if null.\")")
+    /// If null, this Actor's position is used instead.
+    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Override actor for position data. Uses this Actor if null.\")")
     ScriptingObjectReference<Actor> PositionObject;
 
     /// Optional actor to use as the source of orientation data.
-    /// If null, the owner Actor's orientation is used instead.
-    API_FIELD(Attributes="EditorOrder(2), Tooltip(\"Override actor for orientation data. Uses the owner Actor if null.\")")
+    /// If null, this Actor's orientation is used instead.
+    API_FIELD(Attributes="EditorOrder(2), Tooltip(\"Override actor for orientation data. Uses this Actor if null.\")")
     ScriptingObjectReference<Actor> OrientationObject;
 
     // ========================================================================
-    //  Script lifecycle overrides
+    //  Actor lifecycle overrides
     // ========================================================================
 
-    /// Allocates a unique listener ID and registers this listener with the middleware.
+    /// Allocates a unique listener ID, registers this listener with the middleware,
+    /// and binds the per-frame update delegate.
     /// If IsDefault is true, sets this as the scene default listener.
-    void OnEnable() override;
+    void OnBeginPlay() override;
 
-    /// Reads the current transform and submits an update if it has changed.
-    void OnUpdate() override;
+    /// Unbinds the per-frame update delegate, unregisters this listener from the
+    /// middleware, and clears the default listener reference if applicable.
+    void OnEndPlay() override;
 
-    /// Unregisters this listener from the middleware and clears the default
-    /// listener reference if this component was registered as the default.
-    void OnDisable() override;
+    /// Marks the transform dirty so OnFrameUpdate will flush the change to the
+    /// middleware on the next frame.
+    void OnTransformChanged() override;
 
     // ========================================================================
     //  Listener ID
     // ========================================================================
 
-    /// \return The unique listener ID assigned in OnEnable.
-    ///         Returns INVALID_AUDIO_SYSTEM_ID before OnEnable has run.
+    /// \return The unique listener ID assigned in OnBeginPlay.
+    ///         Returns INVALID_AUDIO_SYSTEM_ID before OnBeginPlay has run.
     API_FUNCTION() uint64 GetListenerId() const;
 
 private:
     // ========================================================================
     //  Helpers
     // ========================================================================
+
+    /// Called every frame via Scripting::Update. Computes the current transform
+    /// and submits an UpdateListenerTransform request if it has changed.
+    void OnFrameUpdate();
 
     /// Build an AudioSystemTransform using the configured position/orientation sources.
     AudioSystemTransform ComputeCurrentTransform() const;
@@ -91,16 +100,19 @@ private:
     //  State
     // ========================================================================
 
-    /// Unique listener ID allocated in OnEnable; reset to INVALID_AUDIO_SYSTEM_ID on disable.
+    /// Unique listener ID allocated in OnBeginPlay; reset to INVALID_AUDIO_SYSTEM_ID on end-play.
     AudioSystemDataID _listenerId = INVALID_AUDIO_SYSTEM_ID;
 
-    /// Transform captured at the end of the previous OnUpdate call.
+    /// Transform captured at the end of the previous OnFrameUpdate call.
     AudioSystemTransform _lastTransform;
 
     /// Whether _lastTransform holds a valid previous-frame snapshot.
     bool _hasLastTransform = false;
 
-    /// Whether this component was registered as the default listener in OnEnable.
+    /// Set by OnTransformChanged; cleared after OnFrameUpdate flushes the change.
+    bool _transformDirty = false;
+
+    /// Whether this actor was registered as the default listener in OnBeginPlay.
     bool _registeredAsDefault = false;
 
     /// Source of monotonically increasing listener IDs. Listener IDs start at

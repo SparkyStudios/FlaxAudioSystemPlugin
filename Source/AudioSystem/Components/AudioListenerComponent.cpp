@@ -1,7 +1,7 @@
 #include <Engine/Core/Log.h>
 #include <Engine/Core/Math/Quaternion.h>
 #include <Engine/Engine/Time.h>
-#include <Engine/Level/Actor.h>
+#include <Engine/Scripting/Scripting.h>
 
 #include "AudioListenerComponent.h"
 #include "../Core/AudioSystem.h"
@@ -11,23 +11,26 @@
 //  Static state
 // ============================================================================
 
-AudioListenerComponent::AudioListenerComponent(const SpawnParams& params)
-    : AudioSystemComponent(params)
-{
-}
-
 // Listener IDs start at 2000 to avoid collisions with entity IDs (from 1000).
 AudioSystemDataID AudioListenerComponent::_nextListenerId = 2000;
 
+AudioListenerComponent::AudioListenerComponent(const SpawnParams& params)
+    : Actor(params)
+{
+}
+
 // ============================================================================
-//  OnEnable
+//  OnBeginPlay
 // ============================================================================
 
-void AudioListenerComponent::OnEnable()
+void AudioListenerComponent::OnBeginPlay()
 {
+    Actor::OnBeginPlay();
+
     // Allocate a unique listener ID (main-thread only — no atomics required).
     _listenerId = ++_nextListenerId;
     _hasLastTransform = false;
+    _transformDirty = true;
     _registeredAsDefault = false;
 
     AudioRequest req;
@@ -40,20 +43,70 @@ void AudioListenerComponent::OnEnable()
         AudioSystem::Get()->GetWorldModule().SetDefaultListener(this);
         _registeredAsDefault = true;
     }
+
+    Scripting::Update.Bind<AudioListenerComponent, &AudioListenerComponent::OnFrameUpdate>(this);
 }
 
 // ============================================================================
-//  OnUpdate
+//  OnEndPlay
 // ============================================================================
 
-void AudioListenerComponent::OnUpdate()
+void AudioListenerComponent::OnEndPlay()
+{
+    Scripting::Update.Unbind<AudioListenerComponent, &AudioListenerComponent::OnFrameUpdate>(this);
+
+    if (_registeredAsDefault)
+    {
+        AudioSystem::Get()->GetWorldModule().SetDefaultListener(nullptr);
+        _registeredAsDefault = false;
+    }
+
+    if (_listenerId != INVALID_AUDIO_SYSTEM_ID)
+    {
+        AudioRequest req;
+        req.Type = AudioRequestType::UnregisterListener;
+        req.EntityId = _listenerId;
+        AudioSystem::Get()->SendRequest(std::move(req));
+        _listenerId = INVALID_AUDIO_SYSTEM_ID;
+    }
+
+    _hasLastTransform = false;
+    _transformDirty = false;
+
+    Actor::OnEndPlay();
+}
+
+// ============================================================================
+//  OnTransformChanged
+// ============================================================================
+
+void AudioListenerComponent::OnTransformChanged()
+{
+    Actor::OnTransformChanged();
+    _transformDirty = true;
+}
+
+// ============================================================================
+//  OnFrameUpdate  (private — bound to Scripting::Update)
+// ============================================================================
+
+void AudioListenerComponent::OnFrameUpdate()
 {
     if (_listenerId == INVALID_AUDIO_SYSTEM_ID)
         return;
 
+    // When override actors are active, poll every frame since OnTransformChanged
+    // only fires for THIS actor's transform.
+    const bool hasOverrides = PositionObject.Get() != nullptr || OrientationObject.Get() != nullptr;
+    if (!_transformDirty && !hasOverrides)
+        return;
+
     const AudioSystemTransform current = ComputeCurrentTransform();
     if (_hasLastTransform && current == _lastTransform)
+    {
+        _transformDirty = false;
         return;
+    }
 
     AudioRequest req;
     req.Type = AudioRequestType::UpdateListenerTransform;
@@ -63,30 +116,7 @@ void AudioListenerComponent::OnUpdate()
 
     _lastTransform    = current;
     _hasLastTransform = true;
-}
-
-// ============================================================================
-//  OnDisable
-// ============================================================================
-
-void AudioListenerComponent::OnDisable()
-{
-    if (_listenerId == INVALID_AUDIO_SYSTEM_ID)
-        return;
-
-    if (_registeredAsDefault)
-    {
-        AudioSystem::Get()->GetWorldModule().SetDefaultListener(nullptr);
-        _registeredAsDefault = false;
-    }
-
-    AudioRequest req;
-    req.Type = AudioRequestType::UnregisterListener;
-    req.EntityId = _listenerId;
-    AudioSystem::Get()->SendRequest(std::move(req));
-
-    _listenerId       = INVALID_AUDIO_SYSTEM_ID;
-    _hasLastTransform = false;
+    _transformDirty   = false;
 }
 
 // ============================================================================
@@ -106,29 +136,19 @@ AudioSystemTransform AudioListenerComponent::ComputeCurrentTransform() const
 {
     const Actor* posSource = PositionObject.Get();
     const Actor* oriSource = OrientationObject.Get();
-    const Actor* owner     = GetActor();
 
-    // Fall back to the owner actor when override actors are not set.
+    // Fall back to this actor when override actors are not set.
     if (posSource == nullptr)
-        posSource = owner;
+        posSource = this;
     if (oriSource == nullptr)
-        oriSource = owner;
+        oriSource = this;
 
     AudioSystemTransform result;
 
-    if (posSource == nullptr)
-        return result;
-
     const Vector3 pos = posSource->GetPosition();
-
-    Vector3 forward = Vector3::Forward;
-    Vector3 up      = Vector3::Up;
-    if (oriSource != nullptr)
-    {
-        const Quaternion rot = oriSource->GetOrientation();
-        forward = rot * Vector3::Forward;
-        up      = rot * Vector3::Up;
-    }
+    const Quaternion rot = oriSource->GetOrientation();
+    result.Forward = rot * Vector3::Forward;
+    result.Up      = rot * Vector3::Up;
 
     // Derive velocity from the delta between the last recorded position and
     // the current position, divided by the elapsed frame time.
@@ -138,8 +158,6 @@ AudioSystemTransform AudioListenerComponent::ComputeCurrentTransform() const
         velocity = (pos - _lastTransform.Position) / dt;
 
     result.Position = pos;
-    result.Forward  = forward;
-    result.Up       = up;
     result.Velocity = velocity;
 
     return result;

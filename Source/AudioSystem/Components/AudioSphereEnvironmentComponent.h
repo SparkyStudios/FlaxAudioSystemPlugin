@@ -32,15 +32,15 @@ public:
     //  Serialised properties
     // ========================================================================
 
-    /// Outer radius of the sphere zone (m).
+    /// Outer radius of the sphere zone.
     /// Proxies beyond this distance receive no wet-send.
-    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Outer radius of the sphere zone (m).\")")
+    API_FIELD(Attributes="EditorOrder(1), ValueCategory(Utils.ValueCategory.Distance), Tooltip(\"Outer radius of the sphere zone.\")")
     float Radius = 5.0f;
 
-    /// Width of the falloff shell just inside the outer radius (m).
+    /// Width of the falloff shell just inside the outer radius.
     /// The wet-send transitions from 1.0 at (Radius - MaxDistance) to 0.0 at
     /// Radius.  Clamped to 0 at runtime so negative values are safe to author.
-    API_FIELD(Attributes="EditorOrder(2), Tooltip(\"Falloff distance inside the outer sphere radius (m).\")")
+    API_FIELD(Attributes="EditorOrder(2), ValueCategory(Utils.ValueCategory.Distance), Tooltip(\"Falloff distance inside the outer sphere radius.\")")
     float MaxDistance = 1.0f;
 
     // ========================================================================

@@ -28,13 +28,13 @@ public:
     //  Serialised properties
     // ========================================================================
 
-    /// Half-extents of the box in the Actor's local space (m).
-    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Half-extents of the box zone in local space (m).\")")
+    /// Half-extents of the box in the Actor's local space.
+    API_FIELD(Attributes="EditorOrder(1), ValueCategory(Utils.ValueCategory.Distance), Tooltip(\"Half-extents of the box zone in local space.\")")
     Vector3 HalfExtents = Vector3(1.0f, 1.0f, 1.0f);
 
     /// Distance beyond the box surface over which the wet-send linearly fades
     /// from 1.0 (at the surface) to 0.0 (at MaxDistance).
-    API_FIELD(Attributes="EditorOrder(2), Tooltip(\"Falloff distance beyond the box surface (m).\")")
+    API_FIELD(Attributes="EditorOrder(2), ValueCategory(Utils.ValueCategory.Distance), Tooltip(\"Falloff distance beyond the box surface.\")")
     float MaxDistance = 1.0f;
 
     // ========================================================================

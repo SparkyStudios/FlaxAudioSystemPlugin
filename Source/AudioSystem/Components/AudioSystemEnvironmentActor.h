@@ -43,8 +43,12 @@ public:
     API_FIELD(Attributes="EditorOrder(0), Tooltip(\"Name of the environment (aux bus) as defined in the control collection.\")")
     String EnvironmentName;
 
+    // ========================================================================
+    //  Debug properties
+    // ========================================================================
+
     /// Wireframe color used to visualize this environment zone in the editor viewport.
-    API_FIELD(Attributes="EditorOrder(1), EditorDisplay(\"Environment\", \"Color\"), Tooltip(\"Wireframe color for the environment zone debug visualization.\")")
+    API_FIELD(Attributes="EditorOrder(100), EditorDisplay(\"Debug\", \"Color\"), Tooltip(\"Wireframe color for the environment zone debug visualization.\")")
     Color EnvironmentColor = Color(0.0f, 0.8f, 1.0f, 1.0f);
 
     // ========================================================================

@@ -1,7 +1,30 @@
 #include <Engine/Core/Log.h>
+#include <Engine/Level/Scene/SceneRendering.h>
 
 #include "AudioSystemEnvironmentActor.h"
 #include "../Core/AudioSystem.h"
+
+// ============================================================================
+//  OnEnable / OnDisable — viewport icon registration
+// ============================================================================
+
+void AudioSystemEnvironmentActor::OnEnable()
+{
+    Actor::OnEnable();
+
+#if USE_EDITOR
+    GetSceneRendering()->AddViewportIcon(this);
+#endif
+}
+
+void AudioSystemEnvironmentActor::OnDisable()
+{
+#if USE_EDITOR
+    GetSceneRendering()->RemoveViewportIcon(this);
+#endif
+
+    Actor::OnDisable();
+}
 
 // ============================================================================
 //  OnBeginPlay

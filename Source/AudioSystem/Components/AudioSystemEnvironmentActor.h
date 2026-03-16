@@ -55,6 +55,12 @@ public:
     //  Actor lifecycle overrides
     // ========================================================================
 
+    /// Registers the viewport icon with the scene rendering system.
+    void OnEnable() override;
+
+    /// Unregisters the viewport icon from the scene rendering system.
+    void OnDisable() override;
+
     /// Resolves the environment ID and registers with the AudioWorldModule.
     void OnBeginPlay() override;
 

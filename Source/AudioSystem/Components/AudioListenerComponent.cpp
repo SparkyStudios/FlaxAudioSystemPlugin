@@ -1,6 +1,7 @@
 #include <Engine/Core/Log.h>
 #include <Engine/Core/Math/Quaternion.h>
 #include <Engine/Engine/Time.h>
+#include <Engine/Level/Scene/SceneRendering.h>
 #include <Engine/Scripting/Scripting.h>
 
 #include "AudioListenerComponent.h"
@@ -17,6 +18,28 @@ AudioSystemDataID AudioListenerComponent::_nextListenerId = 2000;
 AudioListenerComponent::AudioListenerComponent(const SpawnParams& params)
     : Actor(params)
 {
+}
+
+// ============================================================================
+//  OnEnable / OnDisable — viewport icon registration
+// ============================================================================
+
+void AudioListenerComponent::OnEnable()
+{
+    Actor::OnEnable();
+
+#if USE_EDITOR
+    GetSceneRendering()->AddViewportIcon(this);
+#endif
+}
+
+void AudioListenerComponent::OnDisable()
+{
+#if USE_EDITOR
+    GetSceneRendering()->RemoveViewportIcon(this);
+#endif
+
+    Actor::OnDisable();
 }
 
 // ============================================================================

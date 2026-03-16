@@ -42,6 +42,12 @@ public:
     //  Actor lifecycle overrides
     // ========================================================================
 
+    /// Registers the viewport icon with the scene rendering system.
+    void OnEnable() override;
+
+    /// Unregisters the viewport icon from the scene rendering system.
+    void OnDisable() override;
+
     /// Allocates a unique entity ID, registers this entity with the middleware,
     /// and binds the per-frame update delegate.
     void OnBeginPlay() override;

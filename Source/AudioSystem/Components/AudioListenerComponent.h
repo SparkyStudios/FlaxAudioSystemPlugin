@@ -63,6 +63,12 @@ public:
     //  Actor lifecycle overrides
     // ========================================================================
 
+    /// Registers the viewport icon with the scene rendering system.
+    void OnEnable() override;
+
+    /// Unregisters the viewport icon from the scene rendering system.
+    void OnDisable() override;
+
     /// Allocates a unique listener ID, registers this listener with the middleware,
     /// and binds the per-frame update delegate.
     /// If IsDefault is true, sets this as the scene default listener.

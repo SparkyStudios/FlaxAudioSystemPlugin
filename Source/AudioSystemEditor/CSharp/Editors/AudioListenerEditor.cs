@@ -1,7 +1,7 @@
 using AudioSystem;
 using FlaxEditor;
 using FlaxEditor.CustomEditors;
-using FlaxEditor.CustomEditors.Editors;
+using FlaxEditor.CustomEditors.Dedicated;
 using FlaxEditor.CustomEditors.Elements;
 using FlaxEngine;
 using FlaxEngine.GUI;
@@ -9,7 +9,7 @@ using FlaxEngine.GUI;
 namespace AudioSystemEditor.Editors
 {
     [CustomEditor(typeof(AudioListenerComponent)), DefaultEditor]
-    public class AudioListenerEditor : GenericEditor
+    public class AudioListenerEditor : ActorEditor
     {
         private Label _statusLabel;
 

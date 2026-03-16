@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Engine/Core/Math/Color.h>
 #include <Engine/Core/Types/String.h>
 #include <Engine/Level/Actor.h>
 
@@ -42,6 +43,10 @@ public:
     API_FIELD(Attributes="EditorOrder(0), Tooltip(\"Name of the environment (aux bus) as defined in the control collection.\")")
     String EnvironmentName;
 
+    /// Wireframe color used to visualize this environment zone in the editor viewport.
+    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Wireframe color for the environment zone debug visualization.\")")
+    Color EnvironmentColor = Color(0.0f, 0.8f, 1.0f, 1.0f);
+
     // ========================================================================
     //  Actor lifecycle overrides
     // ========================================================================
@@ -63,6 +68,18 @@ public:
     /// \return The environment ID resolved from EnvironmentName.
     ///         Returns INVALID_AUDIO_SYSTEM_ID if not yet resolved or not found.
     AudioSystemDataID GetEnvironmentId() const;
+
+    // ========================================================================
+    //  Debug draw (editor only)
+    // ========================================================================
+
+#if USE_EDITOR
+    /// Draws a dim wireframe of the environment zone every editor frame.
+    void OnDebugDraw() override;
+
+    /// Draws a full-color wireframe of the environment zone when selected.
+    void OnDebugDrawSelected() override;
+#endif
 
 protected:
     /// Resolved ID for EnvironmentName. INVALID_AUDIO_SYSTEM_ID if not found.

@@ -42,3 +42,35 @@ float AudioSphereEnvironmentComponent::GetEnvironmentAmount(const AudioProxyComp
     // Falloff shell [innerRadius, Radius]: linear fade from 1 to 0.
     return 1.0f - ((dist - innerRadius) / falloffWidth);
 }
+
+// ============================================================================
+//  Debug draw (editor only)
+// ============================================================================
+
+#if USE_EDITOR
+#include <Engine/Debug/DebugDraw.h>
+
+static constexpr float WiresDimAlpha = 0.35f;
+
+void AudioSphereEnvironmentComponent::OnDebugDraw()
+{
+    const Color dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
+    const Vector3 center = GetPosition();
+
+    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, Radius), dimColor, 0, true);
+    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, MaxDistance), dimColor, 0, true);
+
+    Actor::OnDebugDraw();
+}
+
+void AudioSphereEnvironmentComponent::OnDebugDrawSelected()
+{
+    const Vector3 center = GetPosition();
+
+    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, Radius), EnvironmentColor, 0, false);
+    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, MaxDistance), EnvironmentColor, 0, false);
+
+    Actor::OnDebugDrawSelected();
+}
+
+#endif

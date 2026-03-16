@@ -28,13 +28,13 @@ public:
     //  Serialised properties
     // ========================================================================
 
-    /// Half-extents of the box in the Actor's local space.
-    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Half-extents of the box zone in local space.\")")
+    /// Half-extents of the box in the Actor's local space (m).
+    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Half-extents of the box zone in local space (m).\")")
     Vector3 HalfExtents = Vector3(1.0f, 1.0f, 1.0f);
 
     /// Distance beyond the box surface over which the wet-send linearly fades
     /// from 1.0 (at the surface) to 0.0 (at MaxDistance).
-    API_FIELD(Attributes="EditorOrder(2), Tooltip(\"Falloff distance beyond the box surface.\")")
+    API_FIELD(Attributes="EditorOrder(2), Tooltip(\"Falloff distance beyond the box surface (m).\")")
     float MaxDistance = 1.0f;
 
     // ========================================================================
@@ -44,4 +44,13 @@ public:
     /// \return 1.0 if proxy is inside the box, linearly attenuated in the
     ///         falloff shell, or 0.0 if beyond MaxDistance.
     float GetEnvironmentAmount(const AudioProxyComponent* proxy) const override;
+
+    // ========================================================================
+    //  Debug draw (editor only)
+    // ========================================================================
+
+#if USE_EDITOR
+    void OnDebugDraw() override;
+    void OnDebugDrawSelected() override;
+#endif
 };

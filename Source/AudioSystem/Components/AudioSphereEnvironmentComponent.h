@@ -32,15 +32,15 @@ public:
     //  Serialised properties
     // ========================================================================
 
-    /// Outer radius of the sphere zone in world units.
+    /// Outer radius of the sphere zone (m).
     /// Proxies beyond this distance receive no wet-send.
-    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Outer radius of the sphere zone in world units.\")")
+    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Outer radius of the sphere zone (m).\")")
     float Radius = 5.0f;
 
-    /// Width of the falloff shell just inside the outer radius.
+    /// Width of the falloff shell just inside the outer radius (m).
     /// The wet-send transitions from 1.0 at (Radius - MaxDistance) to 0.0 at
     /// Radius.  Clamped to 0 at runtime so negative values are safe to author.
-    API_FIELD(Attributes="EditorOrder(2), Tooltip(\"Falloff distance inside the outer sphere radius.\")")
+    API_FIELD(Attributes="EditorOrder(2), Tooltip(\"Falloff distance inside the outer sphere radius (m).\")")
     float MaxDistance = 1.0f;
 
     // ========================================================================
@@ -51,4 +51,13 @@ public:
     ///         shell [innerRadius, Radius], or 0.0 outside the outer sphere.
     /// \param proxy  The audio proxy whose world position is tested.
     float GetEnvironmentAmount(const AudioProxyComponent* proxy) const override;
+
+    // ========================================================================
+    //  Debug draw (editor only)
+    // ========================================================================
+
+#if USE_EDITOR
+    void OnDebugDraw() override;
+    void OnDebugDrawSelected() override;
+#endif
 };

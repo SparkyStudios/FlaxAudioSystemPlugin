@@ -48,3 +48,21 @@ AudioSystemDataID AudioSystemEnvironmentActor::GetEnvironmentId() const
 {
     return _environmentId;
 }
+
+// ============================================================================
+//  Debug draw (editor only)
+// ============================================================================
+
+#if USE_EDITOR
+
+void AudioSystemEnvironmentActor::OnDebugDraw()
+{
+    Actor::OnDebugDraw();
+}
+
+void AudioSystemEnvironmentActor::OnDebugDrawSelected()
+{
+    Actor::OnDebugDrawSelected();
+}
+
+#endif

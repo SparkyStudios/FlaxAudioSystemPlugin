@@ -2,7 +2,7 @@
 
 #include <Engine/Core/Collections/Array.h>
 
-#include "../Components/AudioSystemEnvironmentComponent.h"
+#include "../Components/AudioSystemEnvironmentActor.h"
 
 // Forward declarations
 class AudioListenerComponent;
@@ -36,14 +36,14 @@ public:
 
     /// Register an environment component as active.
     /// Logs a warning and does nothing if \p comp is null or already registered.
-    void AddEnvironment(const AudioSystemEnvironmentComponent* comp);
+    void AddEnvironment(const AudioSystemEnvironmentActor* comp);
 
     /// Unregister an environment component.
     /// Logs a warning if \p comp is not currently registered.
-    void RemoveEnvironment(const AudioSystemEnvironmentComponent* comp);
+    void RemoveEnvironment(const AudioSystemEnvironmentActor* comp);
 
     /// \return The list of currently active environment components (read-only).
-    const Array<const AudioSystemEnvironmentComponent*>& GetEnvironments() const;
+    const Array<const AudioSystemEnvironmentActor*>& GetEnvironments() const;
 
     // ========================================================================
     //  Default listener
@@ -57,6 +57,6 @@ public:
     const AudioListenerComponent* GetDefaultListener() const;
 
 private:
-    Array<const AudioSystemEnvironmentComponent*> _environments;
+    Array<const AudioSystemEnvironmentActor*> _environments;
     const AudioListenerComponent* _defaultListener = nullptr;
 };

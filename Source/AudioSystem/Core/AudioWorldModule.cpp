@@ -18,7 +18,7 @@ void AudioWorldModule::Update()
 //  Environment registration
 // ============================================================================
 
-void AudioWorldModule::AddEnvironment(const AudioSystemEnvironmentComponent* comp)
+void AudioWorldModule::AddEnvironment(const AudioSystemEnvironmentActor* comp)
 {
     if (comp == nullptr)
     {
@@ -35,7 +35,7 @@ void AudioWorldModule::AddEnvironment(const AudioSystemEnvironmentComponent* com
     _environments.Add(comp);
 }
 
-void AudioWorldModule::RemoveEnvironment(const AudioSystemEnvironmentComponent* comp)
+void AudioWorldModule::RemoveEnvironment(const AudioSystemEnvironmentActor* comp)
 {
     const int32 index = _environments.Find(comp);
 
@@ -48,7 +48,7 @@ void AudioWorldModule::RemoveEnvironment(const AudioSystemEnvironmentComponent* 
     _environments.RemoveAt(index);
 }
 
-const Array<const AudioSystemEnvironmentComponent*>& AudioWorldModule::GetEnvironments() const
+const Array<const AudioSystemEnvironmentActor*>& AudioWorldModule::GetEnvironments() const
 {
     return _environments;
 }

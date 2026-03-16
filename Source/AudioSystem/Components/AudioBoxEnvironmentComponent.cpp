@@ -48,6 +48,7 @@ float AudioBoxEnvironmentComponent::GetEnvironmentAmount(const AudioProxyCompone
 // ============================================================================
 
 #if USE_EDITOR
+#include <Engine/Core/Math/BoundingSphere.h>
 #include <Engine/Core/Math/Color.h>
 #include <Engine/Core/Math/OrientedBoundingBox.h>
 #include <Engine/Debug/DebugDraw.h>

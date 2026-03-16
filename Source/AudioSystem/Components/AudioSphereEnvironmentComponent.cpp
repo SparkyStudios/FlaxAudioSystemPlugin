@@ -48,6 +48,7 @@ float AudioSphereEnvironmentComponent::GetEnvironmentAmount(const AudioProxyComp
 // ============================================================================
 
 #if USE_EDITOR
+#include <Engine/Core/Math/BoundingSphere.h>
 #include <Engine/Core/Math/Color.h>
 #include <Engine/Debug/DebugDraw.h>
 
@@ -55,11 +56,10 @@ static constexpr float WiresDimAlpha = 0.35f;
 
 void AudioSphereEnvironmentComponent::OnDebugDraw()
 {
-    const float innerRadius = Math::Max(Radius - Math::Max(MaxDistance, 0.0f), 0.0f);
-    const Color dimColor    = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
-    const Vector3 center    = GetPosition();
+    const Color dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
+    const Vector3 center = GetPosition();
 
-    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, innerRadius), dimColor, 0, true);
+    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, Radius), dimColor, 0, true);
     DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, MaxDistance), dimColor, 0, true);
 
     Actor::OnDebugDraw();
@@ -67,10 +67,9 @@ void AudioSphereEnvironmentComponent::OnDebugDraw()
 
 void AudioSphereEnvironmentComponent::OnDebugDrawSelected()
 {
-    const float innerRadius = Math::Max(Radius - Math::Max(MaxDistance, 0.0f), 0.0f);
-    const Vector3 center    = GetPosition();
+    const Vector3 center = GetPosition();
 
-    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, innerRadius), EnvironmentColor, 0, false);
+    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, Radius), EnvironmentColor, 0, false);
     DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, MaxDistance), EnvironmentColor, 0, false);
 
     Actor::OnDebugDrawSelected();

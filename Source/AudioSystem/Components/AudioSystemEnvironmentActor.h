@@ -44,7 +44,7 @@ public:
     String EnvironmentName;
 
     /// Wireframe color used to visualize this environment zone in the editor viewport.
-    API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Wireframe color for the environment zone debug visualization.\")")
+    API_FIELD(Attributes="EditorOrder(1), EditorDisplay(\"Environment\", \"Color\"), Tooltip(\"Wireframe color for the environment zone debug visualization.\")")
     Color EnvironmentColor = Color(0.0f, 0.8f, 1.0f, 1.0f);
 
     // ========================================================================

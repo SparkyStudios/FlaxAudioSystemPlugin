@@ -1,24 +1,12 @@
-#include <Engine/Core/Log.h>
 #include <Engine/Core/Math/Math.h>
 #include <Engine/Core/Math/Vector3.h>
-#include <Engine/Level/Actor.h>
 
 #include "AudioBoxEnvironmentComponent.h"
 #include "AudioProxyComponent.h"
 
 AudioBoxEnvironmentComponent::AudioBoxEnvironmentComponent(const SpawnParams& params)
-    : AudioSystemEnvironmentComponent(params)
+    : AudioSystemEnvironmentActor(params)
 {
-}
-
-// ============================================================================
-//  OnUpdate
-// ============================================================================
-
-void AudioBoxEnvironmentComponent::OnUpdate()
-{
-    // Per-frame logic is handled by AudioWorldModule::Update().
-    // Nothing to do here.
 }
 
 // ============================================================================
@@ -30,15 +18,12 @@ float AudioBoxEnvironmentComponent::GetEnvironmentAmount(const AudioProxyCompone
     if (proxy == nullptr)
         return 0.0f;
 
-    Actor* owner = GetActor();
-    if (owner == nullptr)
-        return 0.0f;
+    // proxy is an Actor — call GetPosition() directly.
+    const Vector3 proxyWorldPos = proxy->GetPosition();
 
-    const Vector3 proxyWorldPos = proxy->GetActor()->GetPosition();
-
-    // Transform the proxy world position into the owner Actor's local space so
+    // Transform the proxy world position into this Actor's local space so
     // the box test is always axis-aligned regardless of Actor rotation/scale.
-    const Vector3 localPos = owner->GetTransform().WorldToLocal(proxyWorldPos);
+    const Vector3 localPos = GetTransform().WorldToLocal(proxyWorldPos);
 
     // Clamp local position to the box surface.
     const Vector3 clamped = Vector3::Clamp(localPos, -HalfExtents, HalfExtents);

@@ -372,12 +372,8 @@ void AudioTriggerComponent::ComputeObstructionOcclusion(float& outObstruction, f
     if (listener == nullptr)
         return;
 
-    const Actor* listenerActor = listener->GetActor();
-    if (listenerActor == nullptr)
-        return;
-
     const Vector3 sourcePos   = owner->GetPosition();
-    const Vector3 listenerPos = listenerActor->GetPosition();
+    const Vector3 listenerPos = listener->GetPosition();
     const Vector3 delta       = listenerPos - sourcePos;
     const float   distance    = delta.Length();
 

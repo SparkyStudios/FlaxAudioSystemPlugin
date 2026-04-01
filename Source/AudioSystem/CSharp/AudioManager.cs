@@ -10,20 +10,20 @@ namespace AudioSystem
     {
         /// <summary>
         /// Play a trigger on a specific actor.
-        /// The actor must be an AudioProxyComponent or contain one as a child.
+        /// The actor must be an AudioProxyActor or contain one as a child.
         /// </summary>
         public static void Play(Actor actor, string triggerName = null)
         {
             if (actor == null) return;
 
-            var proxy = actor as AudioProxyComponent ?? actor.GetChild<AudioProxyComponent>();
+            var proxy = actor as AudioProxyActor ?? actor.GetChild<AudioProxyActor>();
             if (proxy == null)
             {
-                Debug.LogWarning($"[AudioManager] No AudioProxyComponent found on or under '{actor.Name}'.");
+                Debug.LogWarning($"[AudioManager] No AudioProxyActor found on or under '{actor.Name}'.");
                 return;
             }
 
-            var triggers = proxy.GetScripts<AudioTriggerComponent>();
+            var triggers = proxy.GetScripts<AudioTriggerScript>();
             foreach (var trigger in triggers)
             {
                 if (triggerName == null || trigger.PlayTriggerName == triggerName)
@@ -33,7 +33,7 @@ namespace AudioSystem
                 }
             }
 
-            Debug.LogWarning($"[AudioManager] No matching AudioTriggerComponent found on '{proxy.Name}' for trigger '{triggerName}'.");
+            Debug.LogWarning($"[AudioManager] No matching AudioTriggerScript found on '{proxy.Name}' for trigger '{triggerName}'.");
         }
 
         /// <summary>
@@ -43,10 +43,10 @@ namespace AudioSystem
         {
             if (actor == null) return;
 
-            var proxy = actor as AudioProxyComponent ?? actor.GetChild<AudioProxyComponent>();
+            var proxy = actor as AudioProxyActor ?? actor.GetChild<AudioProxyActor>();
             if (proxy == null) return;
 
-            var triggers = proxy.GetScripts<AudioTriggerComponent>();
+            var triggers = proxy.GetScripts<AudioTriggerScript>();
             foreach (var trigger in triggers)
             {
                 if (triggerName == null || trigger.PlayTriggerName == triggerName)
@@ -64,14 +64,14 @@ namespace AudioSystem
         {
             if (actor == null) return;
 
-            var proxy = actor as AudioProxyComponent ?? actor.GetChild<AudioProxyComponent>();
+            var proxy = actor as AudioProxyActor ?? actor.GetChild<AudioProxyActor>();
             if (proxy == null)
             {
-                Debug.LogWarning($"[AudioManager] No AudioProxyComponent found on or under '{actor.Name}'.");
+                Debug.LogWarning($"[AudioManager] No AudioProxyActor found on or under '{actor.Name}'.");
                 return;
             }
 
-            var rtpcs = proxy.GetScripts<AudioRtpcComponent>();
+            var rtpcs = proxy.GetScripts<AudioRtpcScript>();
             foreach (var rtpc in rtpcs)
             {
                 if (rtpc.RtpcName == rtpcName)
@@ -81,7 +81,7 @@ namespace AudioSystem
                 }
             }
 
-            Debug.LogWarning($"[AudioManager] No AudioRtpcComponent with name '{rtpcName}' found on '{proxy.Name}'.");
+            Debug.LogWarning($"[AudioManager] No AudioRtpcScript with name '{rtpcName}' found on '{proxy.Name}'.");
         }
 
         /// <summary>
@@ -91,21 +91,21 @@ namespace AudioSystem
         {
             if (actor == null) return;
 
-            var proxy = actor as AudioProxyComponent ?? actor.GetChild<AudioProxyComponent>();
+            var proxy = actor as AudioProxyActor ?? actor.GetChild<AudioProxyActor>();
             if (proxy == null)
             {
-                Debug.LogWarning($"[AudioManager] No AudioProxyComponent found on or under '{actor.Name}'.");
+                Debug.LogWarning($"[AudioManager] No AudioProxyActor found on or under '{actor.Name}'.");
                 return;
             }
 
-            var switches = proxy.GetScripts<AudioSwitchStateComponent>();
+            var switches = proxy.GetScripts<AudioSwitchStateScript>();
             foreach (var sw in switches)
             {
                 sw.SetState(stateName);
                 return;
             }
 
-            Debug.LogWarning($"[AudioManager] No AudioSwitchStateComponent found on '{proxy.Name}'.");
+            Debug.LogWarning($"[AudioManager] No AudioSwitchStateScript found on '{proxy.Name}'.");
         }
     }
 }

@@ -8,7 +8,7 @@ using FlaxEngine.GUI;
 
 namespace AudioSystemEditor.Editors
 {
-    [CustomEditor(typeof(AudioListenerComponent)), DefaultEditor]
+    [CustomEditor(typeof(AudioListenerActor)), DefaultEditor]
     public class AudioListenerEditor : ActorEditor
     {
         private Label _statusLabel;
@@ -38,7 +38,7 @@ namespace AudioSystemEditor.Editors
 
             foreach (var value in Values)
             {
-                if (value is AudioListenerComponent listener)
+                if (value is AudioListenerActor listener)
                 {
                     _statusLabel.Text = listener.IsDefault
                         ? "This is the DEFAULT listener"

@@ -8,7 +8,7 @@ using FlaxEngine.GUI;
 
 namespace AudioSystemEditor.Editors
 {
-    [CustomEditor(typeof(AudioRtpcComponent)), DefaultEditor]
+    [CustomEditor(typeof(AudioRtpcScript)), DefaultEditor]
     public class AudioRtpcEditor : GenericEditor
     {
         private SliderElement _sliderElement;
@@ -33,7 +33,7 @@ namespace AudioSystemEditor.Editors
             // Seed slider with the current live value
             foreach (var value in Values)
             {
-                if (value is AudioRtpcComponent rtpc)
+                if (value is AudioRtpcScript rtpc)
                 {
                     _sliderElement.Value = rtpc.GetValue();
                     _valueLabel.Text = $"Value: {rtpc.GetValue():F2}";
@@ -50,7 +50,7 @@ namespace AudioSystemEditor.Editors
 
             foreach (var value in Values)
             {
-                if (value is AudioRtpcComponent rtpc)
+                if (value is AudioRtpcScript rtpc)
                 {
                     rtpc.SetValue(_sliderElement.Value);
                 }
@@ -65,7 +65,7 @@ namespace AudioSystemEditor.Editors
 
             foreach (var value in Values)
             {
-                if (value is AudioRtpcComponent rtpc)
+                if (value is AudioRtpcScript rtpc)
                 {
                     _valueLabel.Text = $"Value: {rtpc.GetValue():F2}";
                     break;

@@ -15,19 +15,19 @@ namespace AudioSystemEditor
         // Script-based components: icon registration only.
         private static readonly (System.Type type, string iconName)[] ScriptIcons =
         {
-            (typeof(AudioTriggerComponent),        "AudioTriggerComponent128.flax"),
-            (typeof(AudioRtpcComponent),           "AudioRtpcComponent128.flax"),
-            (typeof(AudioSwitchStateComponent),    "AudioSwitchStateComponent128.flax"),
-            (typeof(AudioAnimationComponent),      "AudioAnimationComponent128.flax"),
+            (typeof(AudioTriggerScript),        "AudioTriggerScript128.flax"),
+            (typeof(AudioRtpcScript),           "AudioRtpcScript128.flax"),
+            (typeof(AudioSwitchStateScript),    "AudioSwitchStateScript128.flax"),
+            (typeof(AudioAnimationScript),      "AudioAnimationScript128.flax"),
         };
 
         // Actor-based components: icon registration + scene graph node type.
         private static readonly (System.Type type, string iconName, System.Type nodeType)[] ActorIcons =
         {
-            (typeof(AudioProxyComponent),             "AudioProxyComponent128.flax",             typeof(AudioProxyNode)),
-            (typeof(AudioListenerComponent),          "AudioListenerComponent128.flax",          typeof(AudioListenerNode)),
-            (typeof(AudioBoxEnvironmentComponent),    "AudioBoxEnvironmentComponent128.flax",    typeof(AudioBoxEnvironmentNode)),
-            (typeof(AudioSphereEnvironmentComponent), "AudioSphereEnvironmentComponent128.flax", typeof(AudioSphereEnvironmentNode)),
+            (typeof(AudioProxyActor),             "AudioProxyActor128.flax",             typeof(AudioProxyNode)),
+            (typeof(AudioListenerActor),          "AudioListenerActor128.flax",          typeof(AudioListenerNode)),
+            (typeof(AudioBoxEnvironmentActor),    "AudioBoxEnvironmentActor128.flax",    typeof(AudioBoxEnvironmentNode)),
+            (typeof(AudioSphereEnvironmentActor), "AudioSphereEnvironmentActor128.flax", typeof(AudioSphereEnvironmentNode)),
         };
 
         public void Register()

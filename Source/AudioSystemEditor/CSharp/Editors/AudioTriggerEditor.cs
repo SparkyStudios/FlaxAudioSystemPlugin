@@ -8,7 +8,7 @@ using FlaxEngine.GUI;
 
 namespace AudioSystemEditor.Editors
 {
-    [CustomEditor(typeof(AudioTriggerComponent)), DefaultEditor]
+    [CustomEditor(typeof(AudioTriggerScript)), DefaultEditor]
     public class AudioTriggerEditor : GenericEditor
     {
         private Label _stateLabel;
@@ -36,14 +36,14 @@ namespace AudioSystemEditor.Editors
             grid.Button("Play").Button.Clicked += () =>
             {
                 foreach (var value in Values)
-                    if (value is AudioTriggerComponent trigger)
+                    if (value is AudioTriggerScript trigger)
                         trigger.Play();
             };
 
             grid.Button("Stop").Button.Clicked += () =>
             {
                 foreach (var value in Values)
-                    if (value is AudioTriggerComponent trigger)
+                    if (value is AudioTriggerScript trigger)
                         trigger.Stop();
             };
         }
@@ -57,7 +57,7 @@ namespace AudioSystemEditor.Editors
             var text = string.Empty;
             foreach (var value in Values)
             {
-                if (value is AudioTriggerComponent trigger)
+                if (value is AudioTriggerScript trigger)
                 {
                     text += $"State: {trigger.GetTriggerState()}\n";
                 }

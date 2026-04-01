@@ -18,29 +18,27 @@ float AudioSphereEnvironmentComponent::GetEnvironmentAmount(const AudioProxyComp
     if (proxy == nullptr)
         return 0.0f;
 
-    // Both this and the proxy are Actors — call GetPosition() directly.
     const Vector3 ownerPos = GetPosition();
     const Vector3 proxyPos = proxy->GetPosition();
     const float   dist     = Vector3::Distance(ownerPos, proxyPos);
 
-    // Outside the sphere entirely: no send.
-    if (Radius <= 0.0f || dist > Radius)
+    // Clamp MaxDistance so the falloff width is never negative.
+    const float outerRadius = Math::Max(MaxDistance, Radius);
+
+    // Beyond the outer sphere: no send.
+    if (outerRadius <= 0.0f || dist >= outerRadius)
         return 0.0f;
 
-    // Clamp MaxDistance to a sane range so innerRadius is non-negative.
-    const float falloffWidth = Math::Max(MaxDistance, 0.0f);
-    const float innerRadius  = Radius - falloffWidth;
-
-    // Inside the inner (fully wet) sphere: full send.
-    if (dist <= innerRadius)
+    // Inside the inner sphere: full send.
+    if (dist <= Radius)
         return 1.0f;
 
-    // Degenerate falloff — treat entire sphere as a hard boundary.
+    // Falloff shell [Radius, outerRadius]: linear fade from 1 to 0.
+    const float falloffWidth = outerRadius - Radius;
     if (falloffWidth <= 0.0f)
         return 0.0f;
 
-    // Falloff shell [innerRadius, Radius]: linear fade from 1 to 0.
-    return 1.0f - ((dist - innerRadius) / falloffWidth);
+    return 1.0f - ((dist - Radius) / falloffWidth);
 }
 
 // ============================================================================
@@ -59,8 +57,11 @@ void AudioSphereEnvironmentComponent::OnDebugDraw()
     const Color dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
     const Vector3 center = GetPosition();
 
+    // Inner sphere (full send boundary).
     DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, Radius), dimColor, 0, true);
-    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, MaxDistance), dimColor, 0, true);
+    // Outer sphere (zero send boundary).
+    const float outerRadius = Math::Max(MaxDistance, Radius);
+    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, outerRadius), dimColor, 0, true);
 
     Actor::OnDebugDraw();
 }
@@ -70,7 +71,8 @@ void AudioSphereEnvironmentComponent::OnDebugDrawSelected()
     const Vector3 center = GetPosition();
 
     DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, Radius), EnvironmentColor, 0, false);
-    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, MaxDistance), EnvironmentColor, 0, false);
+    const float outerRadius = Math::Max(MaxDistance, Radius);
+    DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, outerRadius), EnvironmentColor, 0, false);
 
     Actor::OnDebugDrawSelected();
 }

@@ -141,12 +141,24 @@ void AudioSystem::UnregisterMiddleware()
 
 void AudioSystem::SendRequest(AudioRequest&& request)
 {
+    if (!_initialized)
+    {
+        LOG(Warning, "[AudioSystem] SendRequest: system not initialized, dropping request.");
+        return;
+    }
+
     ScopeLock lock(_requestsMutex);
     _requestsQueue.Add(MoveTemp(request));
 }
 
 void AudioSystem::SendRequests(Array<AudioRequest>& requests)
 {
+    if (!_initialized)
+    {
+        LOG(Warning, "[AudioSystem] SendRequests: system not initialized, dropping {0} request(s).", requests.Count());
+        return;
+    }
+
     ScopeLock lock(_requestsMutex);
     for (auto& req : requests)
     {
@@ -156,6 +168,12 @@ void AudioSystem::SendRequests(Array<AudioRequest>& requests)
 
 void AudioSystem::SendRequestSync(AudioRequest&& request)
 {
+    if (!_initialized)
+    {
+        LOG(Warning, "[AudioSystem] SendRequestSync: system not initialized, dropping request.");
+        return;
+    }
+
     {
         ScopeLock lock(_mainMutex);
         _blockingDone = false;

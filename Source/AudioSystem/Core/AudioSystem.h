@@ -148,6 +148,14 @@ public:
 
     void LoadConfiguration(StringView file);
 
+#if USE_EDITOR
+    /// Forward a deploy-files request to the loaded middleware.
+    /// Called from the editor build hook during game cooking.
+    /// \param outputPath  Absolute path to the cooked output root folder.
+    /// \return true if the middleware deployed successfully, false on error or no middleware.
+    bool DeployFiles(const StringView& outputPath);
+#endif
+
     AudioSystem();
     ~AudioSystem();
 

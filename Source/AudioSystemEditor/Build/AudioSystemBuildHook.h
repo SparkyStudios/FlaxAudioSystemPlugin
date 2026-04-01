@@ -1,23 +1,15 @@
 #pragma once
 
-#include <Engine/Core/Types/String.h>
-
 // ============================================================================
 //  AudioSystemBuildHook
 //
-//  Subscribes to the GameCooker deployment event to copy middleware bank
-//  directories into the cooked output folder.
+//  Subscribes to the GameCooker deployment event and delegates file
+//  deployment to the loaded audio middleware. The hook itself has no
+//  knowledge of middleware-specific assets or file layouts.
 //
 //  Lifecycle:
-//    Register()   — called from AudioSystemEditorPlugin::InitializeEditor()
-//    Unregister() — called from AudioSystemEditorPlugin::DeinitializeEditor()
-//
-//  On the DeployFiles event:
-//    1. Read the list of bank directory paths from AudioSystemPreferences.
-//    2. For each path, recursively copy the directory into the cooked output.
-//
-//  NOTE: The GameCooker C++ event API may vary between Flax Engine versions.
-//  TODO markers below indicate where the exact API call must be substituted.
+//    Register()   — called from AudioSystemEditorPlugin::Initialize()
+//    Unregister() — called from AudioSystemEditorPlugin::Deinitialize()
 // ============================================================================
 
 class AUDIOSYSTEMEDITOR_API AudioSystemBuildHook
@@ -33,12 +25,8 @@ private:
     AudioSystemBuildHook() = delete;
     ~AudioSystemBuildHook() = delete;
 
-    /// Called by GameCooker when it is ready to copy additional files.
-    ///
-    /// \param outputPath  Absolute path to the cooked output root folder.
-    static void OnDeployFiles(const String& outputPath);
-
-    /// Recursively copy \p sourceDir into \p destDir, creating the destination
-    /// tree as needed. Returns the number of files copied, or -1 on error.
-    static int32 CopyDirectoryRecursive(const String& sourceDir, const String& destDir);
+    /// Called by GameCooker during the deploy phase.
+    /// Retrieves CookingData via GameCooker::GetCurrentData() and
+    /// forwards to AudioSystem::DeployFiles().
+    static void OnDeployFiles();
 };

@@ -58,6 +58,19 @@ public:
     /// Immediately stop every currently-playing sound without unloading data.
     virtual void StopAllSounds() = 0;
 
+#if USE_EDITOR
+    /// Deploy middleware-specific files (sound banks, config, etc.) to the
+    /// cooked build output directory. Called by the editor build hook during
+    /// the GameCooker deploy phase.
+    ///
+    /// The middleware implementation is responsible for knowing which files
+    /// to copy and where they should go within the output tree.
+    ///
+    /// \param outputPath  Absolute path to the cooked output root folder.
+    /// \return true if deployment succeeded; false on error.
+    virtual bool DeployFiles(const StringView& outputPath) = 0;
+#endif
+
     // ========================================================================
     //  Entity
     //

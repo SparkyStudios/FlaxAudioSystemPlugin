@@ -444,6 +444,20 @@ void AudioSystem::LoadConfiguration(StringView file)
     }
 }
 
+#if USE_EDITOR
+bool AudioSystem::DeployFiles(const StringView& outputPath)
+{
+    AudioMiddleware* mw = _atl.GetMiddleware();
+    if (mw == nullptr)
+    {
+        LOG(Warning, "[AudioSystem] DeployFiles: no middleware registered — nothing to deploy.");
+        return false;
+    }
+
+    return mw->DeployFiles(outputPath);
+}
+#endif
+
 // ============================================================================
 //  Audio thread management
 // ============================================================================

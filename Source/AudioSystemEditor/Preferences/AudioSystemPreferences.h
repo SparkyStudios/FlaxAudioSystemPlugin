@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Engine/Core/Collections/Array.h>
 #include <Engine/Core/Types/String.h>
 #include <Engine/Scripting/SerializableScriptingObject.h>
 
@@ -35,11 +34,6 @@ public:
     /// When true, all audio output is silenced regardless of master gain.
     API_FIELD(Attributes="EditorOrder(1), Tooltip(\"Mute all audio output.\")")
     bool MuteAudio = false;
-
-    /// List of bank directory paths to copy into the cooked output on build.
-    /// Each entry should be an absolute or project-relative folder path.
-    API_FIELD(Attributes="EditorOrder(2), Tooltip(\"Bank directories to include in the cooked build.\")")
-    Array<String> BankDirectories;
 
     // ========================================================================
     //  Runtime sync

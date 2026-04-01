@@ -2,7 +2,7 @@
 
 #include <Engine/Core/Types/String.h>
 
-#include "AudioSystemComponent.h"
+#include "AudioSystemScript.h"
 #include "../Core/AudioSystemData.h"
 
 // ============================================================================
@@ -22,7 +22,7 @@ constexpr int32 k_MultiRayCount = 5;
 constexpr float k_MultiRayOffsetRadius = 0.25f;
 
 // ============================================================================
-//  AudioTriggerComponent
+//  AudioTriggerScript
 //
 //  Fires named audio triggers on a sibling AudioProxyComponent's entity.
 //  Manages a complete trigger lifecycle:
@@ -40,10 +40,10 @@ constexpr float k_MultiRayOffsetRadius = 0.25f;
 /// The component manages loading, playing, and stopping trigger data, and
 /// optionally performs physics ray casts each frame to compute the
 /// obstruction and occlusion values sent to the audio middleware.
-API_CLASS() class AUDIOSYSTEM_API AudioTriggerComponent : public AudioSystemProxyDependentComponent
+API_CLASS() class AUDIOSYSTEM_API AudioTriggerScript : public AudioProxyDependentScript
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCRIPTING_TYPE(AudioTriggerComponent);
+    DECLARE_SCRIPTING_TYPE(AudioTriggerScript);
 
 public:
     // ========================================================================

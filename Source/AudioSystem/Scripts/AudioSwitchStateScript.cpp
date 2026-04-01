@@ -1,12 +1,12 @@
 #include <Engine/Core/Log.h>
 
-#include "AudioSwitchStateComponent.h"
-#include "AudioProxyComponent.h"
+#include "AudioSwitchStateScript.h"
+#include "../Actors/AudioProxyActor.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
-AudioSwitchStateComponent::AudioSwitchStateComponent(const SpawnParams& params)
-    : AudioSystemProxyDependentComponent(params)
+AudioSwitchStateScript::AudioSwitchStateScript(const SpawnParams& params)
+    : AudioProxyDependentScript(params)
 {
 }
 
@@ -14,10 +14,10 @@ AudioSwitchStateComponent::AudioSwitchStateComponent(const SpawnParams& params)
 //  OnEnable
 // ============================================================================
 
-void AudioSwitchStateComponent::OnEnable()
+void AudioSwitchStateScript::OnEnable()
 {
     // Resolve the sibling proxy (done by the base class).
-    AudioSystemProxyDependentComponent::OnEnable();
+    AudioProxyDependentScript::OnEnable();
 
     if (_proxy == nullptr)
         return;
@@ -31,7 +31,7 @@ void AudioSwitchStateComponent::OnEnable()
 //  OnUpdate
 // ============================================================================
 
-void AudioSwitchStateComponent::OnUpdate()
+void AudioSwitchStateScript::OnUpdate()
 {
     // Switch states are set on-demand — nothing to do per-frame.
 }
@@ -40,28 +40,28 @@ void AudioSwitchStateComponent::OnUpdate()
 //  OnDisable
 // ============================================================================
 
-void AudioSwitchStateComponent::OnDisable()
+void AudioSwitchStateScript::OnDisable()
 {
     _currentStateName.Clear();
 
-    AudioSystemProxyDependentComponent::OnDisable();
+    AudioProxyDependentScript::OnDisable();
 }
 
 // ============================================================================
 //  SetState
 // ============================================================================
 
-void AudioSwitchStateComponent::SetState(const StringView& stateName, bool sync)
+void AudioSwitchStateScript::SetState(const StringView& stateName, bool sync)
 {
     if (_proxy == nullptr)
     {
-        LOG(Warning, "[AudioSwitchStateComponent] SetState: proxy is not available (component may be disabled).");
+        LOG(Warning, "[AudioSwitchStateScript] SetState: proxy is not available (component may be disabled).");
         return;
     }
 
     if (stateName.IsEmpty())
     {
-        LOG(Warning, "[AudioSwitchStateComponent] SetState: stateName is empty. Request ignored.");
+        LOG(Warning, "[AudioSwitchStateScript] SetState: stateName is empty. Request ignored.");
         return;
     }
 
@@ -69,7 +69,7 @@ void AudioSwitchStateComponent::SetState(const StringView& stateName, bool sync)
 
     if (stateId == INVALID_AUDIO_SYSTEM_ID)
     {
-        LOG(Warning, "[AudioSwitchStateComponent] SetState: switch state '{0}' could not be resolved.", String(stateName));
+        LOG(Warning, "[AudioSwitchStateScript] SetState: switch state '{0}' could not be resolved.", String(stateName));
         return;
     }
 
@@ -90,7 +90,7 @@ void AudioSwitchStateComponent::SetState(const StringView& stateName, bool sync)
 //  GetState
 // ============================================================================
 
-const String& AudioSwitchStateComponent::GetState() const
+const String& AudioSwitchStateScript::GetState() const
 {
     return _currentStateName;
 }

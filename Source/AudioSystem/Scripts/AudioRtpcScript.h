@@ -2,11 +2,11 @@
 
 #include <Engine/Core/Types/String.h>
 
-#include "AudioSystemComponent.h"
+#include "AudioSystemScript.h"
 #include "../Core/AudioSystemData.h"
 
 // ============================================================================
-//  AudioRtpcComponent
+//  AudioRtpcScript
 //
 //  Sets and resets a named Real-Time Parameter Control (RTPC) value on the
 //  sibling AudioProxyComponent's entity.
@@ -21,10 +21,10 @@
 /// Requires a sibling AudioProxyComponent on the same Actor.
 /// The initial value is pushed when the component becomes active.
 /// Calling ResetValue() or disabling the component restores the default.
-API_CLASS() class AUDIOSYSTEM_API AudioRtpcComponent : public AudioSystemProxyDependentComponent
+API_CLASS() class AUDIOSYSTEM_API AudioRtpcScript : public AudioProxyDependentScript
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCRIPTING_TYPE(AudioRtpcComponent);
+    DECLARE_SCRIPTING_TYPE(AudioRtpcScript);
 
 public:
     // ========================================================================

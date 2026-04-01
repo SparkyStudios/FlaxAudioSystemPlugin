@@ -3,8 +3,8 @@
 #include <Engine/Level/Actors/AnimatedModel.h>
 #include <Engine/Scripting/ScriptingObject.h>
 
-#include "AudioAnimationComponent.h"
-#include "AudioTriggerComponent.h"
+#include "AudioAnimationScript.h"
+#include "AudioTriggerScript.h"
 
 AudioAnimEvent::AudioAnimEvent(const SpawnParams& params)
     : AnimEvent(params)
@@ -29,7 +29,7 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
         return;
     }
 
-    // Audio scripts (AudioAnimationComponent, AudioTriggerComponent) live on
+    // Audio scripts (AudioAnimationScript, AudioTriggerScript) live on
     // the AudioProxyComponent Actor, which is the parent of the AnimatedModel.
     Actor* proxyActor = actor->GetParent();
     if (proxyActor == nullptr)
@@ -38,9 +38,9 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
         return;
     }
 
-    // First, check whether there is an AudioAnimationComponent on the proxy
+    // First, check whether there is an AudioAnimationScript on the proxy
     // that can remap the trigger name via EventTriggerMap.
-    AudioAnimationComponent* dispatcher = proxyActor->GetScript<AudioAnimationComponent>();
+    AudioAnimationScript* dispatcher = proxyActor->GetScript<AudioAnimationScript>();
     if (dispatcher != nullptr)
     {
         dispatcher->DispatchEvent(TriggerName);
@@ -51,7 +51,7 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
     const Array<Script*>& scripts = proxyActor->Scripts;
     for (Script* script : scripts)
     {
-        AudioTriggerComponent* trigger = ScriptingObject::Cast<AudioTriggerComponent>(script);
+        AudioTriggerScript* trigger = ScriptingObject::Cast<AudioTriggerScript>(script);
         if (trigger == nullptr)
             continue;
 
@@ -62,23 +62,23 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
         }
     }
 
-    LOG(Warning, "[AudioAnimEvent] OnEvent: No AudioTriggerComponent with PlayTriggerName '{0}' found on proxy Actor '{1}'.",
+    LOG(Warning, "[AudioAnimEvent] OnEvent: No AudioTriggerScript with PlayTriggerName '{0}' found on proxy Actor '{1}'.",
         TriggerName, proxyActor->GetName());
 }
 
 // ============================================================================
-//  AudioAnimationComponent — OnEnable
+//  AudioAnimationScript — OnEnable
 // ============================================================================
 
-AudioAnimationComponent::AudioAnimationComponent(const SpawnParams& params)
-    : AudioSystemProxyDependentComponent(params)
+AudioAnimationScript::AudioAnimationScript(const SpawnParams& params)
+    : AudioProxyDependentScript(params)
 {
 }
 
-void AudioAnimationComponent::OnEnable()
+void AudioAnimationScript::OnEnable()
 {
     // Resolve the sibling proxy (base class handles null/missing proxy).
-    AudioSystemProxyDependentComponent::OnEnable();
+    AudioProxyDependentScript::OnEnable();
 
     if (_proxy == nullptr)
         return;
@@ -90,39 +90,39 @@ void AudioAnimationComponent::OnEnable()
     _animatedModel = owner->GetChild<AnimatedModel>();
     if (_animatedModel == nullptr)
     {
-        LOG(Warning, "[AudioAnimationComponent] OnEnable: No AnimatedModel found on Actor '{0}'. Animation events will not fire.",
+        LOG(Warning, "[AudioAnimationScript] OnEnable: No AnimatedModel found on Actor '{0}'. Animation events will not fire.",
             owner->GetName());
     }
 }
 
 // ============================================================================
-//  AudioAnimationComponent — OnUpdate
+//  AudioAnimationScript — OnUpdate
 // ============================================================================
 
-void AudioAnimationComponent::OnUpdate()
+void AudioAnimationScript::OnUpdate()
 {
     // Events are dispatched by AudioAnimEvent::OnEvent() — nothing to do here.
 }
 
 // ============================================================================
-//  AudioAnimationComponent — OnDisable
+//  AudioAnimationScript — OnDisable
 // ============================================================================
 
-void AudioAnimationComponent::OnDisable()
+void AudioAnimationScript::OnDisable()
 {
     _animatedModel = nullptr;
-    AudioSystemProxyDependentComponent::OnDisable();
+    AudioProxyDependentScript::OnDisable();
 }
 
 // ============================================================================
-//  AudioAnimationComponent — DispatchEvent
+//  AudioAnimationScript — DispatchEvent
 // ============================================================================
 
-void AudioAnimationComponent::DispatchEvent(const StringView& eventName)
+void AudioAnimationScript::DispatchEvent(const StringView& eventName)
 {
     if (eventName.IsEmpty())
     {
-        LOG(Warning, "[AudioAnimationComponent] DispatchEvent: eventName is empty.");
+        LOG(Warning, "[AudioAnimationScript] DispatchEvent: eventName is empty.");
         return;
     }
 
@@ -137,11 +137,11 @@ void AudioAnimationComponent::DispatchEvent(const StringView& eventName)
     if (mapped != nullptr && mapped->HasChars())
         resolvedTriggerName = *mapped;
 
-    // Find the sibling AudioTriggerComponent with the matching PlayTriggerName.
+    // Find the sibling AudioTriggerScript with the matching PlayTriggerName.
     const Array<Script*>& scripts = owner->Scripts;
     for (Script* script : scripts)
     {
-        AudioTriggerComponent* trigger = ScriptingObject::Cast<AudioTriggerComponent>(script);
+        AudioTriggerScript* trigger = ScriptingObject::Cast<AudioTriggerScript>(script);
         if (trigger == nullptr)
             continue;
 
@@ -152,6 +152,6 @@ void AudioAnimationComponent::DispatchEvent(const StringView& eventName)
         }
     }
 
-    LOG(Warning, "[AudioAnimationComponent] DispatchEvent: No sibling AudioTriggerComponent with PlayTriggerName '{0}' found on Actor '{1}'.",
+    LOG(Warning, "[AudioAnimationScript] DispatchEvent: No sibling AudioTriggerScript with PlayTriggerName '{0}' found on Actor '{1}'.",
         resolvedTriggerName, owner->GetName());
 }

@@ -1,12 +1,12 @@
 #include <Engine/Core/Log.h>
 
-#include "AudioRtpcComponent.h"
-#include "AudioProxyComponent.h"
+#include "AudioRtpcScript.h"
+#include "../Actors/AudioProxyActor.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
-AudioRtpcComponent::AudioRtpcComponent(const SpawnParams& params)
-    : AudioSystemProxyDependentComponent(params)
+AudioRtpcScript::AudioRtpcScript(const SpawnParams& params)
+    : AudioProxyDependentScript(params)
 {
 }
 
@@ -14,10 +14,10 @@ AudioRtpcComponent::AudioRtpcComponent(const SpawnParams& params)
 //  OnEnable
 // ============================================================================
 
-void AudioRtpcComponent::OnEnable()
+void AudioRtpcScript::OnEnable()
 {
     // Resolve the sibling proxy (done by the base class).
-    AudioSystemProxyDependentComponent::OnEnable();
+    AudioProxyDependentScript::OnEnable();
 
     if (_proxy == nullptr)
         return;
@@ -25,7 +25,7 @@ void AudioRtpcComponent::OnEnable()
     // Resolve the RTPC ID from its name.
     if (!RtpcName.HasChars())
     {
-        LOG(Warning, "[AudioRtpcComponent] OnEnable: RtpcName is empty. No RTPC will be driven.");
+        LOG(Warning, "[AudioRtpcScript] OnEnable: RtpcName is empty. No RTPC will be driven.");
         _rtpcId = INVALID_AUDIO_SYSTEM_ID;
         return;
     }
@@ -34,7 +34,7 @@ void AudioRtpcComponent::OnEnable()
 
     if (_rtpcId == INVALID_AUDIO_SYSTEM_ID)
     {
-        LOG(Warning, "[AudioRtpcComponent] OnEnable: RTPC '{0}' could not be resolved.", RtpcName);
+        LOG(Warning, "[AudioRtpcScript] OnEnable: RTPC '{0}' could not be resolved.", RtpcName);
         return;
     }
 
@@ -46,7 +46,7 @@ void AudioRtpcComponent::OnEnable()
 //  OnUpdate
 // ============================================================================
 
-void AudioRtpcComponent::OnUpdate()
+void AudioRtpcScript::OnUpdate()
 {
     // RTPC values are set on-demand — nothing to do per-frame.
 }
@@ -55,7 +55,7 @@ void AudioRtpcComponent::OnUpdate()
 //  OnDisable
 // ============================================================================
 
-void AudioRtpcComponent::OnDisable()
+void AudioRtpcScript::OnDisable()
 {
     if (_proxy != nullptr && _rtpcId != INVALID_AUDIO_SYSTEM_ID)
         ResetValue(false);
@@ -63,24 +63,24 @@ void AudioRtpcComponent::OnDisable()
     _rtpcId       = INVALID_AUDIO_SYSTEM_ID;
     _currentValue = 0.0f;
 
-    AudioSystemProxyDependentComponent::OnDisable();
+    AudioProxyDependentScript::OnDisable();
 }
 
 // ============================================================================
 //  SetValue
 // ============================================================================
 
-void AudioRtpcComponent::SetValue(float value, bool sync)
+void AudioRtpcScript::SetValue(float value, bool sync)
 {
     if (_proxy == nullptr)
     {
-        LOG(Warning, "[AudioRtpcComponent] SetValue: proxy is not available (component may be disabled).");
+        LOG(Warning, "[AudioRtpcScript] SetValue: proxy is not available (component may be disabled).");
         return;
     }
 
     if (_rtpcId == INVALID_AUDIO_SYSTEM_ID)
     {
-        LOG(Warning, "[AudioRtpcComponent] SetValue: RTPC '{0}' is not resolved.", RtpcName);
+        LOG(Warning, "[AudioRtpcScript] SetValue: RTPC '{0}' is not resolved.", RtpcName);
         return;
     }
 
@@ -102,17 +102,17 @@ void AudioRtpcComponent::SetValue(float value, bool sync)
 //  ResetValue
 // ============================================================================
 
-void AudioRtpcComponent::ResetValue(bool sync)
+void AudioRtpcScript::ResetValue(bool sync)
 {
     if (_proxy == nullptr)
     {
-        LOG(Warning, "[AudioRtpcComponent] ResetValue: proxy is not available (component may be disabled).");
+        LOG(Warning, "[AudioRtpcScript] ResetValue: proxy is not available (component may be disabled).");
         return;
     }
 
     if (_rtpcId == INVALID_AUDIO_SYSTEM_ID)
     {
-        LOG(Warning, "[AudioRtpcComponent] ResetValue: RTPC '{0}' is not resolved.", RtpcName);
+        LOG(Warning, "[AudioRtpcScript] ResetValue: RTPC '{0}' is not resolved.", RtpcName);
         return;
     }
 
@@ -131,7 +131,7 @@ void AudioRtpcComponent::ResetValue(bool sync)
 //  GetValue
 // ============================================================================
 
-float AudioRtpcComponent::GetValue() const
+float AudioRtpcScript::GetValue() const
 {
     return _currentValue;
 }

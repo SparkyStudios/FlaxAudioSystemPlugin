@@ -1,28 +1,28 @@
 #include <Engine/Core/Log.h>
 #include <Engine/Level/Actor.h>
 
-#include "AudioSystemComponent.h"
-#include "AudioProxyComponent.h"
+#include "AudioSystemScript.h"
+#include "../Actors/AudioProxyActor.h"
 #include "../Core/AudioSystemData.h"
 
 // ============================================================================
-//  AudioSystemProxyDependentComponent — OnEnable
+//  AudioProxyDependentScript — OnEnable
 // ============================================================================
 
-void AudioSystemProxyDependentComponent::OnEnable()
+void AudioProxyDependentScript::OnEnable()
 {
     Actor* owner = GetActor();
     if (owner == nullptr)
     {
-        LOG(Warning, "[AudioSystemProxyDependentComponent] OnEnable: owner Actor is null. Component will be disabled.");
+        LOG(Warning, "[AudioProxyDependentScript] OnEnable: owner Actor is null. Component will be disabled.");
         SetEnabled(false);
         return;
     }
 
-    _proxy = Cast<AudioProxyComponent>(owner);
+    _proxy = Cast<AudioProxyActor>(owner);
     if (_proxy == nullptr)
     {
-        LOG(Warning, "[AudioSystemProxyDependentComponent] OnEnable: owner Actor '{0}' is not an AudioProxyComponent. Attach this script to an AudioProxyComponent actor.",
+        LOG(Warning, "[AudioProxyDependentScript] OnEnable: owner Actor '{0}' is not an AudioProxyActor. Attach this script to an AudioProxyActor actor.",
             owner->GetName());
         SetEnabled(false);
         return;
@@ -30,19 +30,19 @@ void AudioSystemProxyDependentComponent::OnEnable()
 }
 
 // ============================================================================
-//  AudioSystemProxyDependentComponent — OnDisable
+//  AudioProxyDependentScript — OnDisable
 // ============================================================================
 
-void AudioSystemProxyDependentComponent::OnDisable()
+void AudioProxyDependentScript::OnDisable()
 {
     _proxy = nullptr;
 }
 
 // ============================================================================
-//  AudioSystemProxyDependentComponent — GetEntityId
+//  AudioProxyDependentScript — GetEntityId
 // ============================================================================
 
-AudioSystemDataID AudioSystemProxyDependentComponent::GetEntityId() const
+AudioSystemDataID AudioProxyDependentScript::GetEntityId() const
 {
     if (_proxy == nullptr)
         return INVALID_AUDIO_SYSTEM_ID;

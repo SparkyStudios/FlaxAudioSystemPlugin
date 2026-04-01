@@ -3,11 +3,11 @@
 #include <Engine/Core/Types/String.h>
 #include <Engine/Core/Types/StringView.h>
 
-#include "AudioSystemComponent.h"
+#include "AudioSystemScript.h"
 #include "../Core/AudioSystemData.h"
 
 // ============================================================================
-//  AudioSwitchStateComponent
+//  AudioSwitchStateScript
 //
 //  Activates a named switch state on the sibling AudioProxyComponent's entity.
 //
@@ -20,10 +20,10 @@
 /// Requires a sibling AudioProxyComponent on the same Actor.
 /// The switch state specified in SwitchStateName is applied when the component
 /// becomes active.  Call SetState() to change the active state at runtime.
-API_CLASS() class AUDIOSYSTEM_API AudioSwitchStateComponent : public AudioSystemProxyDependentComponent
+API_CLASS() class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCRIPTING_TYPE(AudioSwitchStateComponent);
+    DECLARE_SCRIPTING_TYPE(AudioSwitchStateScript);
 
 public:
     // ========================================================================

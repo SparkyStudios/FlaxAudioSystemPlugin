@@ -5,10 +5,10 @@
 #include "../Core/AudioSystemData.h"
 
 // Forward declarations
-class AudioProxyComponent;
+class AudioProxyActor;
 
 // ============================================================================
-//  AudioSystemComponent — abstract base for all audio scripts
+//  AudioSystemScript — abstract base for all audio scripts
 //
 //  Script-based audio components (trigger, RTPC, switch-state, animation)
 //  derive from this class. Actor-based components (proxy, listener,
@@ -20,13 +20,13 @@ class AudioProxyComponent;
 ///
 /// Derived classes must implement OnUpdate(). All audio scripts that need
 /// per-frame processing inherit from this class.
-API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemComponent : public Script
+API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemScript : public Script
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemComponent);
+    DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemScript);
 
 public:
-    explicit AudioSystemComponent(const SpawnParams& params) : Script(params) {}
+    explicit AudioSystemScript(const SpawnParams& params) : Script(params) {}
 
 protected:
     /// Called every frame when the component is active. Must be implemented by subclasses.
@@ -34,7 +34,7 @@ protected:
 };
 
 // ============================================================================
-//  AudioSystemProxyDependentComponent — base for components that need an
+//  AudioProxyDependentScript — base for components that need an
 //  AudioProxyComponent sibling on the same Actor.
 //
 //  OnEnable locates the sibling proxy automatically. If none is found the
@@ -45,14 +45,14 @@ protected:
 ///
 /// Resolves the sibling proxy in OnEnable and releases the reference in OnDisable.
 /// Subclasses can access the proxy via _proxy and the entity ID via GetEntityId().
-API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemProxyDependentComponent
-    : public AudioSystemComponent
+API_CLASS(Abstract) class AUDIOSYSTEM_API AudioProxyDependentScript
+    : public AudioSystemScript
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemProxyDependentComponent);
+    DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioProxyDependentScript);
 
 public:
-    explicit AudioSystemProxyDependentComponent(const SpawnParams& params) : AudioSystemComponent(params) {}
+    explicit AudioProxyDependentScript(const SpawnParams& params) : AudioSystemScript(params) {}
 
     /// Called when this component becomes active.
     /// Locates the sibling AudioProxyComponent on the owner Actor.
@@ -69,5 +69,5 @@ protected:
     AudioSystemDataID GetEntityId() const;
 
     /// Cached pointer to the sibling AudioProxyComponent resolved in OnEnable.
-    AudioProxyComponent* _proxy = nullptr;
+    AudioProxyActor* _proxy = nullptr;
 };

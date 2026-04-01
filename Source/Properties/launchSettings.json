@@ -3,14 +3,14 @@
     "AudioSystem": {
       "commandName": "Executable",
       "workingDirectory": "/Users/na2axl/Projects/SparkyStudios/FlaxSamples/ThirdPersonShooterTemplate",
-      "executablePath": "/Applications/FlaxEditor.app/Contents/Binaries/Editor/Mac/Development/FlaxEditor",
+      "executablePath": "/Users/na2axl/Projects/SparkyStudios/FlaxEngine/Binaries/Editor/Mac/$(FlaxConfiguration)/FlaxEditor",
       "commandLineArgs": "-project \"/Users/na2axl/Projects/SparkyStudios/FlaxSamples/ThirdPersonShooterTemplate\"",
       "nativeDebugging": false
     },
     "AudioSystemEditor": {
       "commandName": "Executable",
       "workingDirectory": "/Users/na2axl/Projects/SparkyStudios/FlaxSamples/ThirdPersonShooterTemplate",
-      "executablePath": "/Applications/FlaxEditor.app/Contents/Binaries/Editor/Mac/Development/FlaxEditor",
+      "executablePath": "/Users/na2axl/Projects/SparkyStudios/FlaxEngine/Binaries/Editor/Mac/$(FlaxConfiguration)/FlaxEditor",
       "commandLineArgs": "-project \"/Users/na2axl/Projects/SparkyStudios/FlaxSamples/ThirdPersonShooterTemplate\"",
       "nativeDebugging": false
     }

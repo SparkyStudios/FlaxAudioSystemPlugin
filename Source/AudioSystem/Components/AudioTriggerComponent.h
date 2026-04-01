@@ -81,10 +81,12 @@ public:
     /// Resolves the proxy, caches trigger IDs, and optionally starts loading.
     void OnEnable() override;
 
+protected:
     /// Per-frame update: submits transform-delta obstruction/occlusion rays
     /// while the trigger is in the Playing state.
     void OnUpdate() override;
 
+public:
     /// Stops any active playback and unloads trigger data.
     void OnDisable() override;
 

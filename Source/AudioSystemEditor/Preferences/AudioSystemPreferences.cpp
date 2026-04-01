@@ -35,6 +35,15 @@ AudioSystemPreferences* AudioSystemPreferences::Get()
     return _instance;
 }
 
+void AudioSystemPreferences::Destroy()
+{
+    if (_instance != nullptr)
+    {
+        Delete(_instance);
+        _instance = nullptr;
+    }
+}
+
 // ============================================================================
 //  Runtime sync
 // ============================================================================
@@ -101,7 +110,7 @@ bool AudioSystemPreferences::LoadOrCreate()
     return true;
 }
 
-void AudioSystemPreferences::Save() const
+void AudioSystemPreferences::Save()
 {
     const String settingsPath = GetSettingsPath();
 
@@ -113,8 +122,7 @@ void AudioSystemPreferences::Save() const
     }
 
     // Serialise the instance fields to raw JSON bytes.
-    const Array<byte> data = JsonSerializer::SaveToBytes(
-        const_cast<AudioSystemPreferences*>(this));
+    const Array<byte> data = JsonSerializer::SaveToBytes(this);
 
     if (File::WriteAllBytes(settingsPath, data))
     {

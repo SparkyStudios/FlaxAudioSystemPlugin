@@ -57,6 +57,8 @@ void AudioSystemEditorPlugin::Deinitialize()
         prefs->Save();
     }
 
+    AudioSystemPreferences::Destroy();
+
     LOG(Info, "[AudioSystemEditorPlugin] Editor plugin deinitialised.");
 
     EditorPlugin::Deinitialize();

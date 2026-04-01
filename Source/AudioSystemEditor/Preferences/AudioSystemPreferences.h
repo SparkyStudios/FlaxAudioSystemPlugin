@@ -58,10 +58,14 @@ public:
     static bool LoadOrCreate();
 
     /// Persist current values back to disk (JSON asset).
-    void Save() const;
+    void Save();
 
     /// \return The global singleton instance. May be null before LoadOrCreate() succeeds.
     API_FUNCTION() static AudioSystemPreferences* Get();
+
+    /// Destroy the singleton instance and release memory.
+    /// Safe to call even if LoadOrCreate() was never called.
+    static void Destroy();
 
 private:
     /// Returns the absolute path to the settings JSON file.

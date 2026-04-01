@@ -24,7 +24,9 @@ void AudioSystemPlugin::Initialize()
         return;
     }
 
-    audioSystem->Startup();
+    // Do not call Startup() here — the middleware plugin has not registered yet.
+    // The middleware plugin (e.g. AmplitudeAudioPlugin) is responsible for
+    // calling RegisterMiddleware() followed by Startup().
 
     // Hook into the engine update loop so the audio system is ticked every frame.
     Engine::LateUpdate.Bind<AudioSystem, &AudioSystem::UpdateSound>(audioSystem);

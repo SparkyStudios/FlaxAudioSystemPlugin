@@ -2,11 +2,11 @@
 
 #include <Engine/Core/Collections/Array.h>
 
-#include "../Components/AudioSystemEnvironmentActor.h"
+#include "../Actors/AudioSystemEnvironmentActor.h"
 
 // Forward declarations
-class AudioListenerComponent;
-class AudioProxyComponent;
+class AudioListenerActor;
+class AudioProxyActor;
 
 // ============================================================================
 //  AudioWorldModule
@@ -52,23 +52,23 @@ public:
 
     /// Set the default listener used for occlusion ray casting.
     /// Passing null clears the current default listener.
-    void SetDefaultListener(const AudioListenerComponent* listener);
+    void SetDefaultListener(const AudioListenerActor* listener);
 
     /// \return The current default listener, or null if none is set.
-    const AudioListenerComponent* GetDefaultListener() const;
+    const AudioListenerActor* GetDefaultListener() const;
 
     // ========================================================================
     //  Proxy registration
     // ========================================================================
 
     /// Register an active audio proxy for environment updates.
-    void AddProxy(AudioProxyComponent* proxy);
+    void AddProxy(AudioProxyActor* proxy);
 
     /// Unregister a proxy (e.g., on EndPlay).
-    void RemoveProxy(AudioProxyComponent* proxy);
+    void RemoveProxy(AudioProxyActor* proxy);
 
 private:
     Array<const AudioSystemEnvironmentActor*> _environments;
-    Array<AudioProxyComponent*> _proxies;
-    const AudioListenerComponent* _defaultListener = nullptr;
+    Array<AudioProxyActor*> _proxies;
+    const AudioListenerActor* _defaultListener = nullptr;
 };

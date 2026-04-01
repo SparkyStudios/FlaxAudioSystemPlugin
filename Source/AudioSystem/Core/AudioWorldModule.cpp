@@ -1,7 +1,7 @@
 #include <Engine/Core/Log.h>
 
 #include "AudioWorldModule.h"
-#include "../Components/AudioProxyComponent.h"
+#include "../Actors/AudioProxyActor.h"
 
 // ============================================================================
 //  Per-frame update
@@ -11,7 +11,7 @@ void AudioWorldModule::Update()
 {
     // For each active proxy, query each environment for the send amount
     // and push it to the proxy (which dispatches to the audio system if changed).
-    for (AudioProxyComponent* proxy : _proxies)
+    for (AudioProxyActor* proxy : _proxies)
     {
         if (proxy == nullptr)
             continue;
@@ -74,12 +74,12 @@ const Array<const AudioSystemEnvironmentActor*>& AudioWorldModule::GetEnvironmen
 //  Default listener
 // ============================================================================
 
-void AudioWorldModule::SetDefaultListener(const AudioListenerComponent* listener)
+void AudioWorldModule::SetDefaultListener(const AudioListenerActor* listener)
 {
     _defaultListener = listener;
 }
 
-const AudioListenerComponent* AudioWorldModule::GetDefaultListener() const
+const AudioListenerActor* AudioWorldModule::GetDefaultListener() const
 {
     return _defaultListener;
 }
@@ -88,7 +88,7 @@ const AudioListenerComponent* AudioWorldModule::GetDefaultListener() const
 //  Proxy registration
 // ============================================================================
 
-void AudioWorldModule::AddProxy(AudioProxyComponent* proxy)
+void AudioWorldModule::AddProxy(AudioProxyActor* proxy)
 {
     if (proxy == nullptr)
     {
@@ -102,7 +102,7 @@ void AudioWorldModule::AddProxy(AudioProxyComponent* proxy)
     _proxies.Add(proxy);
 }
 
-void AudioWorldModule::RemoveProxy(AudioProxyComponent* proxy)
+void AudioWorldModule::RemoveProxy(AudioProxyActor* proxy)
 {
     const int32 index = _proxies.Find(proxy);
     if (index != -1)

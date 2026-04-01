@@ -8,4 +8,8 @@ API_CLASS() class AUDIOSYSTEM_API AudioSystemPlugin : public GamePlugin
 public:
     void Initialize() override;
     void Deinitialize() override;
+
+private:
+    /// Guards against double initialization when multiple projects reference this plugin.
+    static bool _initialized;
 };

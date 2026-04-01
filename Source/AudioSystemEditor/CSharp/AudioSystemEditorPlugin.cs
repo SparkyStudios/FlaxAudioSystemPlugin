@@ -12,6 +12,8 @@ namespace AudioSystemEditor
     /// </summary>
     public class AudioSystemEditorScriptingPlugin : EditorPlugin
     {
+        private static bool _initialized;
+
         private AudioSystemToolbar _toolbar;
         private AudioSystemIcons _icons;
         private AudioSystemAssetProxies _assetProxies;
@@ -21,6 +23,9 @@ namespace AudioSystemEditor
         public override void InitializeEditor()
         {
             base.InitializeEditor();
+
+            if (_initialized)
+                return;
 
             _icons = new AudioSystemIcons();
             _icons.Register();
@@ -37,12 +42,19 @@ namespace AudioSystemEditor
             Editor.PlayModeBegin += OnPlayModeBegin;
             Editor.PlayModeEnd += OnPlayModeEnd;
 
+            _initialized = true;
             Debug.Log("[AudioSystemEditor] C# editor plugin initialized.");
         }
 
         /// <inheritdoc />
         public override void DeinitializeEditor()
         {
+            if (!_initialized)
+            {
+                base.DeinitializeEditor();
+                return;
+            }
+
             Editor.PlayModeBegin -= OnPlayModeBegin;
             Editor.PlayModeEnd -= OnPlayModeEnd;
 
@@ -58,6 +70,7 @@ namespace AudioSystemEditor
             _icons?.Unregister();
             _icons = null;
 
+            _initialized = false;
             Debug.Log("[AudioSystemEditor] C# editor plugin deinitialized.");
 
             base.DeinitializeEditor();

@@ -6,6 +6,12 @@
 #include "Preferences/AudioSystemPreferences.h"
 
 // ============================================================================
+//  Static state
+// ============================================================================
+
+bool AudioSystemEditorPlugin::_initialized = false;
+
+// ============================================================================
 //  Constructor
 // ============================================================================
 
@@ -26,6 +32,9 @@ void AudioSystemEditorPlugin::Initialize()
 {
     EditorPlugin::Initialize();
 
+    if (_initialized)
+        return;
+
     // ------------------------------------------------------------------
     // Step 1 — Load or create preferences
     // ------------------------------------------------------------------
@@ -40,6 +49,7 @@ void AudioSystemEditorPlugin::Initialize()
     // ------------------------------------------------------------------
     AudioSystemBuildHook::Register();
 
+    _initialized = true;
     LOG(Info, "[AudioSystemEditorPlugin] Editor plugin initialised.");
 }
 
@@ -49,6 +59,12 @@ void AudioSystemEditorPlugin::Initialize()
 
 void AudioSystemEditorPlugin::Deinitialize()
 {
+    if (!_initialized)
+    {
+        EditorPlugin::Deinitialize();
+        return;
+    }
+
     AudioSystemBuildHook::Unregister();
 
     // Persist preferences one final time before teardown.
@@ -59,6 +75,7 @@ void AudioSystemEditorPlugin::Deinitialize()
 
     AudioSystemPreferences::Destroy();
 
+    _initialized = false;
     LOG(Info, "[AudioSystemEditorPlugin] Editor plugin deinitialised.");
 
     EditorPlugin::Deinitialize();

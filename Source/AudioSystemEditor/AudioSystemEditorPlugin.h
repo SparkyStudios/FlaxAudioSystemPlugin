@@ -25,4 +25,7 @@ API_CLASS() class AUDIOSYSTEMEDITOR_API AudioSystemEditorPlugin : public EditorP
 public:
     void Initialize() override;
     void Deinitialize() override;
+
+private:
+    static bool _initialized;
 };

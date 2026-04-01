@@ -334,8 +334,24 @@ void AudioSystem::SetListenerOverrideMode(bool enabled)
 
 void AudioSystem::SetListener(int32 index, Vector3 position, Vector3 forward, Vector3 up, Vector3 velocity)
 {
-    // Build a transform request for the listener at the given index.
-    const AudioSystemDataID listenerId = static_cast<AudioSystemDataID>(index + 1);
+    AudioSystemDataID listenerId;
+
+    if (_listenerOverrideMode && index == -1)
+    {
+        listenerId = EDITOR_LISTENER_ID;
+    }
+    else
+    {
+        // Listener indices are 0-based; IDs are 1-based (0 is INVALID).
+        listenerId = static_cast<AudioSystemDataID>(index + 1);
+    }
+
+    if (listenerId == INVALID_AUDIO_SYSTEM_ID)
+    {
+        LOG(Warning, "[AudioSystem] SetListener: computed listener ID is invalid (index={0}).", index);
+        return;
+    }
+
     AudioRequest req;
     req.Type = AudioRequestType::UpdateListenerTransform;
     req.EntityId = listenerId;
@@ -343,7 +359,11 @@ void AudioSystem::SetListener(int32 index, Vector3 position, Vector3 forward, Ve
     req.Transform.Forward = forward;
     req.Transform.Up = up;
     req.Transform.Velocity = velocity;
-    SendRequest(MoveTemp(req));
+
+    if (_listenerOverrideMode)
+        SendRequestSync(MoveTemp(req));
+    else
+        SendRequest(MoveTemp(req));
 }
 
 // ============================================================================

@@ -31,6 +31,9 @@ class AudioMiddleware;
 class AUDIOSYSTEM_API AudioSystem
 {
 public:
+    /// Listener ID reserved for the editor preview listener (override mode).
+    static constexpr AudioSystemDataID EDITOR_LISTENER_ID = 1;
+
     // ========================================================================
     //  Singleton
     // ========================================================================

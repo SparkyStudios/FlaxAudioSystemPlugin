@@ -12,6 +12,16 @@
 static constexpr AudioSystemDataID WORLD_ENTITY_ID = 1;
 
 // ============================================================================
+//  Helpers
+// ============================================================================
+
+/// Hash a control name for reverse-lookup in the name maps.
+static uint32 HashName(const StringView& name)
+{
+    return GetHash(String(name));
+}
+
+// ============================================================================
 //  Lifecycle
 // ============================================================================
 
@@ -684,32 +694,306 @@ bool AudioTranslationLayer::HandleUnloadBank(const AudioRequest& request)
 }
 
 // ============================================================================
+//  Control registration
+// ============================================================================
+
+bool AudioTranslationLayer::RegisterTrigger(AudioSystemDataID id, const StringView& name, AudioSystemTriggerData* data)
+{
+    if (id == INVALID_AUDIO_SYSTEM_ID || data == nullptr)
+    {
+        LOG(Error, "[ATL] RegisterTrigger: invalid id or null data.");
+        return false;
+    }
+
+    if (_triggers.ContainsKey(id))
+    {
+        LOG(Warning, "[ATL] RegisterTrigger: trigger {0} already registered.", id);
+        return false;
+    }
+
+    ATLTrigger* trigger = New<ATLTrigger>();
+    trigger->Id = id;
+    trigger->pData = data;
+    _triggers.Add(id, trigger);
+
+    if (name.HasChars())
+        _triggerNameMap.Add(HashName(name), id);
+
+    return true;
+}
+
+bool AudioTranslationLayer::RegisterRtpc(AudioSystemDataID id, const StringView& name, AudioSystemRtpcData* data)
+{
+    if (id == INVALID_AUDIO_SYSTEM_ID || data == nullptr)
+    {
+        LOG(Error, "[ATL] RegisterRtpc: invalid id or null data.");
+        return false;
+    }
+
+    if (_rtpcs.ContainsKey(id))
+    {
+        LOG(Warning, "[ATL] RegisterRtpc: RTPC {0} already registered.", id);
+        return false;
+    }
+
+    ATLRtpc* rtpc = New<ATLRtpc>();
+    rtpc->Id = id;
+    rtpc->pData = data;
+    _rtpcs.Add(id, rtpc);
+
+    if (name.HasChars())
+        _rtpcNameMap.Add(HashName(name), id);
+
+    return true;
+}
+
+bool AudioTranslationLayer::RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data)
+{
+    if (id == INVALID_AUDIO_SYSTEM_ID || data == nullptr)
+    {
+        LOG(Error, "[ATL] RegisterSwitchState: invalid id or null data.");
+        return false;
+    }
+
+    if (_switchStates.ContainsKey(id))
+    {
+        LOG(Warning, "[ATL] RegisterSwitchState: switch state {0} already registered.", id);
+        return false;
+    }
+
+    ATLSwitchState* ss = New<ATLSwitchState>();
+    ss->Id = id;
+    ss->pData = data;
+    _switchStates.Add(id, ss);
+
+    if (name.HasChars())
+        _switchStateNameMap.Add(HashName(name), id);
+
+    return true;
+}
+
+bool AudioTranslationLayer::RegisterEnvironment(AudioSystemDataID id, const StringView& name, AudioSystemEnvironmentData* data)
+{
+    if (id == INVALID_AUDIO_SYSTEM_ID || data == nullptr)
+    {
+        LOG(Error, "[ATL] RegisterEnvironment: invalid id or null data.");
+        return false;
+    }
+
+    if (_environments.ContainsKey(id))
+    {
+        LOG(Warning, "[ATL] RegisterEnvironment: environment {0} already registered.", id);
+        return false;
+    }
+
+    ATLEnvironment* env = New<ATLEnvironment>();
+    env->Id = id;
+    env->pData = data;
+    _environments.Add(id, env);
+
+    if (name.HasChars())
+        _environmentNameMap.Add(HashName(name), id);
+
+    return true;
+}
+
+bool AudioTranslationLayer::RegisterSoundBank(AudioSystemDataID id, const StringView& name, AudioSystemBankData* data)
+{
+    if (id == INVALID_AUDIO_SYSTEM_ID || data == nullptr)
+    {
+        LOG(Error, "[ATL] RegisterSoundBank: invalid id or null data.");
+        return false;
+    }
+
+    if (_banks.ContainsKey(id))
+    {
+        LOG(Warning, "[ATL] RegisterSoundBank: bank {0} already registered.", id);
+        return false;
+    }
+
+    ATLSoundBank* bank = New<ATLSoundBank>();
+    bank->Id = id;
+    bank->pData = data;
+    _banks.Add(id, bank);
+
+    if (name.HasChars())
+        _bankNameMap.Add(HashName(name), id);
+
+    return true;
+}
+
+// ============================================================================
+//  Control unregistration
+// ============================================================================
+
+bool AudioTranslationLayer::UnregisterTrigger(AudioSystemDataID id)
+{
+    ATLTrigger* trigger = nullptr;
+    if (!_triggers.TryGet(id, trigger) || trigger == nullptr)
+    {
+        LOG(Warning, "[ATL] UnregisterTrigger: trigger {0} not found.", id);
+        return false;
+    }
+
+    if (trigger->pData != nullptr && _middleware != nullptr)
+        _middleware->DestroyTriggerData(trigger->pData);
+
+    // Remove the reverse name-map entry that points to this ID.
+    for (auto& kv : _triggerNameMap)
+    {
+        if (kv.Value == id)
+        {
+            _triggerNameMap.Remove(kv.Key);
+            break;
+        }
+    }
+
+    _triggers.Remove(id);
+    Delete(trigger);
+    return true;
+}
+
+bool AudioTranslationLayer::UnregisterRtpc(AudioSystemDataID id)
+{
+    ATLRtpc* rtpc = nullptr;
+    if (!_rtpcs.TryGet(id, rtpc) || rtpc == nullptr)
+    {
+        LOG(Warning, "[ATL] UnregisterRtpc: RTPC {0} not found.", id);
+        return false;
+    }
+
+    if (rtpc->pData != nullptr && _middleware != nullptr)
+        _middleware->DestroyRtpcData(rtpc->pData);
+
+    for (auto& kv : _rtpcNameMap)
+    {
+        if (kv.Value == id)
+        {
+            _rtpcNameMap.Remove(kv.Key);
+            break;
+        }
+    }
+
+    _rtpcs.Remove(id);
+    Delete(rtpc);
+    return true;
+}
+
+bool AudioTranslationLayer::UnregisterSwitchState(AudioSystemDataID id)
+{
+    ATLSwitchState* ss = nullptr;
+    if (!_switchStates.TryGet(id, ss) || ss == nullptr)
+    {
+        LOG(Warning, "[ATL] UnregisterSwitchState: switch state {0} not found.", id);
+        return false;
+    }
+
+    if (ss->pData != nullptr && _middleware != nullptr)
+        _middleware->DestroySwitchStateData(ss->pData);
+
+    for (auto& kv : _switchStateNameMap)
+    {
+        if (kv.Value == id)
+        {
+            _switchStateNameMap.Remove(kv.Key);
+            break;
+        }
+    }
+
+    _switchStates.Remove(id);
+    Delete(ss);
+    return true;
+}
+
+bool AudioTranslationLayer::UnregisterEnvironment(AudioSystemDataID id)
+{
+    ATLEnvironment* env = nullptr;
+    if (!_environments.TryGet(id, env) || env == nullptr)
+    {
+        LOG(Warning, "[ATL] UnregisterEnvironment: environment {0} not found.", id);
+        return false;
+    }
+
+    if (env->pData != nullptr && _middleware != nullptr)
+        _middleware->DestroyEnvironmentData(env->pData);
+
+    for (auto& kv : _environmentNameMap)
+    {
+        if (kv.Value == id)
+        {
+            _environmentNameMap.Remove(kv.Key);
+            break;
+        }
+    }
+
+    _environments.Remove(id);
+    Delete(env);
+    return true;
+}
+
+bool AudioTranslationLayer::UnregisterSoundBank(AudioSystemDataID id)
+{
+    ATLSoundBank* bank = nullptr;
+    if (!_banks.TryGet(id, bank) || bank == nullptr)
+    {
+        LOG(Warning, "[ATL] UnregisterSoundBank: bank {0} not found.", id);
+        return false;
+    }
+
+    if (bank->pData != nullptr && _middleware != nullptr)
+        _middleware->DestroyBank(bank->pData);
+
+    for (auto& kv : _bankNameMap)
+    {
+        if (kv.Value == id)
+        {
+            _bankNameMap.Remove(kv.Key);
+            break;
+        }
+    }
+
+    _banks.Remove(id);
+    Delete(bank);
+    return true;
+}
+
+// ============================================================================
 //  Control ID lookup by hashed name
 // ============================================================================
 
 AudioSystemDataID AudioTranslationLayer::GetTriggerId(StringView name) const
 {
-    return INVALID_AUDIO_SYSTEM_ID;
+    const uint32 nameHash = HashName(name);
+    const AudioSystemDataID* id = _triggerNameMap.TryGet(nameHash);
+    return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetRtpcId(StringView name) const
 {
-    return INVALID_AUDIO_SYSTEM_ID;
+    const uint32 nameHash = HashName(name);
+    const AudioSystemDataID* id = _rtpcNameMap.TryGet(nameHash);
+    return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetSwitchStateId(StringView name) const
 {
-    return INVALID_AUDIO_SYSTEM_ID;
+    const uint32 nameHash = HashName(name);
+    const AudioSystemDataID* id = _switchStateNameMap.TryGet(nameHash);
+    return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetEnvironmentId(StringView name) const
 {
-    return INVALID_AUDIO_SYSTEM_ID;
+    const uint32 nameHash = HashName(name);
+    const AudioSystemDataID* id = _environmentNameMap.TryGet(nameHash);
+    return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetBankId(StringView name) const
 {
-    return INVALID_AUDIO_SYSTEM_ID;
+    const uint32 nameHash = HashName(name);
+    const AudioSystemDataID* id = _bankNameMap.TryGet(nameHash);
+    return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
 // ============================================================================
@@ -738,4 +1022,10 @@ void AudioTranslationLayer::ClearAllMaps()
     _environments.Clear();
     _listeners.Clear();
     _entities.Clear();
+
+    _triggerNameMap.Clear();
+    _rtpcNameMap.Clear();
+    _switchStateNameMap.Clear();
+    _environmentNameMap.Clear();
+    _bankNameMap.Clear();
 }

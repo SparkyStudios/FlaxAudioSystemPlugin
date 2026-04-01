@@ -80,6 +80,30 @@ public:
     void SendRequestSync(AudioRequest&& request);
 
     // ========================================================================
+    //  Control registration (synchronous, delegates to ATL)
+    //
+    //  These methods register control descriptors into the ATL maps so that
+    //  subsequent audio requests (LoadTrigger, SetRtpc, etc.) can find them.
+    //  The AudioSystem takes ownership of the data pointer on success.
+    // ========================================================================
+
+    bool RegisterTrigger(AudioSystemDataID id, const StringView& name, AudioSystemTriggerData* data);
+    bool RegisterRtpc(AudioSystemDataID id, const StringView& name, AudioSystemRtpcData* data);
+    bool RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data);
+    bool RegisterEnvironment(AudioSystemDataID id, const StringView& name, AudioSystemEnvironmentData* data);
+    bool RegisterSoundBank(AudioSystemDataID id, const StringView& name, AudioSystemBankData* data);
+
+    // ========================================================================
+    //  Control unregistration (synchronous, delegates to ATL)
+    // ========================================================================
+
+    bool UnregisterTrigger(AudioSystemDataID id);
+    bool UnregisterRtpc(AudioSystemDataID id);
+    bool UnregisterSwitchState(AudioSystemDataID id);
+    bool UnregisterEnvironment(AudioSystemDataID id);
+    bool UnregisterSoundBank(AudioSystemDataID id);
+
+    // ========================================================================
     //  Named control ID lookups (delegates to ATL)
     // ========================================================================
 

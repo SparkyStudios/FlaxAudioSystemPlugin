@@ -81,14 +81,57 @@ public:
     bool ProcessRequest(AudioRequest&& request, bool sync);
 
     // ========================================================================
+    //  Control registration
+    //
+    //  Called synchronously from the main thread to populate the ATL maps
+    //  with control descriptors created by the middleware plugin.
+    //  The ATL takes ownership of the data pointer after a successful call.
+    // ========================================================================
+
+    /// Register a trigger control. The ATL takes ownership of \p data.
+    /// \return true if registration succeeded; false if \p id is invalid or already registered.
+    bool RegisterTrigger(AudioSystemDataID id, const StringView& name, AudioSystemTriggerData* data);
+
+    /// Register an RTPC control. The ATL takes ownership of \p data.
+    bool RegisterRtpc(AudioSystemDataID id, const StringView& name, AudioSystemRtpcData* data);
+
+    /// Register a switch-state control. The ATL takes ownership of \p data.
+    bool RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data);
+
+    /// Register an environment control. The ATL takes ownership of \p data.
+    bool RegisterEnvironment(AudioSystemDataID id, const StringView& name, AudioSystemEnvironmentData* data);
+
+    /// Register a sound bank control. The ATL takes ownership of \p data.
+    bool RegisterSoundBank(AudioSystemDataID id, const StringView& name, AudioSystemBankData* data);
+
+    // ========================================================================
+    //  Control unregistration
+    //
+    //  Removes the control from the ATL map and calls the appropriate
+    //  middleware Destroy*Data() method to free the data pointer.
+    // ========================================================================
+
+    /// Unregister a trigger and destroy its middleware data.
+    bool UnregisterTrigger(AudioSystemDataID id);
+
+    /// Unregister an RTPC and destroy its middleware data.
+    bool UnregisterRtpc(AudioSystemDataID id);
+
+    /// Unregister a switch-state and destroy its middleware data.
+    bool UnregisterSwitchState(AudioSystemDataID id);
+
+    /// Unregister an environment and destroy its middleware data.
+    bool UnregisterEnvironment(AudioSystemDataID id);
+
+    /// Unregister a sound bank and destroy its middleware data.
+    bool UnregisterSoundBank(AudioSystemDataID id);
+
+    // ========================================================================
     //  Control ID lookup by hashed name
     //
     //  Names are hashed at asset-load time and stored as AudioSystemDataID.
     //  These methods perform a map lookup and return INVALID_AUDIO_SYSTEM_ID
     //  when the control is not yet registered.
-    //
-    //  NOTE: The maps will be populated in Phase 5 when the asset-loading
-    //  pipeline and control registration path are implemented.
     // ========================================================================
 
     /// \return The ID of the named trigger, or INVALID_AUDIO_SYSTEM_ID.
@@ -152,6 +195,13 @@ private:
     ATLSwitchStateMap _switchStates;
     ATLEnvironmentMap _environments;
     ATLSoundBankMap   _banks;
+
+    /// Reverse lookup maps: hashed name -> control ID.
+    Dictionary<uint32, AudioSystemDataID> _triggerNameMap;
+    Dictionary<uint32, AudioSystemDataID> _rtpcNameMap;
+    Dictionary<uint32, AudioSystemDataID> _switchStateNameMap;
+    Dictionary<uint32, AudioSystemDataID> _environmentNameMap;
+    Dictionary<uint32, AudioSystemDataID> _bankNameMap;
 
     DateTime _lastUpdateTime;
 };

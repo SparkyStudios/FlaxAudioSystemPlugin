@@ -180,6 +180,64 @@ void AudioSystem::SendRequestSync(AudioRequest&& request)
 }
 
 // ============================================================================
+//  Control registration
+// ============================================================================
+
+bool AudioSystem::RegisterTrigger(AudioSystemDataID id, const StringView& name, AudioSystemTriggerData* data)
+{
+    return _atl.RegisterTrigger(id, name, data);
+}
+
+bool AudioSystem::RegisterRtpc(AudioSystemDataID id, const StringView& name, AudioSystemRtpcData* data)
+{
+    return _atl.RegisterRtpc(id, name, data);
+}
+
+bool AudioSystem::RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data)
+{
+    return _atl.RegisterSwitchState(id, name, data);
+}
+
+bool AudioSystem::RegisterEnvironment(AudioSystemDataID id, const StringView& name, AudioSystemEnvironmentData* data)
+{
+    return _atl.RegisterEnvironment(id, name, data);
+}
+
+bool AudioSystem::RegisterSoundBank(AudioSystemDataID id, const StringView& name, AudioSystemBankData* data)
+{
+    return _atl.RegisterSoundBank(id, name, data);
+}
+
+// ============================================================================
+//  Control unregistration
+// ============================================================================
+
+bool AudioSystem::UnregisterTrigger(AudioSystemDataID id)
+{
+    return _atl.UnregisterTrigger(id);
+}
+
+bool AudioSystem::UnregisterRtpc(AudioSystemDataID id)
+{
+    return _atl.UnregisterRtpc(id);
+}
+
+bool AudioSystem::UnregisterSwitchState(AudioSystemDataID id)
+{
+    return _atl.UnregisterSwitchState(id);
+}
+
+bool AudioSystem::UnregisterEnvironment(AudioSystemDataID id)
+{
+    return _atl.UnregisterEnvironment(id);
+}
+
+bool AudioSystem::UnregisterSoundBank(AudioSystemDataID id)
+{
+    return _atl.UnregisterSoundBank(id);
+}
+
+// ============================================================================
 //  Named control ID lookups
 // ============================================================================
 

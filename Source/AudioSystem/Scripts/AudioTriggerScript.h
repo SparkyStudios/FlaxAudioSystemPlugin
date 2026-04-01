@@ -24,7 +24,7 @@ constexpr float k_MultiRayOffsetRadius = 0.25f;
 // ============================================================================
 //  AudioTriggerScript
 //
-//  Fires named audio triggers on a sibling AudioProxyComponent's entity.
+//  Fires named audio triggers on a sibling AudioProxyActor's entity.
 //  Manages a complete trigger lifecycle:
 //
 //    Invalid → Loading → Ready → Starting → Playing → Stopping → Stopped
@@ -36,7 +36,7 @@ constexpr float k_MultiRayOffsetRadius = 0.25f;
 
 /// \brief Plays and stops named audio triggers on an Actor with obstruction/occlusion support.
 ///
-/// Requires a sibling AudioProxyComponent on the same Actor.
+/// Requires a sibling AudioProxyActor on the same Actor.
 /// The component manages loading, playing, and stopping trigger data, and
 /// optionally performs physics ray casts each frame to compute the
 /// obstruction and occlusion values sent to the audio middleware.

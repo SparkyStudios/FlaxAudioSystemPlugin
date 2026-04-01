@@ -30,7 +30,7 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
     }
 
     // Audio scripts (AudioAnimationScript, AudioTriggerScript) live on
-    // the AudioProxyComponent Actor, which is the parent of the AnimatedModel.
+    // the AudioProxyActor Actor, which is the parent of the AnimatedModel.
     Actor* proxyActor = actor->GetParent();
     if (proxyActor == nullptr)
     {

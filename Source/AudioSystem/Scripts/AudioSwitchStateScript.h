@@ -9,15 +9,15 @@
 // ============================================================================
 //  AudioSwitchStateScript
 //
-//  Activates a named switch state on the sibling AudioProxyComponent's entity.
+//  Activates a named switch state on the sibling AudioProxyActor's entity.
 //
 //  On enable the configured SwitchStateName is applied automatically.
 //  The active state can be changed at runtime via SetState().
 // ============================================================================
 
-/// \brief Activates a named switch state on a sibling AudioProxyComponent entity.
+/// \brief Activates a named switch state on a sibling AudioProxyActor entity.
 ///
-/// Requires a sibling AudioProxyComponent on the same Actor.
+/// Requires a sibling AudioProxyActor on the same Actor.
 /// The switch state specified in SwitchStateName is applied when the component
 /// becomes active.  Call SetState() to change the active state at runtime.
 API_CLASS() class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript

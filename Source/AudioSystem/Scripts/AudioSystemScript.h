@@ -35,13 +35,13 @@ protected:
 
 // ============================================================================
 //  AudioProxyDependentScript — base for components that need an
-//  AudioProxyComponent sibling on the same Actor.
+//  AudioProxyActor sibling on the same Actor.
 //
 //  OnEnable locates the sibling proxy automatically. If none is found the
 //  component disables itself and logs a warning.
 // ============================================================================
 
-/// \brief Abstract base for audio components that require a sibling AudioProxyComponent.
+/// \brief Abstract base for audio components that require a sibling AudioProxyActor.
 ///
 /// Resolves the sibling proxy in OnEnable and releases the reference in OnDisable.
 /// Subclasses can access the proxy via _proxy and the entity ID via GetEntityId().
@@ -55,7 +55,7 @@ public:
     explicit AudioProxyDependentScript(const SpawnParams& params) : AudioSystemScript(params) {}
 
     /// Called when this component becomes active.
-    /// Locates the sibling AudioProxyComponent on the owner Actor.
+    /// Locates the sibling AudioProxyActor on the owner Actor.
     /// Disables itself (with a logged warning) if no proxy is found.
     void OnEnable() override;
 
@@ -68,6 +68,6 @@ protected:
     ///         Returns INVALID_AUDIO_SYSTEM_ID if no proxy has been resolved.
     AudioSystemDataID GetEntityId() const;
 
-    /// Cached pointer to the sibling AudioProxyComponent resolved in OnEnable.
+    /// Cached pointer to the sibling AudioProxyActor resolved in OnEnable.
     AudioProxyActor* _proxy = nullptr;
 };

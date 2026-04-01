@@ -72,7 +72,7 @@ public:
 
 /// \brief Centralised dispatcher that maps animation event names to AudioTriggerScript play calls.
 ///
-/// Requires a sibling AudioProxyComponent. Attach AudioAnimEvent instances to
+/// Requires a sibling AudioProxyActor. Attach AudioAnimEvent instances to
 /// your animation assets and set their TriggerName to a key in EventTriggerMap.
 /// EventTriggerMap then maps that key to the PlayTriggerName of the sibling
 /// AudioTriggerScript that should be played.

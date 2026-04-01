@@ -9,16 +9,16 @@
 //  AudioRtpcScript
 //
 //  Sets and resets a named Real-Time Parameter Control (RTPC) value on the
-//  sibling AudioProxyComponent's entity.
+//  sibling AudioProxyActor's entity.
 //
 //  On enable the RTPC name is resolved to an ID and the initial value is
 //  applied.  Values can be changed at any time via SetValue().  On disable
 //  the RTPC is reset to its middleware-defined default.
 // ============================================================================
 
-/// \brief Drives a named RTPC on a sibling AudioProxyComponent entity.
+/// \brief Drives a named RTPC on a sibling AudioProxyActor entity.
 ///
-/// Requires a sibling AudioProxyComponent on the same Actor.
+/// Requires a sibling AudioProxyActor on the same Actor.
 /// The initial value is pushed when the component becomes active.
 /// Calling ResetValue() or disabling the component restores the default.
 API_CLASS() class AUDIOSYSTEM_API AudioRtpcScript : public AudioProxyDependentScript

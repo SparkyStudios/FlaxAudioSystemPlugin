@@ -3,7 +3,7 @@
 #include "AudioSystemEnvironmentActor.h"
 
 // ============================================================================
-//  AudioSphereEnvironmentComponent
+//  AudioSphereEnvironmentActor
 //
 //  An environment zone defined by a sphere centred on this Actor's world-space
 //  position.  Proxies inside Radius receive a full wet-send (1.0).  Proxies in
@@ -21,10 +21,10 @@
 /// Radius receive full send (1.0).  A linear falloff between Radius and
 /// MaxDistance blends the wet-send from 1.0 to 0.0.
 API_CLASS(Attributes="ActorContextMenu(\"New/Audio/Audio Sphere Environment\")")
-class AUDIOSYSTEM_API AudioSphereEnvironmentComponent : public AudioSystemEnvironmentActor
+class AUDIOSYSTEM_API AudioSphereEnvironmentActor : public AudioSystemEnvironmentActor
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCENE_OBJECT(AudioSphereEnvironmentComponent);
+    DECLARE_SCENE_OBJECT(AudioSphereEnvironmentActor);
 
 public:
     // ========================================================================
@@ -47,7 +47,7 @@ public:
     /// \return 1.0 inside the inner sphere, linearly attenuated in the falloff
     ///         shell [Radius, MaxDistance], or 0.0 outside the outer sphere.
     /// \param proxy  The audio proxy whose world position is tested.
-    float GetEnvironmentAmount(const AudioProxyComponent* proxy) const override;
+    float GetEnvironmentAmount(const AudioProxyActor* proxy) const override;
 
     // ========================================================================
     //  Debug draw (editor only)

@@ -7,7 +7,7 @@
 #include "../Core/AudioSystemData.h"
 
 // ============================================================================
-//  AudioListenerComponent
+//  AudioListenerActor
 //
 //  Registers a spatial listener with the audio middleware. Each active
 //  listener receives its own unique ID (allocated from a static counter
@@ -34,10 +34,10 @@
 /// for position and orientation, and propagates the result to the middleware
 /// each frame.
 API_CLASS(Attributes="ActorContextMenu(\"New/Audio/Audio Listener\")")
-class AUDIOSYSTEM_API AudioListenerComponent : public Actor
+class AUDIOSYSTEM_API AudioListenerActor : public Actor
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCENE_OBJECT(AudioListenerComponent);
+    DECLARE_SCENE_OBJECT(AudioListenerActor);
 
 public:
     // ========================================================================

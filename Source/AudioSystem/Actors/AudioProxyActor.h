@@ -7,7 +7,7 @@
 #include "../Core/AudioSystemData.h"
 
 // ============================================================================
-//  AudioProxyComponent
+//  AudioProxyActor
 //
 //  An Actor that acts as a spatial audio entity. Other audio scripts
 //  (trigger, RTPC, switch-state, etc.) are attached as children and obtain
@@ -32,10 +32,10 @@
 /// Environment components update per-environment send amounts via
 /// SetEnvironmentAmount / GetEnvironmentAmount.
 API_CLASS(Attributes="ActorContextMenu(\"New/Audio/Audio Proxy\")")
-class AUDIOSYSTEM_API AudioProxyComponent : public Actor
+class AUDIOSYSTEM_API AudioProxyActor : public Actor
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCENE_OBJECT(AudioProxyComponent);
+    DECLARE_SCENE_OBJECT(AudioProxyActor);
 
 public:
     // ========================================================================

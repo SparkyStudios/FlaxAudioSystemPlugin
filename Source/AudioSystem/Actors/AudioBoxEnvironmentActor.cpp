@@ -1,10 +1,10 @@
 #include <Engine/Core/Math/Math.h>
 #include <Engine/Core/Math/Vector3.h>
 
-#include "AudioBoxEnvironmentComponent.h"
-#include "AudioProxyComponent.h"
+#include "AudioBoxEnvironmentActor.h"
+#include "AudioProxyActor.h"
 
-AudioBoxEnvironmentComponent::AudioBoxEnvironmentComponent(const SpawnParams& params)
+AudioBoxEnvironmentActor::AudioBoxEnvironmentActor(const SpawnParams& params)
     : AudioSystemEnvironmentActor(params)
 {
 }
@@ -13,7 +13,7 @@ AudioBoxEnvironmentComponent::AudioBoxEnvironmentComponent(const SpawnParams& pa
 //  GetEnvironmentAmount
 // ============================================================================
 
-float AudioBoxEnvironmentComponent::GetEnvironmentAmount(const AudioProxyComponent* proxy) const
+float AudioBoxEnvironmentActor::GetEnvironmentAmount(const AudioProxyActor* proxy) const
 {
     if (proxy == nullptr)
         return 0.0f;
@@ -73,7 +73,7 @@ float AudioBoxEnvironmentComponent::GetEnvironmentAmount(const AudioProxyCompone
 
 static constexpr float WiresDimAlpha = 0.35f;
 
-void AudioBoxEnvironmentComponent::OnDebugDraw()
+void AudioBoxEnvironmentActor::OnDebugDraw()
 {
     const Color dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
     const Vector3 outerExtents = Vector3::Max(MaxExtents, HalfExtents);
@@ -93,7 +93,7 @@ void AudioBoxEnvironmentComponent::OnDebugDraw()
     Actor::OnDebugDraw();
 }
 
-void AudioBoxEnvironmentComponent::OnDebugDrawSelected()
+void AudioBoxEnvironmentActor::OnDebugDrawSelected()
 {
     const Vector3 outerExtents = Vector3::Max(MaxExtents, HalfExtents);
 

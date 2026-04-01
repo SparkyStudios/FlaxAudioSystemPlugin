@@ -4,7 +4,7 @@
 #include <Engine/Level/Scene/SceneRendering.h>
 #include <Engine/Scripting/Scripting.h>
 
-#include "AudioListenerComponent.h"
+#include "AudioListenerActor.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
@@ -13,9 +13,9 @@
 // ============================================================================
 
 // Listener IDs start at 2000 to avoid collisions with entity IDs (from 1000).
-AudioSystemDataID AudioListenerComponent::_nextListenerId = 2000;
+AudioSystemDataID AudioListenerActor::_nextListenerId = 2000;
 
-AudioListenerComponent::AudioListenerComponent(const SpawnParams& params)
+AudioListenerActor::AudioListenerActor(const SpawnParams& params)
     : Actor(params)
 {
 }
@@ -24,7 +24,7 @@ AudioListenerComponent::AudioListenerComponent(const SpawnParams& params)
 //  OnEnable / OnDisable — viewport icon registration
 // ============================================================================
 
-void AudioListenerComponent::OnEnable()
+void AudioListenerActor::OnEnable()
 {
     Actor::OnEnable();
 
@@ -33,7 +33,7 @@ void AudioListenerComponent::OnEnable()
 #endif
 }
 
-void AudioListenerComponent::OnDisable()
+void AudioListenerActor::OnDisable()
 {
 #if USE_EDITOR
     GetSceneRendering()->RemoveViewportIcon(this);
@@ -46,7 +46,7 @@ void AudioListenerComponent::OnDisable()
 //  OnBeginPlay
 // ============================================================================
 
-void AudioListenerComponent::OnBeginPlay()
+void AudioListenerActor::OnBeginPlay()
 {
     Actor::OnBeginPlay();
 
@@ -67,16 +67,16 @@ void AudioListenerComponent::OnBeginPlay()
         _registeredAsDefault = true;
     }
 
-    Scripting::Update.Bind<AudioListenerComponent, &AudioListenerComponent::OnFrameUpdate>(this);
+    Scripting::Update.Bind<AudioListenerActor, &AudioListenerActor::OnFrameUpdate>(this);
 }
 
 // ============================================================================
 //  OnEndPlay
 // ============================================================================
 
-void AudioListenerComponent::OnEndPlay()
+void AudioListenerActor::OnEndPlay()
 {
-    Scripting::Update.Unbind<AudioListenerComponent, &AudioListenerComponent::OnFrameUpdate>(this);
+    Scripting::Update.Unbind<AudioListenerActor, &AudioListenerActor::OnFrameUpdate>(this);
 
     if (_registeredAsDefault)
     {
@@ -103,7 +103,7 @@ void AudioListenerComponent::OnEndPlay()
 //  OnTransformChanged
 // ============================================================================
 
-void AudioListenerComponent::OnTransformChanged()
+void AudioListenerActor::OnTransformChanged()
 {
     Actor::OnTransformChanged();
     _transformDirty = true;
@@ -113,7 +113,7 @@ void AudioListenerComponent::OnTransformChanged()
 //  OnFrameUpdate  (private — bound to Scripting::Update)
 // ============================================================================
 
-void AudioListenerComponent::OnFrameUpdate()
+void AudioListenerActor::OnFrameUpdate()
 {
     if (_listenerId == INVALID_AUDIO_SYSTEM_ID)
         return;
@@ -146,7 +146,7 @@ void AudioListenerComponent::OnFrameUpdate()
 //  GetListenerId
 // ============================================================================
 
-AudioSystemDataID AudioListenerComponent::GetListenerId() const
+AudioSystemDataID AudioListenerActor::GetListenerId() const
 {
     return _listenerId;
 }
@@ -155,7 +155,7 @@ AudioSystemDataID AudioListenerComponent::GetListenerId() const
 //  ComputeCurrentTransform  (private helper)
 // ============================================================================
 
-AudioSystemTransform AudioListenerComponent::ComputeCurrentTransform() const
+AudioSystemTransform AudioListenerActor::ComputeCurrentTransform() const
 {
     const Actor* posSource = PositionObject.Get();
     const Actor* oriSource = OrientationObject.Get();

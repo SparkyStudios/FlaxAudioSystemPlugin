@@ -7,7 +7,7 @@
 #include "../Core/AudioSystemData.h"
 
 // Forward declarations
-class AudioProxyComponent;
+class AudioProxyActor;
 
 // ============================================================================
 //  AudioSystemEnvironmentActor
@@ -73,7 +73,7 @@ public:
 
     /// \return How much the given proxy is affected by this environment [0, 1].
     ///         Subclasses must implement the distance / overlap logic.
-    virtual float GetEnvironmentAmount(const AudioProxyComponent* proxy) const = 0;
+    virtual float GetEnvironmentAmount(const AudioProxyActor* proxy) const = 0;
 
     /// \return The environment ID resolved from EnvironmentName.
     ///         Returns INVALID_AUDIO_SYSTEM_ID if not yet resolved or not found.

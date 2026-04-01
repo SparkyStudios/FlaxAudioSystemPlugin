@@ -4,7 +4,7 @@
 #include <Engine/Level/Scene/SceneRendering.h>
 #include <Engine/Scripting/Scripting.h>
 
-#include "AudioProxyComponent.h"
+#include "AudioProxyActor.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
@@ -13,9 +13,9 @@
 // ============================================================================
 
 // Entity IDs below 1000 are reserved for internal / listener use.
-AudioSystemDataID AudioProxyComponent::_nextEntityId = 1000;
+AudioSystemDataID AudioProxyActor::_nextEntityId = 1000;
 
-AudioProxyComponent::AudioProxyComponent(const SpawnParams& params)
+AudioProxyActor::AudioProxyActor(const SpawnParams& params)
     : Actor(params)
 {
 }
@@ -24,7 +24,7 @@ AudioProxyComponent::AudioProxyComponent(const SpawnParams& params)
 //  OnEnable / OnDisable — viewport icon registration
 // ============================================================================
 
-void AudioProxyComponent::OnEnable()
+void AudioProxyActor::OnEnable()
 {
     Actor::OnEnable();
 
@@ -33,7 +33,7 @@ void AudioProxyComponent::OnEnable()
 #endif
 }
 
-void AudioProxyComponent::OnDisable()
+void AudioProxyActor::OnDisable()
 {
 #if USE_EDITOR
     GetSceneRendering()->RemoveViewportIcon(this);
@@ -46,7 +46,7 @@ void AudioProxyComponent::OnDisable()
 //  OnBeginPlay
 // ============================================================================
 
-void AudioProxyComponent::OnBeginPlay()
+void AudioProxyActor::OnBeginPlay()
 {
     Actor::OnBeginPlay();
 
@@ -62,7 +62,7 @@ void AudioProxyComponent::OnBeginPlay()
     AudioSystem::Get()->SendRequest(std::move(req));
 
     // Bind the per-frame update to receive Scripting::Update callbacks.
-    Scripting::Update.Bind<AudioProxyComponent, &AudioProxyComponent::OnFrameUpdate>(this);
+    Scripting::Update.Bind<AudioProxyActor, &AudioProxyActor::OnFrameUpdate>(this);
 
     AudioSystem::Get()->GetWorldModule().AddProxy(this);
 }
@@ -71,12 +71,12 @@ void AudioProxyComponent::OnBeginPlay()
 //  OnEndPlay
 // ============================================================================
 
-void AudioProxyComponent::OnEndPlay()
+void AudioProxyActor::OnEndPlay()
 {
     AudioSystem::Get()->GetWorldModule().RemoveProxy(this);
 
     // Unbind the per-frame update before tearing down any state.
-    Scripting::Update.Unbind<AudioProxyComponent, &AudioProxyComponent::OnFrameUpdate>(this);
+    Scripting::Update.Unbind<AudioProxyActor, &AudioProxyActor::OnFrameUpdate>(this);
 
     if (_entityId != INVALID_AUDIO_SYSTEM_ID)
     {
@@ -98,7 +98,7 @@ void AudioProxyComponent::OnEndPlay()
 //  OnTransformChanged
 // ============================================================================
 
-void AudioProxyComponent::OnTransformChanged()
+void AudioProxyActor::OnTransformChanged()
 {
     Actor::OnTransformChanged();
     _transformDirty = true;
@@ -108,7 +108,7 @@ void AudioProxyComponent::OnTransformChanged()
 //  OnFrameUpdate  (private — Scripting::Update delegate)
 // ============================================================================
 
-void AudioProxyComponent::OnFrameUpdate()
+void AudioProxyActor::OnFrameUpdate()
 {
     if (_entityId == INVALID_AUDIO_SYSTEM_ID)
         return;
@@ -148,7 +148,7 @@ void AudioProxyComponent::OnFrameUpdate()
 //  GetEntityId
 // ============================================================================
 
-AudioSystemDataID AudioProxyComponent::GetEntityId() const
+AudioSystemDataID AudioProxyActor::GetEntityId() const
 {
     return _entityId;
 }
@@ -157,7 +157,7 @@ AudioSystemDataID AudioProxyComponent::GetEntityId() const
 //  SetEnvironmentAmount
 // ============================================================================
 
-void AudioProxyComponent::SetEnvironmentAmount(AudioSystemDataID envId, float amount)
+void AudioProxyActor::SetEnvironmentAmount(AudioSystemDataID envId, float amount)
 {
     if (envId == INVALID_AUDIO_SYSTEM_ID)
         return;
@@ -184,7 +184,7 @@ void AudioProxyComponent::SetEnvironmentAmount(AudioSystemDataID envId, float am
 //  GetEnvironmentAmount
 // ============================================================================
 
-float AudioProxyComponent::GetEnvironmentAmount(AudioSystemDataID envId) const
+float AudioProxyActor::GetEnvironmentAmount(AudioSystemDataID envId) const
 {
     const float* value = _environmentAmounts.TryGet(envId);
     return (value != nullptr) ? *value : 0.0f;

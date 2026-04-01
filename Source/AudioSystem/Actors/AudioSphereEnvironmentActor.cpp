@@ -1,10 +1,10 @@
 #include <Engine/Core/Math/Math.h>
 #include <Engine/Core/Math/Vector3.h>
 
-#include "AudioSphereEnvironmentComponent.h"
-#include "AudioProxyComponent.h"
+#include "AudioSphereEnvironmentActor.h"
+#include "AudioProxyActor.h"
 
-AudioSphereEnvironmentComponent::AudioSphereEnvironmentComponent(const SpawnParams& params)
+AudioSphereEnvironmentActor::AudioSphereEnvironmentActor(const SpawnParams& params)
     : AudioSystemEnvironmentActor(params)
 {
 }
@@ -13,7 +13,7 @@ AudioSphereEnvironmentComponent::AudioSphereEnvironmentComponent(const SpawnPara
 //  GetEnvironmentAmount
 // ============================================================================
 
-float AudioSphereEnvironmentComponent::GetEnvironmentAmount(const AudioProxyComponent* proxy) const
+float AudioSphereEnvironmentActor::GetEnvironmentAmount(const AudioProxyActor* proxy) const
 {
     if (proxy == nullptr)
         return 0.0f;
@@ -52,7 +52,7 @@ float AudioSphereEnvironmentComponent::GetEnvironmentAmount(const AudioProxyComp
 
 static constexpr float WiresDimAlpha = 0.35f;
 
-void AudioSphereEnvironmentComponent::OnDebugDraw()
+void AudioSphereEnvironmentActor::OnDebugDraw()
 {
     const Color dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
     const Vector3 center = GetPosition();
@@ -66,7 +66,7 @@ void AudioSphereEnvironmentComponent::OnDebugDraw()
     Actor::OnDebugDraw();
 }
 
-void AudioSphereEnvironmentComponent::OnDebugDrawSelected()
+void AudioSphereEnvironmentActor::OnDebugDrawSelected()
 {
     const Vector3 center = GetPosition();
 

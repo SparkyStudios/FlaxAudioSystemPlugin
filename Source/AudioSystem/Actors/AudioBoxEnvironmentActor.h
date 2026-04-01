@@ -5,7 +5,7 @@
 #include "AudioSystemEnvironmentActor.h"
 
 // ============================================================================
-//  AudioBoxEnvironmentComponent
+//  AudioBoxEnvironmentActor
 //
 //  An environment zone defined by two axis-aligned boxes in the Actor's local
 //  space.  Proxies inside HalfExtents receive a full wet-send (1.0).  Proxies
@@ -19,10 +19,10 @@
 /// both in the Actor's local space.  A per-axis linear falloff is applied
 /// between the two boxes.
 API_CLASS(Attributes="ActorContextMenu(\"New/Audio/Audio Box Environment\")")
-class AUDIOSYSTEM_API AudioBoxEnvironmentComponent : public AudioSystemEnvironmentActor
+class AUDIOSYSTEM_API AudioBoxEnvironmentActor : public AudioSystemEnvironmentActor
 {
     API_AUTO_SERIALIZATION();
-    DECLARE_SCENE_OBJECT(AudioBoxEnvironmentComponent);
+    DECLARE_SCENE_OBJECT(AudioBoxEnvironmentActor);
 
 public:
     // ========================================================================
@@ -45,7 +45,7 @@ public:
 
     /// \return 1.0 if proxy is inside HalfExtents, linearly attenuated in the
     ///         falloff zone between HalfExtents and MaxExtents, or 0.0 outside.
-    float GetEnvironmentAmount(const AudioProxyComponent* proxy) const override;
+    float GetEnvironmentAmount(const AudioProxyActor* proxy) const override;
 
     // ========================================================================
     //  Debug draw (editor only)

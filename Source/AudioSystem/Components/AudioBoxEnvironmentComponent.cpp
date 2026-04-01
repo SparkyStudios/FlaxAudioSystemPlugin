@@ -18,29 +18,48 @@ float AudioBoxEnvironmentComponent::GetEnvironmentAmount(const AudioProxyCompone
     if (proxy == nullptr)
         return 0.0f;
 
-    // proxy is an Actor — call GetPosition() directly.
     const Vector3 proxyWorldPos = proxy->GetPosition();
 
     // Transform the proxy world position into this Actor's local space so
     // the box test is always axis-aligned regardless of Actor rotation/scale.
     const Vector3 localPos = GetTransform().WorldToLocal(proxyWorldPos);
+    const Vector3 absPos = Vector3(Math::Abs(localPos.X), Math::Abs(localPos.Y), Math::Abs(localPos.Z));
 
-    // Clamp local position to the box surface.
-    const Vector3 clamped = Vector3::Clamp(localPos, -HalfExtents, HalfExtents);
+    // Clamp MaxExtents so each axis is at least as large as HalfExtents.
+    const Vector3 outerExtents = Vector3::Max(MaxExtents, HalfExtents);
 
-    // Distance from the proxy's local position to the nearest point on the box.
-    const float dist = Vector3::Distance(localPos, clamped);
-
-    // Inside the box: full send.
-    if (dist <= 0.0f)
-        return 1.0f;
-
-    // Beyond the falloff shell: no send.
-    if (MaxDistance <= 0.0f || dist >= MaxDistance)
+    // Outside the outer box entirely: no send.
+    if (absPos.X >= outerExtents.X || absPos.Y >= outerExtents.Y || absPos.Z >= outerExtents.Z)
         return 0.0f;
 
-    // Linear falloff from 1 (at box surface) to 0 (at MaxDistance).
-    return 1.0f - (dist / MaxDistance);
+    // Inside the inner box: full send.
+    if (absPos.X <= HalfExtents.X && absPos.Y <= HalfExtents.Y && absPos.Z <= HalfExtents.Z)
+        return 1.0f;
+
+    // Falloff zone: compute per-axis interpolation factor and take the minimum.
+    // For each axis, the factor is 1.0 at HalfExtents and 0.0 at outerExtents.
+    float minFactor = 1.0f;
+
+    for (int32 i = 0; i < 3; ++i)
+    {
+        const float inner = (&HalfExtents.X)[i];
+        const float outer = (&outerExtents.X)[i];
+        const float pos   = (&absPos.X)[i];
+
+        if (pos > inner)
+        {
+            const float range = outer - inner;
+            if (range <= 0.0f)
+            {
+                minFactor = 0.0f;
+                break;
+            }
+            const float factor = 1.0f - ((pos - inner) / range);
+            minFactor = Math::Min(minFactor, factor);
+        }
+    }
+
+    return Math::Max(minFactor, 0.0f);
 }
 
 // ============================================================================
@@ -48,7 +67,6 @@ float AudioBoxEnvironmentComponent::GetEnvironmentAmount(const AudioProxyCompone
 // ============================================================================
 
 #if USE_EDITOR
-#include <Engine/Core/Math/BoundingSphere.h>
 #include <Engine/Core/Math/Color.h>
 #include <Engine/Core/Math/OrientedBoundingBox.h>
 #include <Engine/Debug/DebugDraw.h>
@@ -58,29 +76,36 @@ static constexpr float WiresDimAlpha = 0.35f;
 void AudioBoxEnvironmentComponent::OnDebugDraw()
 {
     const Color dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
+    const Vector3 outerExtents = Vector3::Max(MaxExtents, HalfExtents);
 
-    OrientedBoundingBox box;
-    OrientedBoundingBox::CreateCentered(Vector3::Zero, HalfExtents * 2.0f, box);
-    box.Transform(GetTransform());
+    // Inner box (full send boundary).
+    OrientedBoundingBox innerBox;
+    OrientedBoundingBox::CreateCentered(Vector3::Zero, HalfExtents * 2.0f, innerBox);
+    innerBox.Transform(GetTransform());
+    DEBUG_DRAW_WIRE_BOX(innerBox, dimColor, 0, true);
 
-    DEBUG_DRAW_WIRE_BOX(box, dimColor, 0, true);
-
-    if (MaxDistance > 0.0f)
-        DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(GetPosition(), MaxDistance), dimColor, 0, true);
+    // Outer box (zero send boundary).
+    OrientedBoundingBox outerBox;
+    OrientedBoundingBox::CreateCentered(Vector3::Zero, outerExtents * 2.0f, outerBox);
+    outerBox.Transform(GetTransform());
+    DEBUG_DRAW_WIRE_BOX(outerBox, dimColor, 0, true);
 
     Actor::OnDebugDraw();
 }
 
 void AudioBoxEnvironmentComponent::OnDebugDrawSelected()
 {
-    OrientedBoundingBox box;
-    OrientedBoundingBox::CreateCentered(Vector3::Zero, HalfExtents * 2.0f, box);
-    box.Transform(GetTransform());
+    const Vector3 outerExtents = Vector3::Max(MaxExtents, HalfExtents);
 
-    DEBUG_DRAW_WIRE_BOX(box, EnvironmentColor, 0, false);
+    OrientedBoundingBox innerBox;
+    OrientedBoundingBox::CreateCentered(Vector3::Zero, HalfExtents * 2.0f, innerBox);
+    innerBox.Transform(GetTransform());
+    DEBUG_DRAW_WIRE_BOX(innerBox, EnvironmentColor, 0, false);
 
-    if (MaxDistance > 0.0f)
-        DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(GetPosition(), MaxDistance), EnvironmentColor, 0, false);
+    OrientedBoundingBox outerBox;
+    OrientedBoundingBox::CreateCentered(Vector3::Zero, outerExtents * 2.0f, outerBox);
+    outerBox.Transform(GetTransform());
+    DEBUG_DRAW_WIRE_BOX(outerBox, EnvironmentColor, 0, false);
 
     Actor::OnDebugDrawSelected();
 }

@@ -63,6 +63,8 @@ void AudioProxyComponent::OnBeginPlay()
 
     // Bind the per-frame update to receive Scripting::Update callbacks.
     Scripting::Update.Bind<AudioProxyComponent, &AudioProxyComponent::OnFrameUpdate>(this);
+
+    AudioSystem::Get()->GetWorldModule().AddProxy(this);
 }
 
 // ============================================================================
@@ -71,6 +73,8 @@ void AudioProxyComponent::OnBeginPlay()
 
 void AudioProxyComponent::OnEndPlay()
 {
+    AudioSystem::Get()->GetWorldModule().RemoveProxy(this);
+
     // Unbind the per-frame update before tearing down any state.
     Scripting::Update.Unbind<AudioProxyComponent, &AudioProxyComponent::OnFrameUpdate>(this);
 

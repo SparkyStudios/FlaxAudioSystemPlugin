@@ -6,6 +6,7 @@
 
 // Forward declarations
 class AudioListenerComponent;
+class AudioProxyComponent;
 
 // ============================================================================
 //  AudioWorldModule
@@ -56,7 +57,18 @@ public:
     /// \return The current default listener, or null if none is set.
     const AudioListenerComponent* GetDefaultListener() const;
 
+    // ========================================================================
+    //  Proxy registration
+    // ========================================================================
+
+    /// Register an active audio proxy for environment updates.
+    void AddProxy(AudioProxyComponent* proxy);
+
+    /// Unregister a proxy (e.g., on EndPlay).
+    void RemoveProxy(AudioProxyComponent* proxy);
+
 private:
     Array<const AudioSystemEnvironmentActor*> _environments;
+    Array<AudioProxyComponent*> _proxies;
     const AudioListenerComponent* _defaultListener = nullptr;
 };

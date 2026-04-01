@@ -1,6 +1,7 @@
 #include <Engine/Core/Log.h>
 
 #include "AudioWorldModule.h"
+#include "../Components/AudioProxyComponent.h"
 
 // ============================================================================
 //  Per-frame update
@@ -8,10 +9,26 @@
 
 void AudioWorldModule::Update()
 {
-    // TODO (Phase 7): For each component in _environments, query overlap with
-    //                 active ATL audio objects and push environment amounts via
-    //                 the AudioTranslationLayer so that the middleware can apply
-    //                 reverb / obstruction blending per sound.
+    // For each active proxy, query each environment for the send amount
+    // and push it to the proxy (which dispatches to the audio system if changed).
+    for (AudioProxyComponent* proxy : _proxies)
+    {
+        if (proxy == nullptr)
+            continue;
+
+        for (const AudioSystemEnvironmentActor* env : _environments)
+        {
+            if (env == nullptr)
+                continue;
+
+            const AudioSystemDataID envId = env->GetEnvironmentId();
+            if (envId == INVALID_AUDIO_SYSTEM_ID)
+                continue;
+
+            const float amount = env->GetEnvironmentAmount(proxy);
+            proxy->SetEnvironmentAmount(envId, amount);
+        }
+    }
 }
 
 // ============================================================================
@@ -65,4 +82,29 @@ void AudioWorldModule::SetDefaultListener(const AudioListenerComponent* listener
 const AudioListenerComponent* AudioWorldModule::GetDefaultListener() const
 {
     return _defaultListener;
+}
+
+// ============================================================================
+//  Proxy registration
+// ============================================================================
+
+void AudioWorldModule::AddProxy(AudioProxyComponent* proxy)
+{
+    if (proxy == nullptr)
+    {
+        LOG(Warning, "[AudioWorldModule] AddProxy: null proxy pointer — ignoring.");
+        return;
+    }
+
+    if (_proxies.Contains(proxy))
+        return;
+
+    _proxies.Add(proxy);
+}
+
+void AudioWorldModule::RemoveProxy(AudioProxyComponent* proxy)
+{
+    const int32 index = _proxies.Find(proxy);
+    if (index != -1)
+        _proxies.RemoveAt(index);
 }

@@ -21,6 +21,7 @@ launchSettings.json
 
 # Ignore Rider project files (generated locally)
 *.idea/
+*.air/
 
 # Ignore thumbnails created by OS
 Thumbs.db

@@ -9,6 +9,7 @@ Source/*.Gen.*
 
 # Local files
 imgui.ini
+.clangd
 
 # Ignore Visual Studio project files (generated locally)
 *.csproj

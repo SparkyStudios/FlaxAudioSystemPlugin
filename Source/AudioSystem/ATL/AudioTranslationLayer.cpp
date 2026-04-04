@@ -1,21 +1,39 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "AudioTranslationLayer.h"
+
 #include <Engine/Core/Log.h>
 #include <Engine/Core/Types/DateTime.h>
 #include <Engine/Core/Types/TimeSpan.h>
-
-#include "AudioTranslationLayer.h"
 
 // ============================================================================
 //  Constants
 // ============================================================================
 
+/// <summary>
 /// ID assigned to the global "world" entity (used for non-spatial sounds).
+/// </summary>
 static constexpr AudioSystemDataID WORLD_ENTITY_ID = 1;
 
 // ============================================================================
 //  Helpers
 // ============================================================================
 
+/// <summary>
 /// Hash a control name for reverse-lookup in the name maps.
+/// </summary>
 static uint32 HashName(const StringView& name)
 {
     return GetHash(String(name));
@@ -56,8 +74,8 @@ bool AudioTranslationLayer::Startup()
     }
 
     ATLEntity* worldEntity = New<ATLEntity>();
-    worldEntity->Id = WORLD_ENTITY_ID;
-    worldEntity->pData = worldData;
+    worldEntity->Id        = WORLD_ENTITY_ID;
+    worldEntity->pData     = worldData;
     _entities.Add(WORLD_ENTITY_ID, worldEntity);
 
     _lastUpdateTime = DateTime::Now();
@@ -209,8 +227,8 @@ void AudioTranslationLayer::Update()
     }
 
     const DateTime now = DateTime::Now();
-    const float dt = static_cast<float>((now - _lastUpdateTime).GetTotalSeconds());
-    _lastUpdateTime = now;
+    const float    dt  = static_cast<float>((now - _lastUpdateTime).GetTotalSeconds());
+    _lastUpdateTime    = now;
 
     _middleware->Update(dt);
 }
@@ -238,48 +256,48 @@ bool AudioTranslationLayer::ProcessRequest(AudioRequest&& request, bool sync)
 
     switch (request.Type)
     {
-    case AudioRequestType::RegisterEntity:
-        return HandleRegisterEntity(request);
-    case AudioRequestType::UnregisterEntity:
-        return HandleUnregisterEntity(request);
-    case AudioRequestType::UpdateEntityTransform:
-        return HandleUpdateEntityTransform(request);
-    case AudioRequestType::RegisterListener:
-        return HandleRegisterListener(request);
-    case AudioRequestType::UnregisterListener:
-        return HandleUnregisterListener(request);
-    case AudioRequestType::UpdateListenerTransform:
-        return HandleUpdateListenerTransform(request);
-    case AudioRequestType::LoadTrigger:
-        return HandleLoadTrigger(request);
-    case AudioRequestType::ActivateTrigger:
-        return HandleActivateTrigger(request);
-    case AudioRequestType::StopEvent:
-        return HandleStopEvent(request);
-    case AudioRequestType::StopAllEvents:
-        return HandleStopAllEvents(request);
-    case AudioRequestType::UnloadTrigger:
-        return HandleUnloadTrigger(request);
-    case AudioRequestType::SetRtpcValue:
-        return HandleSetRtpcValue(request);
-    case AudioRequestType::ResetRtpcValue:
-        return HandleResetRtpcValue(request);
-    case AudioRequestType::SetSwitchState:
-        return HandleSetSwitchState(request);
-    case AudioRequestType::SetObstructionOcclusion:
-        return HandleSetObstructionOcclusion(request);
-    case AudioRequestType::SetEnvironmentAmount:
-        return HandleSetEnvironmentAmount(request);
-    case AudioRequestType::LoadBank:
-        return HandleLoadBank(request);
-    case AudioRequestType::UnloadBank:
-        return HandleUnloadBank(request);
-    case AudioRequestType::Shutdown:
-        LOG(Info, "[ATL] Shutdown request received.");
-        return true;
-    default:
-        LOG(Warning, "[ATL] Unknown request type: {0}.", static_cast<int32>(request.Type));
-        return false;
+        case AudioRequestType::RegisterEntity:
+            return HandleRegisterEntity(request);
+        case AudioRequestType::UnregisterEntity:
+            return HandleUnregisterEntity(request);
+        case AudioRequestType::UpdateEntityTransform:
+            return HandleUpdateEntityTransform(request);
+        case AudioRequestType::RegisterListener:
+            return HandleRegisterListener(request);
+        case AudioRequestType::UnregisterListener:
+            return HandleUnregisterListener(request);
+        case AudioRequestType::UpdateListenerTransform:
+            return HandleUpdateListenerTransform(request);
+        case AudioRequestType::LoadTrigger:
+            return HandleLoadTrigger(request);
+        case AudioRequestType::ActivateTrigger:
+            return HandleActivateTrigger(request);
+        case AudioRequestType::StopEvent:
+            return HandleStopEvent(request);
+        case AudioRequestType::StopAllEvents:
+            return HandleStopAllEvents(request);
+        case AudioRequestType::UnloadTrigger:
+            return HandleUnloadTrigger(request);
+        case AudioRequestType::SetRtpcValue:
+            return HandleSetRtpcValue(request);
+        case AudioRequestType::ResetRtpcValue:
+            return HandleResetRtpcValue(request);
+        case AudioRequestType::SetSwitchState:
+            return HandleSetSwitchState(request);
+        case AudioRequestType::SetObstructionOcclusion:
+            return HandleSetObstructionOcclusion(request);
+        case AudioRequestType::SetEnvironmentAmount:
+            return HandleSetEnvironmentAmount(request);
+        case AudioRequestType::LoadBank:
+            return HandleLoadBank(request);
+        case AudioRequestType::UnloadBank:
+            return HandleUnloadBank(request);
+        case AudioRequestType::Shutdown:
+            LOG(Info, "[ATL] Shutdown request received.");
+            return true;
+        default:
+            LOG(Warning, "[ATL] Unknown request type: {0}.", static_cast<int32>(request.Type));
+            return false;
     }
 }
 
@@ -317,16 +335,16 @@ bool AudioTranslationLayer::HandleRegisterEntity(const AudioRequest& request)
     }
 
     ATLEntity* entity = New<ATLEntity>();
-    entity->Id = id;
-    entity->pData = data;
+    entity->Id        = id;
+    entity->pData     = data;
     _entities.Add(id, entity);
     return true;
 }
 
 bool AudioTranslationLayer::HandleUnregisterEntity(const AudioRequest& request)
 {
-    const AudioSystemDataID id = request.EntityId;
-    ATLEntity* entity = nullptr;
+    const AudioSystemDataID id     = request.EntityId;
+    ATLEntity*              entity = nullptr;
 
     if (!_entities.TryGet(id, entity) || entity == nullptr)
     {
@@ -347,8 +365,8 @@ bool AudioTranslationLayer::HandleUnregisterEntity(const AudioRequest& request)
 
 bool AudioTranslationLayer::HandleUpdateEntityTransform(const AudioRequest& request)
 {
-    const AudioSystemDataID id = request.EntityId;
-    ATLEntity* entity = nullptr;
+    const AudioSystemDataID id     = request.EntityId;
+    ATLEntity*              entity = nullptr;
 
     if (!_entities.TryGet(id, entity) || entity == nullptr)
     {
@@ -365,7 +383,7 @@ bool AudioTranslationLayer::HandleUpdateEntityTransform(const AudioRequest& requ
 
 bool AudioTranslationLayer::HandleRegisterListener(const AudioRequest& request)
 {
-    const AudioSystemDataID id = request.EntityId;
+    const AudioSystemDataID id = request.ListenerId;
     if (id == INVALID_AUDIO_SYSTEM_ID)
     {
         LOG(Error, "[ATL] RegisterListener: invalid listener ID.");
@@ -378,7 +396,7 @@ bool AudioTranslationLayer::HandleRegisterListener(const AudioRequest& request)
         return true;
     }
 
-    AudioSystemListenerData* data = _middleware->CreateListenerData(id);
+    AudioSystemListenerData* data = _middleware->CreateListenerData(id, request.IsDefaultListener);
     if (data == nullptr)
     {
         LOG(Error, "[ATL] RegisterListener: middleware failed to create listener data for {0}.", id);
@@ -393,16 +411,16 @@ bool AudioTranslationLayer::HandleRegisterListener(const AudioRequest& request)
     }
 
     ATLListener* listener = New<ATLListener>();
-    listener->Id = id;
-    listener->pData = data;
+    listener->Id          = id;
+    listener->pData       = data;
     _listeners.Add(id, listener);
     return true;
 }
 
 bool AudioTranslationLayer::HandleUnregisterListener(const AudioRequest& request)
 {
-    const AudioSystemDataID id = request.EntityId;
-    ATLListener* listener = nullptr;
+    const AudioSystemDataID id       = request.ListenerId;
+    ATLListener*            listener = nullptr;
 
     if (!_listeners.TryGet(id, listener) || listener == nullptr)
     {
@@ -423,8 +441,8 @@ bool AudioTranslationLayer::HandleUnregisterListener(const AudioRequest& request
 
 bool AudioTranslationLayer::HandleUpdateListenerTransform(const AudioRequest& request)
 {
-    const AudioSystemDataID id = request.EntityId;
-    ATLListener* listener = nullptr;
+    const AudioSystemDataID id       = request.ListenerId;
+    ATLListener*            listener = nullptr;
 
     if (!_listeners.TryGet(id, listener) || listener == nullptr)
     {
@@ -441,7 +459,7 @@ bool AudioTranslationLayer::HandleUpdateListenerTransform(const AudioRequest& re
 
 bool AudioTranslationLayer::HandleLoadTrigger(const AudioRequest& request)
 {
-    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID entityId  = request.EntityId;
     const AudioSystemDataID triggerId = request.ObjectId;
 
     ATLEntity* entity = nullptr;
@@ -476,7 +494,7 @@ bool AudioTranslationLayer::HandleLoadTrigger(const AudioRequest& request)
 
 bool AudioTranslationLayer::HandleActivateTrigger(const AudioRequest& request)
 {
-    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID entityId  = request.EntityId;
     const AudioSystemDataID triggerId = request.ObjectId;
 
     ATLEntity* entity = nullptr;
@@ -511,8 +529,8 @@ bool AudioTranslationLayer::HandleActivateTrigger(const AudioRequest& request)
     const AudioSystemDataID eventId = _nextEventId++;
 
     ATLEvent* atlEvent = New<ATLEvent>();
-    atlEvent->Id = eventId;
-    atlEvent->pData = eventData;
+    atlEvent->Id       = eventId;
+    atlEvent->pData    = eventData;
     _events.Add(eventId, atlEvent);
     trigger->Events.Add(eventId, atlEvent);
 
@@ -522,7 +540,7 @@ bool AudioTranslationLayer::HandleActivateTrigger(const AudioRequest& request)
 bool AudioTranslationLayer::HandleStopEvent(const AudioRequest& request)
 {
     const AudioSystemDataID entityId = request.EntityId;
-    const AudioSystemDataID eventId = request.ObjectId;
+    const AudioSystemDataID eventId  = request.ObjectId;
 
     ATLEvent* atlEvent = nullptr;
     if (!_events.TryGet(eventId, atlEvent) || atlEvent == nullptr)
@@ -562,7 +580,7 @@ bool AudioTranslationLayer::HandleStopAllEvents(const AudioRequest& request)
 
 bool AudioTranslationLayer::HandleUnloadTrigger(const AudioRequest& request)
 {
-    const AudioSystemDataID entityId = request.EntityId;
+    const AudioSystemDataID entityId  = request.EntityId;
     const AudioSystemDataID triggerId = request.ObjectId;
 
     ATLTrigger* trigger = nullptr;
@@ -591,7 +609,7 @@ bool AudioTranslationLayer::HandleUnloadTrigger(const AudioRequest& request)
 bool AudioTranslationLayer::HandleSetRtpcValue(const AudioRequest& request)
 {
     const AudioSystemDataID entityId = request.EntityId;
-    const AudioSystemDataID rtpcId = request.ObjectId;
+    const AudioSystemDataID rtpcId   = request.ObjectId;
 
     ATLRtpc* rtpc = nullptr;
     if (!_rtpcs.TryGet(rtpcId, rtpc) || rtpc == nullptr)
@@ -606,7 +624,7 @@ bool AudioTranslationLayer::HandleSetRtpcValue(const AudioRequest& request)
 bool AudioTranslationLayer::HandleResetRtpcValue(const AudioRequest& request)
 {
     const AudioSystemDataID entityId = request.EntityId;
-    const AudioSystemDataID rtpcId = request.ObjectId;
+    const AudioSystemDataID rtpcId   = request.ObjectId;
 
     ATLRtpc* rtpc = nullptr;
     if (!_rtpcs.TryGet(rtpcId, rtpc) || rtpc == nullptr)
@@ -649,7 +667,7 @@ bool AudioTranslationLayer::HandleSetObstructionOcclusion(const AudioRequest& re
 bool AudioTranslationLayer::HandleSetEnvironmentAmount(const AudioRequest& request)
 {
     const AudioSystemDataID entityId = request.EntityId;
-    const AudioSystemDataID envId = request.ObjectId;
+    const AudioSystemDataID envId    = request.ObjectId;
 
     ATLEnvironment* env = nullptr;
     if (!_environments.TryGet(envId, env) || env == nullptr)
@@ -712,8 +730,8 @@ bool AudioTranslationLayer::RegisterTrigger(AudioSystemDataID id, const StringVi
     }
 
     ATLTrigger* trigger = New<ATLTrigger>();
-    trigger->Id = id;
-    trigger->pData = data;
+    trigger->Id         = id;
+    trigger->pData      = data;
     _triggers.Add(id, trigger);
 
     if (name.HasChars())
@@ -737,8 +755,8 @@ bool AudioTranslationLayer::RegisterRtpc(AudioSystemDataID id, const StringView&
     }
 
     ATLRtpc* rtpc = New<ATLRtpc>();
-    rtpc->Id = id;
-    rtpc->pData = data;
+    rtpc->Id      = id;
+    rtpc->pData   = data;
     _rtpcs.Add(id, rtpc);
 
     if (name.HasChars())
@@ -762,8 +780,8 @@ bool AudioTranslationLayer::RegisterSwitchState(AudioSystemDataID id, const Stri
     }
 
     ATLSwitchState* ss = New<ATLSwitchState>();
-    ss->Id = id;
-    ss->pData = data;
+    ss->Id             = id;
+    ss->pData          = data;
     _switchStates.Add(id, ss);
 
     if (name.HasChars())
@@ -787,8 +805,8 @@ bool AudioTranslationLayer::RegisterEnvironment(AudioSystemDataID id, const Stri
     }
 
     ATLEnvironment* env = New<ATLEnvironment>();
-    env->Id = id;
-    env->pData = data;
+    env->Id             = id;
+    env->pData          = data;
     _environments.Add(id, env);
 
     if (name.HasChars())
@@ -812,8 +830,8 @@ bool AudioTranslationLayer::RegisterSoundBank(AudioSystemDataID id, const String
     }
 
     ATLSoundBank* bank = New<ATLSoundBank>();
-    bank->Id = id;
-    bank->pData = data;
+    bank->Id           = id;
+    bank->pData        = data;
     _banks.Add(id, bank);
 
     if (name.HasChars())
@@ -963,36 +981,36 @@ bool AudioTranslationLayer::UnregisterSoundBank(AudioSystemDataID id)
 
 AudioSystemDataID AudioTranslationLayer::GetTriggerId(StringView name) const
 {
-    const uint32 nameHash = HashName(name);
-    const AudioSystemDataID* id = _triggerNameMap.TryGet(nameHash);
+    const uint32             nameHash = HashName(name);
+    const AudioSystemDataID* id       = _triggerNameMap.TryGet(nameHash);
     return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetRtpcId(StringView name) const
 {
-    const uint32 nameHash = HashName(name);
-    const AudioSystemDataID* id = _rtpcNameMap.TryGet(nameHash);
+    const uint32             nameHash = HashName(name);
+    const AudioSystemDataID* id       = _rtpcNameMap.TryGet(nameHash);
     return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetSwitchStateId(StringView name) const
 {
-    const uint32 nameHash = HashName(name);
-    const AudioSystemDataID* id = _switchStateNameMap.TryGet(nameHash);
+    const uint32             nameHash = HashName(name);
+    const AudioSystemDataID* id       = _switchStateNameMap.TryGet(nameHash);
     return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetEnvironmentId(StringView name) const
 {
-    const uint32 nameHash = HashName(name);
-    const AudioSystemDataID* id = _environmentNameMap.TryGet(nameHash);
+    const uint32             nameHash = HashName(name);
+    const AudioSystemDataID* id       = _environmentNameMap.TryGet(nameHash);
     return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
 AudioSystemDataID AudioTranslationLayer::GetBankId(StringView name) const
 {
-    const uint32 nameHash = HashName(name);
-    const AudioSystemDataID* id = _bankNameMap.TryGet(nameHash);
+    const uint32             nameHash = HashName(name);
+    const AudioSystemDataID* id       = _bankNameMap.TryGet(nameHash);
     return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
@@ -1005,14 +1023,22 @@ void AudioTranslationLayer::ClearAllMaps()
     // Free ATL wrapper objects only — does NOT call any middleware teardown.
     // This is the emergency path when _middleware is null during Shutdown().
 
-    for (auto& kv : _banks)       Delete(kv.Value);
-    for (auto& kv : _events)      Delete(kv.Value);
-    for (auto& kv : _triggers)    Delete(kv.Value);
-    for (auto& kv : _rtpcs)       Delete(kv.Value);
-    for (auto& kv : _switchStates) Delete(kv.Value);
-    for (auto& kv : _environments) Delete(kv.Value);
-    for (auto& kv : _listeners)   Delete(kv.Value);
-    for (auto& kv : _entities)    Delete(kv.Value);
+    for (auto& kv : _banks)
+        Delete(kv.Value);
+    for (auto& kv : _events)
+        Delete(kv.Value);
+    for (auto& kv : _triggers)
+        Delete(kv.Value);
+    for (auto& kv : _rtpcs)
+        Delete(kv.Value);
+    for (auto& kv : _switchStates)
+        Delete(kv.Value);
+    for (auto& kv : _environments)
+        Delete(kv.Value);
+    for (auto& kv : _listeners)
+        Delete(kv.Value);
+    for (auto& kv : _entities)
+        Delete(kv.Value);
 
     _banks.Clear();
     _events.Clear();

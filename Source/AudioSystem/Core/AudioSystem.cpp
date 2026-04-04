@@ -1,7 +1,22 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "AudioSystem.h"
+
 #include <Engine/Core/Log.h>
 #include <Engine/Threading/Threading.h>
 
-#include "AudioSystem.h"
 #include "AudioThread.h"
 
 // ============================================================================
@@ -13,9 +28,8 @@ AudioSystem* AudioSystem::_instance = nullptr;
 AudioSystem* AudioSystem::Get()
 {
     if (_instance == nullptr)
-    {
         _instance = New<AudioSystem>();
-    }
+
     return _instance;
 }
 
@@ -353,11 +367,11 @@ void AudioSystem::SetListener(int32 index, Vector3 position, Vector3 forward, Ve
     }
 
     AudioRequest req;
-    req.Type = AudioRequestType::UpdateListenerTransform;
-    req.EntityId = listenerId;
+    req.Type               = AudioRequestType::UpdateListenerTransform;
+    req.ListenerId         = listenerId;
     req.Transform.Position = position;
-    req.Transform.Forward = forward;
-    req.Transform.Up = up;
+    req.Transform.Forward  = forward;
+    req.Transform.Up       = up;
     req.Transform.Velocity = velocity;
 
     if (_listenerOverrideMode)
@@ -413,16 +427,16 @@ void AudioSystem::UpdateSound()
     }
 
     // 4. Update scene-level audio world state (environments, listener) after ATL.
-    _worldModule.Update();
+    _world.Update();
 }
 
 // ============================================================================
 //  World module
 // ============================================================================
 
-AudioWorldModule& AudioSystem::GetWorldModule()
+AudioWorld& AudioSystem::GetWorld()
 {
-    return _worldModule;
+    return _world;
 }
 
 // ============================================================================
@@ -467,7 +481,7 @@ void AudioSystem::StartAudioThread()
     if (_audioThread != nullptr)
         return;
 
-    _audioThread = New<AudioThread>();
+    _audioThread               = New<AudioThread>();
     _audioThread->_audioSystem = this;
 
     if (!_audioThread->Start())
@@ -511,15 +525,16 @@ void AudioSystem::ProcessPendingRequests()
     for (auto& req : batch)
     {
         // Extract the callback before processing so it survives the move.
-        Function<void(bool)> callback = MoveTemp(req.Callback);
-        const bool success = _atl.ProcessRequest(MoveTemp(req), false);
+        Function<void(bool)>   callback = MoveTemp(req.Callback);
+        const AudioRequestType type     = req.Type;
+        const bool             success  = _atl.ProcessRequest(MoveTemp(req), false);
 
         if (callback.IsBinded())
         {
             // Queue the callback for main-thread invocation instead of calling it here.
             AudioRequest cbEntry;
-            cbEntry.Type = AudioRequestType::Shutdown; // Type is irrelevant for callbacks.
-            cbEntry.Success = success;
+            cbEntry.Type     = type;
+            cbEntry.Success  = success;
             cbEntry.Callback = MoveTemp(callback);
 
             ScopeLock lock(_pendingCallbacksMutex);
@@ -541,15 +556,16 @@ void AudioSystem::ProcessBlockingRequests()
 
     for (auto& req : batch)
     {
-        Function<void(bool)> callback = MoveTemp(req.Callback);
-        const bool success = _atl.ProcessRequest(MoveTemp(req), true);
+        Function<void(bool)>   callback = MoveTemp(req.Callback);
+        const AudioRequestType type     = req.Type;
+        const bool             success  = _atl.ProcessRequest(MoveTemp(req), true);
 
         if (callback.IsBinded())
         {
             // Queue the callback for main-thread invocation instead of calling it here.
             AudioRequest cbEntry;
-            cbEntry.Type = AudioRequestType::Shutdown; // Type is irrelevant for callbacks.
-            cbEntry.Success = success;
+            cbEntry.Type     = type;
+            cbEntry.Success  = success;
             cbEntry.Callback = MoveTemp(callback);
 
             ScopeLock lock(_blockingCallbacksMutex);

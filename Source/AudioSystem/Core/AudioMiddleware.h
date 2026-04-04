@@ -1,3 +1,17 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
 #include <Engine/Core/Types/StringView.h>
@@ -15,16 +29,18 @@
 //  (or absolute path) as a StringView to LoadConfiguration().
 // ============================================================================
 
-/// \brief Abstract backend interface that decouples the AudioSystem from any
+/// <summary>
+/// Abstract backend interface that decouples the AudioSystem from any
 ///        specific audio middleware (Wwise, FMOD, OpenAL, …).
 ///
 /// A concrete middleware plugin subclasses this, overrides every pure-virtual
 /// method, and registers an instance with the AudioSystem at startup.
 /// The AudioSystem calls methods on this interface exclusively — it never
 /// touches middleware-specific APIs directly.
+/// </summary>
 class AUDIOSYSTEM_API AudioMiddleware
 {
-public:
+  public:
     virtual ~AudioMiddleware() = default;
 
     // ========================================================================
@@ -35,39 +51,52 @@ public:
     //  the middleware is running.
     // ========================================================================
 
+    /// <summary>
     /// Load the middleware configuration from a Flax JSON asset.
-    /// \param configFile Virtual or absolute path to the JSON configuration asset.
-    /// \return true on success; false if the asset is missing or malformed.
+    /// </summary>
+    /// <param name="configFile">Virtual or absolute path to the JSON configuration asset.</param>
+    /// <returns>true on success; false if the asset is missing or malformed.</returns>
     virtual bool LoadConfiguration(StringView configFile) = 0;
 
+    /// <summary>
     /// Initialise the middleware engine. Call after LoadConfiguration succeeds.
-    /// \return true if the backend started successfully.
+    /// </summary>
+    /// <returns>true if the backend started successfully.</returns>
     virtual bool Startup() = 0;
 
+    /// <summary>
     /// Advance the middleware audio engine by one frame.
-    /// \param dt Elapsed time in seconds since the last Update call.
+    /// </summary>
+    /// <param name="dt">Elapsed time in seconds since the last Update call.</param>
     virtual void Update(float dt) = 0;
 
+    /// <summary>
     /// Pause all middleware processing and release runtime audio resources.
     /// Pair with Release() to fully tear down the backend.
+    /// </summary>
     virtual void Shutdown() = 0;
 
+    /// <summary>
     /// Fully release all middleware resources. Call after Shutdown().
+    /// </summary>
     virtual void Release() = 0;
 
+    /// <summary>
     /// Immediately stop every currently-playing sound without unloading data.
+    /// </summary>
     virtual void StopAllSounds() = 0;
 
 #if USE_EDITOR
+    /// <summary>
     /// Deploy middleware-specific files (sound banks, config, etc.) to the
     /// cooked build output directory. Called by the editor build hook during
     /// the GameCooker deploy phase.
     ///
     /// The middleware implementation is responsible for knowing which files
     /// to copy and where they should go within the output tree.
-    ///
-    /// \param outputPath  Absolute path to the cooked output root folder.
-    /// \return true if deployment succeeded; false on error.
+    /// </summary>
+    /// <param name="outputPath">Absolute path to the cooked output root folder.</param>
+    /// <returns>true if deployment succeeded; false on error.</returns>
     virtual bool DeployFiles(const StringView& outputPath) = 0;
 #endif
 
@@ -79,41 +108,56 @@ public:
     //  (2-D) sounds that are not attached to any scene object.
     // ========================================================================
 
+    /// <summary>
     /// Create the global "world" entity used for non-spatial sounds.
-    /// \param id Unique identifier to assign to the world entity.
-    /// \return Newly allocated entity data, or nullptr on failure. Caller owns
-    ///         the pointer and must eventually pass it to DestroyEntityData().
+    /// </summary>
+    /// <param name="id">Unique identifier to assign to the world entity.</param>
+    /// <returns>Newly allocated entity data, or nullptr on failure. Caller owns the pointer and must eventually pass it to DestroyEntityData().</returns>
     virtual AudioSystemEntityData* CreateWorldEntity(AudioSystemDataID id) = 0;
 
+    /// <summary>
     /// Create middleware data for a new spatial audio entity.
-    /// \param id Unique identifier for the entity.
-    /// \return Newly allocated entity data, or nullptr on failure.
+    /// </summary>
+    /// <param name="id">Unique identifier for the entity.</param>
+    /// <returns>Newly allocated entity data, or nullptr on failure.</returns>
     virtual AudioSystemEntityData* CreateEntityData(AudioSystemDataID id) = 0;
 
+    /// <summary>
     /// Release middleware data previously created by CreateEntityData or
     /// CreateWorldEntity.
+    /// </summary>
     virtual void DestroyEntityData(AudioSystemEntityData* data) = 0;
 
+    /// <summary>
     /// Register an entity with the middleware so it can receive audio requests.
-    /// \return true if the entity was registered successfully.
+    /// </summary>
+    /// <returns>true if the entity was registered successfully.</returns>
     virtual bool AddEntity(AudioSystemDataID id, AudioSystemEntityData* data) = 0;
 
+    /// <summary>
     /// Reset an entity to its default state without unregistering it.
-    /// \return true on success.
+    /// </summary>
+    /// <returns>true on success.</returns>
     virtual bool ResetEntity(AudioSystemDataID id, AudioSystemEntityData* data) = 0;
 
+    /// <summary>
     /// Notify the middleware that an entity's properties (other than transform)
     /// may have changed and should be re-evaluated.
-    /// \return true on success.
+    /// </summary>
+    /// <returns>true on success.</returns>
     virtual bool UpdateEntity(AudioSystemDataID id, AudioSystemEntityData* data) = 0;
 
-    /// Unregister an entity from the middleware. Does not free \p data.
-    /// \return true on success.
+    /// <summary>
+    /// Unregister an entity from the middleware. Does not free data.
+    /// </summary>
+    /// <returns>true on success.</returns>
     virtual bool RemoveEntity(AudioSystemDataID id, AudioSystemEntityData* data) = 0;
 
+    /// <summary>
     /// Push an updated world-space transform to the middleware for an entity.
-    /// \param transform Position, velocity, forward, and up vectors.
-    /// \return true on success.
+    /// </summary>
+    /// <param name="transform">Position, velocity, forward, and up vectors.</param>
+    /// <returns>true on success.</returns>
     virtual bool SetEntityTransform(AudioSystemDataID id, AudioSystemEntityData* data, const AudioSystemTransform& transform) = 0;
 
     // ========================================================================
@@ -124,29 +168,42 @@ public:
     //  listeners.
     // ========================================================================
 
+    /// <summary>
     /// Create middleware data for a new audio listener.
-    /// \param id Unique identifier for the listener.
-    /// \return Newly allocated listener data, or nullptr on failure.
-    virtual AudioSystemListenerData* CreateListenerData(AudioSystemDataID id) = 0;
+    /// </summary>
+    /// <param name="id">Unique identifier for the listener.</param>
+    /// <param name="isDefault">Whether the listener is the default listener.</param>
+    /// <returns>Newly allocated listener data, or nullptr on failure.</returns>
+    virtual AudioSystemListenerData* CreateListenerData(AudioSystemDataID id, bool isDefault) = 0;
 
+    /// <summary>
     /// Release middleware data previously created by CreateListenerData.
+    /// </summary>
     virtual void DestroyListenerData(AudioSystemListenerData* data) = 0;
 
+    /// <summary>
     /// Register a listener with the middleware.
-    /// \return true if the listener was registered successfully.
+    /// </summary>
+    /// <returns>true if the listener was registered successfully.</returns>
     virtual bool AddListener(AudioSystemDataID id, AudioSystemListenerData* data) = 0;
 
+    /// <summary>
     /// Reset a listener to its default state without unregistering it.
-    /// \return true on success.
+    /// </summary>
+    /// <returns>true on success.</returns>
     virtual bool ResetListener(AudioSystemDataID id, AudioSystemListenerData* data) = 0;
 
-    /// Unregister a listener from the middleware. Does not free \p data.
-    /// \return true on success.
+    /// <summary>
+    /// Unregister a listener from the middleware. Does not free data.
+    /// </summary>
+    /// <returns>true on success.</returns>
     virtual bool RemoveListener(AudioSystemDataID id, AudioSystemListenerData* data) = 0;
 
+    /// <summary>
     /// Push an updated world-space transform to the middleware for a listener.
-    /// \param transform Position, velocity, forward, and up vectors.
-    /// \return true on success.
+    /// </summary>
+    /// <param name="transform">Position, velocity, forward, and up vectors.</param>
+    /// <returns>true on success.</returns>
     virtual bool SetListenerTransform(AudioSystemDataID id, AudioSystemListenerData* data, const AudioSystemTransform& transform) = 0;
 
     // ========================================================================
@@ -156,14 +213,20 @@ public:
     //  inside the middleware (e.g. a playing Wwise event or FMOD instance).
     // ========================================================================
 
+    /// <summary>
     /// Allocate a new event instance for the given logical ID.
-    /// \return Newly allocated event data, or nullptr on failure.
+    /// </summary>
+    /// <returns>Newly allocated event data, or nullptr on failure.</returns>
     virtual AudioSystemEventData* CreateEventData(AudioSystemDataID id) = 0;
 
+    /// <summary>
     /// Reset an event instance back to its initial state (e.g. after stopping).
+    /// </summary>
     virtual void ResetEventData(AudioSystemEventData* data) = 0;
 
+    /// <summary>
     /// Release event instance data previously created by CreateEventData.
+    /// </summary>
     virtual void DestroyEventData(AudioSystemEventData* data) = 0;
 
     // ========================================================================
@@ -173,24 +236,34 @@ public:
     //  activating starts playback; unloading releases resources.
     // ========================================================================
 
+    /// <summary>
     /// Prepare the trigger's audio data for playback (pre-load / bank prime).
-    /// \return true if the load request was accepted.
+    /// </summary>
+    /// <returns>true if the load request was accepted.</returns>
     virtual bool LoadTrigger(AudioSystemDataID entityId, AudioSystemTriggerData* triggerData, AudioSystemEventData* eventData) = 0;
 
+    /// <summary>
     /// Start playing the trigger on the specified entity.
-    /// \return true if the activation request was accepted.
+    /// </summary>
+    /// <returns>true if the activation request was accepted.</returns>
     virtual bool ActivateTrigger(AudioSystemDataID entityId, AudioSystemTriggerData* triggerData, AudioSystemEventData* eventData) = 0;
 
+    /// <summary>
     /// Release audio data loaded by LoadTrigger.
-    /// \return true if the unload request was accepted.
+    /// </summary>
+    /// <returns>true if the unload request was accepted.</returns>
     virtual bool UnloadTrigger(AudioSystemDataID entityId, AudioSystemTriggerData* triggerData, AudioSystemEventData* eventData) = 0;
 
+    /// <summary>
     /// Stop a specific running event instance on the given entity.
-    /// \return true on success.
+    /// </summary>
+    /// <returns>true on success.</returns>
     virtual bool StopEvent(AudioSystemDataID entityId, AudioSystemEventData* eventData) = 0;
 
+    /// <summary>
     /// Stop all running events on the given entity.
-    /// \return true on success.
+    /// </summary>
+    /// <returns>true on success.</returns>
     virtual bool StopAllEvents(AudioSystemDataID entityId) = 0;
 
     // ========================================================================
@@ -200,13 +273,17 @@ public:
     //  behaviours (e.g. music intensity, character speed).
     // ========================================================================
 
+    /// <summary>
     /// Set an RTPC to a specific value on the given entity.
-    /// \param value New parameter value (range is middleware-defined).
-    /// \return true on success.
+    /// </summary>
+    /// <param name="value">New parameter value (range is middleware-defined).</param>
+    /// <returns>true on success.</returns>
     virtual bool SetRtpc(AudioSystemDataID entityId, AudioSystemRtpcData* data, float value) = 0;
 
+    /// <summary>
     /// Reset an RTPC to its default (middleware-defined) value on the entity.
-    /// \return true on success.
+    /// </summary>
+    /// <returns>true on success.</returns>
     virtual bool ResetRtpc(AudioSystemDataID entityId, AudioSystemRtpcData* data) = 0;
 
     // ========================================================================
@@ -216,8 +293,10 @@ public:
     //  that select between different audio behaviours or variations.
     // ========================================================================
 
+    /// <summary>
     /// Apply a switch-state value to the given entity.
-    /// \return true on success.
+    /// </summary>
+    /// <returns>true on success.</returns>
     virtual bool SetSwitchState(AudioSystemDataID entityId, AudioSystemSwitchStateData* data) = 0;
 
     // ========================================================================
@@ -228,10 +307,12 @@ public:
     //  it can attenuate or filter sounds accordingly.
     // ========================================================================
 
+    /// <summary>
     /// Supply obstruction and occlusion coefficients for an entity.
-    /// \param obstruction Partial-blockage factor [0.0, 1.0].
-    /// \param occlusion   Full-blockage factor [0.0, 1.0].
-    /// \return true on success.
+    /// </summary>
+    /// <param name="obstruction">Partial-blockage factor [0.0, 1.0].</param>
+    /// <param name="occlusion">Full-blockage factor [0.0, 1.0].</param>
+    /// <returns>true on success.</returns>
     virtual bool SetObstructionAndOcclusion(AudioSystemDataID entityId, AudioSystemEntityData* entityData, float obstruction, float occlusion) = 0;
 
     // ========================================================================
@@ -242,9 +323,11 @@ public:
     //  each with its own send amount.
     // ========================================================================
 
+    /// <summary>
     /// Set how strongly an entity contributes to a given environment.
-    /// \param amount Contribution factor [0.0, 1.0].
-    /// \return true on success.
+    /// </summary>
+    /// <param name="amount">Contribution factor [0.0, 1.0].</param>
+    /// <returns>true on success.</returns>
     virtual bool SetEnvironmentAmount(AudioSystemDataID entityId, AudioSystemEnvironmentData* envData, float amount) = 0;
 
     // ========================================================================
@@ -254,15 +337,21 @@ public:
     //  any triggers or RTPCs that reference their assets can be used.
     // ========================================================================
 
+    /// <summary>
     /// Load a sound bank into middleware memory.
-    /// \return true if the bank was loaded successfully.
+    /// </summary>
+    /// <returns>true if the bank was loaded successfully.</returns>
     virtual bool LoadBank(AudioSystemBankData* data) = 0;
 
+    /// <summary>
     /// Unload a previously loaded sound bank from middleware memory.
-    /// \return true if the bank was unloaded successfully.
+    /// </summary>
+    /// <returns>true if the bank was unloaded successfully.</returns>
     virtual bool UnloadBank(AudioSystemBankData* data) = 0;
 
+    /// <summary>
     /// Release bank descriptor data previously created by the middleware.
+    /// </summary>
     virtual void DestroyBank(AudioSystemBankData* data) = 0;
 
     // ========================================================================
@@ -272,16 +361,24 @@ public:
     //  after the control has been deregistered from all entities.
     // ========================================================================
 
+    /// <summary>
     /// Release trigger descriptor data.
+    /// </summary>
     virtual void DestroyTriggerData(AudioSystemTriggerData* data) = 0;
 
+    /// <summary>
     /// Release RTPC descriptor data.
+    /// </summary>
     virtual void DestroyRtpcData(AudioSystemRtpcData* data) = 0;
 
+    /// <summary>
     /// Release switch-state descriptor data.
+    /// </summary>
     virtual void DestroySwitchStateData(AudioSystemSwitchStateData* data) = 0;
 
+    /// <summary>
     /// Release environment descriptor data.
+    /// </summary>
     virtual void DestroyEnvironmentData(AudioSystemEnvironmentData* data) = 0;
 
     // ========================================================================
@@ -290,23 +387,33 @@ public:
     //  Session-wide settings that affect the entire middleware instance.
     // ========================================================================
 
+    /// <summary>
     /// Set the active voice/localisation language for middleware assets.
+    /// </summary>
     virtual void SetLanguage(StringView language) = 0;
 
+    /// <summary>
     /// Respond to a master-gain change issued by the AudioSystem.
-    /// \param gain New master gain value (range is implementation-defined).
+    /// </summary>
+    /// <param name="gain">New master gain value (range is implementation-defined).</param>
     virtual void OnMasterGainChange(float gain) = 0;
 
+    /// <summary>
     /// Respond to a mute-state change issued by the AudioSystem.
-    /// \param muted true to mute all output; false to unmute.
+    /// </summary>
+    /// <param name="muted">true to mute all output; false to unmute.</param>
     virtual void OnMuteChange(bool muted) = 0;
 
+    /// <summary>
     /// Called when the application loses focus (e.g. Alt-Tab on PC).
     /// Implementations should pause or duck audio as appropriate.
+    /// </summary>
     virtual void OnLoseFocus() = 0;
 
+    /// <summary>
     /// Called when the application regains focus.
     /// Implementations should restore the audio state set before OnLoseFocus.
+    /// </summary>
     virtual void OnGainFocus() = 0;
 
     // ========================================================================
@@ -315,12 +422,12 @@ public:
     //  Read-only accessors for middleware state inspected by the AudioSystem.
     // ========================================================================
 
-    /// \return The human-readable name of this middleware (e.g. "Wwise", "FMOD").
+    /// <returns>The human-readable name of this middleware (e.g. "Amplitude", "Wwise", "FMOD").</returns>
     virtual StringView GetMiddlewareName() const = 0;
 
-    /// \return The current master gain value.
+    /// <returns>The current master gain value.</returns>
     virtual float GetMasterGain() const = 0;
 
-    /// \return true if the middleware output is currently muted.
+    /// <returns>true if the middleware output is currently muted.</returns>
     virtual bool GetMute() const = 0;
 };

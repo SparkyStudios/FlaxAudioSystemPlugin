@@ -1,12 +1,26 @@
-#include <Engine/Core/Log.h>
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "AudioSwitchStateScript.h"
+
+#include <Engine/Core/Log.h>
+
 #include "../Actors/AudioProxyActor.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
-AudioSwitchStateScript::AudioSwitchStateScript(const SpawnParams& params)
-    : AudioProxyDependentScript(params)
+AudioSwitchStateScript::AudioSwitchStateScript(const SpawnParams& params) : AudioProxyDependentScript(params)
 {
 }
 
@@ -16,7 +30,6 @@ AudioSwitchStateScript::AudioSwitchStateScript(const SpawnParams& params)
 
 void AudioSwitchStateScript::OnEnable()
 {
-    // Resolve the sibling proxy (done by the base class).
     AudioProxyDependentScript::OnEnable();
 
     if (_proxy == nullptr)
@@ -55,7 +68,7 @@ void AudioSwitchStateScript::SetState(const StringView& stateName, bool sync)
 {
     if (_proxy == nullptr)
     {
-        LOG(Warning, "[AudioSwitchStateScript] SetState: proxy is not available (component may be disabled).");
+        LOG(Warning, "[AudioSwitchStateScript] SetState: proxy is not available (script may be disabled).");
         return;
     }
 
@@ -73,12 +86,20 @@ void AudioSwitchStateScript::SetState(const StringView& stateName, bool sync)
         return;
     }
 
-    _currentStateName = stateName;
-
     AudioRequest req;
-    req.Type = AudioRequestType::SetSwitchState;
+    req.Type     = AudioRequestType::SetSwitchState;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = stateId;
+    req.Callback = [this, stateName](bool success)
+    {
+        if (!success)
+        {
+            LOG(Warning, "[AudioSwitchStateScript] SetState: failed to set switch state '{0}'.", String(stateName));
+            return;
+        }
+
+        _currentStateName = stateName;
+    };
 
     if (sync)
         AudioSystem::Get()->SendRequestSync(std::move(req));

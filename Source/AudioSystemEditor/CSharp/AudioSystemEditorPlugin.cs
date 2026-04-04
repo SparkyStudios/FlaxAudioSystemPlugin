@@ -1,5 +1,20 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 using FlaxEditor;
 using FlaxEngine;
+using FlaxEditor.Content.Settings;
 
 namespace AudioSystemEditor
 {
@@ -7,10 +22,8 @@ namespace AudioSystemEditor
     /// C# editor plugin for the AudioSystem.
     /// Orchestrates icons, asset proxies, toolbar, and menu registration,
     /// and wires up play-mode event callbacks.
-    /// Named differently from the C++ AudioSystemEditorPlugin to avoid
-    /// conflicting with the auto-generated partial class from C++ bindings.
     /// </summary>
-    public class AudioSystemEditorScriptingPlugin : EditorPlugin
+    public partial class AudioSystemEditorPlugin : EditorPlugin
     {
         private static bool _initialized;
 
@@ -42,8 +55,12 @@ namespace AudioSystemEditor
             Editor.PlayModeBegin += OnPlayModeBegin;
             Editor.PlayModeEnd += OnPlayModeEnd;
 
+            var asset = GameSettings.LoadAsset<AudioSystemSettings>();
+            if (asset == null)
+                AudioSystemSettings.Save(new AudioSystemSettings());
+
             _initialized = true;
-            Debug.Log("[AudioSystemEditor] C# editor plugin initialized.");
+            Debug.Log("[AudioSystem] C# editor plugin initialized.");
         }
 
         /// <inheritdoc />
@@ -71,16 +88,16 @@ namespace AudioSystemEditor
             _icons = null;
 
             _initialized = false;
-            Debug.Log("[AudioSystemEditor] C# editor plugin deinitialized.");
+            Debug.Log("[AudioSystem] C# editor plugin deinitialized.");
 
             base.DeinitializeEditor();
         }
 
         private void OnPlayModeBegin()
         {
-            var prefs = AudioSystemPreferences.Get();
-            if (prefs != null)
-                prefs.SyncSettings();
+            var settings = AudioSystemSettings.Get();
+            if (settings != null)
+                GameSettings.Apply();
         }
 
         private void OnPlayModeEnd()

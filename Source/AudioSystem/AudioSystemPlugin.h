@@ -1,15 +1,36 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
+
 #include <Engine/Scripting/Plugins/GamePlugin.h>
 
-/// \brief Entry point for the AudioSystem game plugin.
-API_CLASS() class AUDIOSYSTEM_API AudioSystemPlugin : public GamePlugin
+/// <summary>
+/// Entry point for the AudioSystem game plugin.
+/// </summary>
+API_CLASS()
+class AUDIOSYSTEM_API AudioSystemPlugin : public GamePlugin
 {
     DECLARE_SCRIPTING_TYPE(AudioSystemPlugin);
-public:
+
+  public:
     void Initialize() override;
     void Deinitialize() override;
 
-private:
+  private:
+    /// <summary>
     /// Guards against double initialization when multiple projects reference this plugin.
+    /// </summary>
     static bool _initialized;
 };

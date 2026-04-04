@@ -1,12 +1,26 @@
-#include <Engine/Core/Log.h>
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 #include "AudioRtpcScript.h"
+
+#include <Engine/Core/Log.h>
+
 #include "../Actors/AudioProxyActor.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
-AudioRtpcScript::AudioRtpcScript(const SpawnParams& params)
-    : AudioProxyDependentScript(params)
+AudioRtpcScript::AudioRtpcScript(const SpawnParams& params) : AudioProxyDependentScript(params)
 {
 }
 
@@ -16,7 +30,6 @@ AudioRtpcScript::AudioRtpcScript(const SpawnParams& params)
 
 void AudioRtpcScript::OnEnable()
 {
-    // Resolve the sibling proxy (done by the base class).
     AudioProxyDependentScript::OnEnable();
 
     if (_proxy == nullptr)
@@ -74,7 +87,7 @@ void AudioRtpcScript::SetValue(float value, bool sync)
 {
     if (_proxy == nullptr)
     {
-        LOG(Warning, "[AudioRtpcScript] SetValue: proxy is not available (component may be disabled).");
+        LOG(Warning, "[AudioRtpcScript] SetValue: proxy is not available (script may be disabled).");
         return;
     }
 
@@ -87,10 +100,20 @@ void AudioRtpcScript::SetValue(float value, bool sync)
     _currentValue = value;
 
     AudioRequest req;
-    req.Type = AudioRequestType::SetRtpcValue;
+    req.Type     = AudioRequestType::SetRtpcValue;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _rtpcId;
     req.Value    = value;
+    req.Callback = [this, value](bool success)
+    {
+        if (!success)
+        {
+            LOG(Warning, "[AudioRtpcScript] SetValue: Failed to set RTPC '{0}' to value {1}.", RtpcName, value);
+            return;
+        }
+
+        _currentValue = value;
+    };
 
     if (sync)
         AudioSystem::Get()->SendRequestSync(std::move(req));
@@ -106,7 +129,7 @@ void AudioRtpcScript::ResetValue(bool sync)
 {
     if (_proxy == nullptr)
     {
-        LOG(Warning, "[AudioRtpcScript] ResetValue: proxy is not available (component may be disabled).");
+        LOG(Warning, "[AudioRtpcScript] ResetValue: proxy is not available (script may be disabled).");
         return;
     }
 
@@ -117,7 +140,7 @@ void AudioRtpcScript::ResetValue(bool sync)
     }
 
     AudioRequest req;
-    req.Type = AudioRequestType::ResetRtpcValue;
+    req.Type     = AudioRequestType::ResetRtpcValue;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _rtpcId;
 

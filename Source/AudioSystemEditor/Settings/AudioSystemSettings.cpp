@@ -12,52 +12,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "AudioSystemBuildHook.h"
+#include "AudioSystemSettings.h"
 
-#include <Editor/Cooker/GameCooker.h>
+#include <Engine/Content/Content.h>
+#include <Engine/Content/JsonAsset.h>
+#include <Engine/Core/Config/GameSettings.h>
 #include <Engine/Core/Log.h>
+#include <Engine/Scripting/Internal/InternalCalls.h>
 
 #include "../../AudioSystem/Core/AudioSystem.h"
 
+IMPLEMENT_GAME_SETTINGS_GETTER(AudioSystemSettings, "Audio System");
+
 // ============================================================================
-//  Lifecycle
+//  Constructor
 // ============================================================================
 
-void AudioSystemBuildHook::Register()
+AudioSystemSettings::AudioSystemSettings()
 {
-    GameCooker::DeployFiles.Bind<&AudioSystemBuildHook::OnDeployFiles>();
-    LOG(Info, "[AudioSystem] Build deployment hook registered.");
-}
-
-void AudioSystemBuildHook::Unregister()
-{
-    GameCooker::DeployFiles.Unbind<&AudioSystemBuildHook::OnDeployFiles>();
-    LOG(Info, "[AudioSystem] Build deployment hook unregistered.");
 }
 
 // ============================================================================
-//  DeployFiles handler
+//  SettingsBase
 // ============================================================================
 
-void AudioSystemBuildHook::OnDeployFiles()
+void AudioSystemSettings::Apply()
 {
-    AudioSystem* system = AudioSystem::Get();
-    if (system == nullptr)
+    LOG(Info, "[AudioSystem] Applying settings.");
+
+    AudioSystem* audioSystem = AudioSystem::Get();
+    if (audioSystem == nullptr || !audioSystem->IsInitialized())
     {
-        LOG(Warning, "[AudioSystem] OnDeployFiles: AudioSystem not available.");
+        LOG(Info, "[AudioSystem] AudioSystem not yet started — cannot apply settings.");
         return;
     }
 
-    const CookingData* data = GameCooker::GetCurrentData();
-    if (data == nullptr)
-    {
-        LOG(Warning, "[AudioSystem] OnDeployFiles: no active CookingData.");
-        return;
-    }
+    audioSystem->SetMasterVolume(MasterGain);
+    audioSystem->SetMasterMute(MuteAudio);
+}
 
-    const String outputPath = data->DataOutputPath;
-    if (!system->DeployFiles(outputPath))
-    {
-        LOG(Error, "[AudioSystem] Middleware file deployment failed.");
-    }
+DEFINE_INTERNAL_CALL(void)
+AudioSystemSettingsInternal_Apply()
+{
+    auto settings = AudioSystemSettings::Get();
+    if (!settings)
+        return;
+
+    settings->Apply();
 }

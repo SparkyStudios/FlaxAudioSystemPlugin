@@ -1,19 +1,32 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "AudioTriggerScript.h"
+
 #include <Engine/Core/Log.h>
 #include <Engine/Core/Math/Math.h>
 #include <Engine/Core/Math/Quaternion.h>
 #include <Engine/Core/Math/Vector3.h>
 #include <Engine/Level/Actor.h>
-// Physics.h includes Engine/Physics/Types.h which defines RayCastHit.
 #include <Engine/Physics/Physics.h>
 
-#include "AudioTriggerScript.h"
 #include "../Actors/AudioListenerActor.h"
 #include "../Actors/AudioProxyActor.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
-AudioTriggerScript::AudioTriggerScript(const SpawnParams& params)
-    : AudioProxyDependentScript(params)
+AudioTriggerScript::AudioTriggerScript(const SpawnParams& params) : AudioProxyDependentScript(params)
 {
 }
 
@@ -60,7 +73,7 @@ void AudioTriggerScript::OnEnable()
 
 void AudioTriggerScript::OnUpdate()
 {
-    if (_state == AudioSystemTriggerState::Playing)
+    if (_state == AudioSystemTriggerState::Played)
         UpdateObstructionOcclusion();
 }
 
@@ -71,20 +84,18 @@ void AudioTriggerScript::OnUpdate()
 void AudioTriggerScript::OnDisable()
 {
     // Stop any active playback first (fire-and-forget, not sync).
-    if (_state == AudioSystemTriggerState::Playing ||
-        _state == AudioSystemTriggerState::Starting)
+    if (_state == AudioSystemTriggerState::Played || _state == AudioSystemTriggerState::Playing)
     {
         RequestStop(false);
     }
 
     // Unload if trigger data is resident.
-    if (_state == AudioSystemTriggerState::Ready  ||
-        _state == AudioSystemTriggerState::Stopped)
+    if (_state == AudioSystemTriggerState::Ready || _state == AudioSystemTriggerState::Stopped)
     {
         RequestUnload(false);
     }
 
-    _state = AudioSystemTriggerState::Invalid;
+    _state         = AudioSystemTriggerState::Invalid;
     _playTriggerId = INVALID_AUDIO_SYSTEM_ID;
     _stopTriggerId = INVALID_AUDIO_SYSTEM_ID;
 
@@ -105,31 +116,23 @@ void AudioTriggerScript::Play(bool sync)
 
     switch (_state)
     {
-    case AudioSystemTriggerState::Invalid:
-        // Trigger data is not loaded — load it, then play on callback.
-        RequestLoad(sync);
-        break;
+        case AudioSystemTriggerState::Invalid:
+            // Trigger data is not loaded — load it, then play on callback.
+            RequestLoad(sync);
+            break;
 
-    case AudioSystemTriggerState::Loading:
-        // Already loading — PlayOnActivate flag will handle auto-play on callback.
-        break;
+        case AudioSystemTriggerState::Loading:
+        case AudioSystemTriggerState::Playing:
+        case AudioSystemTriggerState::Stopping:
+            // Already loading — PlayOnActivate flag will handle auto-play on callback.
+            break;
 
-    case AudioSystemTriggerState::Ready:
-    case AudioSystemTriggerState::Stopped:
-        RequestPlay(sync);
-        break;
-
-    case AudioSystemTriggerState::Starting:
-    case AudioSystemTriggerState::Playing:
-        // Already starting/playing — nothing to do.
-        break;
-
-    case AudioSystemTriggerState::Stopping:
-        // Let the current stop complete, then the Stopped→Ready flow will handle replay.
-        break;
-
-    default:
-        break;
+        case AudioSystemTriggerState::Ready:
+        case AudioSystemTriggerState::Stopped:
+        case AudioSystemTriggerState::Played:
+        default:
+            RequestPlay(sync);
+            break;
     }
 }
 
@@ -139,11 +142,8 @@ void AudioTriggerScript::Play(bool sync)
 
 void AudioTriggerScript::Stop(bool sync)
 {
-    if (_state != AudioSystemTriggerState::Playing &&
-        _state != AudioSystemTriggerState::Starting)
-    {
+    if (_state != AudioSystemTriggerState::Played && _state != AudioSystemTriggerState::Playing)
         return;
-    }
 
     RequestStop(sync);
 }
@@ -157,14 +157,43 @@ AudioSystemTriggerState AudioTriggerScript::GetTriggerState() const
     return _state;
 }
 
-bool AudioTriggerScript::IsLoading()  const { return _state == AudioSystemTriggerState::Loading;  }
-bool AudioTriggerScript::IsReady()    const { return _state == AudioSystemTriggerState::Ready;    }
-bool AudioTriggerScript::IsPlaying()  const { return _state == AudioSystemTriggerState::Playing;  }
-bool AudioTriggerScript::IsStopping() const { return _state == AudioSystemTriggerState::Stopping; }
-bool AudioTriggerScript::IsStopped()  const { return _state == AudioSystemTriggerState::Stopped;  }
+bool AudioTriggerScript::IsLoading() const
+{
+    return _state == AudioSystemTriggerState::Loading;
+}
+
+bool AudioTriggerScript::IsReady() const
+{
+    return _state == AudioSystemTriggerState::Ready;
+}
+
+bool AudioTriggerScript::IsPlaying() const
+{
+    return _state == AudioSystemTriggerState::Played;
+}
+
+bool AudioTriggerScript::IsStopping() const
+{
+    return _state == AudioSystemTriggerState::Stopping;
+}
+
+bool AudioTriggerScript::IsStopped() const
+{
+    return _state == AudioSystemTriggerState::Stopped;
+}
+
+float AudioTriggerScript::GetOcclusion() const
+{
+    return _currentOcclusion;
+}
+
+float AudioTriggerScript::GetObstruction() const
+{
+    return _currentObstruction;
+}
 
 // ============================================================================
-//  RequestLoad  (private)
+//  RequestLoad
 // ============================================================================
 
 void AudioTriggerScript::RequestLoad(bool sync)
@@ -178,7 +207,7 @@ void AudioTriggerScript::RequestLoad(bool sync)
     _state = AudioSystemTriggerState::Loading;
 
     AudioRequest req;
-    req.Type = AudioRequestType::LoadTrigger;
+    req.Type     = AudioRequestType::LoadTrigger;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _playTriggerId;
     req.Callback = [this](bool success)
@@ -204,7 +233,7 @@ void AudioTriggerScript::RequestLoad(bool sync)
 }
 
 // ============================================================================
-//  RequestPlay  (private)
+//  RequestPlay
 // ============================================================================
 
 void AudioTriggerScript::RequestPlay(bool sync)
@@ -215,10 +244,10 @@ void AudioTriggerScript::RequestPlay(bool sync)
     if (_proxy == nullptr)
         return;
 
-    _state = AudioSystemTriggerState::Starting;
+    _state = AudioSystemTriggerState::Playing;
 
     AudioRequest req;
-    req.Type = AudioRequestType::ActivateTrigger;
+    req.Type     = AudioRequestType::ActivateTrigger;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _playTriggerId;
     req.Callback = [this](bool success)
@@ -230,7 +259,7 @@ void AudioTriggerScript::RequestPlay(bool sync)
             return;
         }
 
-        _state = AudioSystemTriggerState::Playing;
+        _state = AudioSystemTriggerState::Played;
     };
 
     if (sync)
@@ -240,7 +269,7 @@ void AudioTriggerScript::RequestPlay(bool sync)
 }
 
 // ============================================================================
-//  RequestStop  (private)
+//  RequestStop
 // ============================================================================
 
 void AudioTriggerScript::RequestStop(bool sync)
@@ -256,13 +285,11 @@ void AudioTriggerScript::RequestStop(bool sync)
     {
         // Use the dedicated stop trigger.
         AudioRequest req;
-        req.Type = AudioRequestType::ActivateTrigger;
+        req.Type     = AudioRequestType::ActivateTrigger;
         req.EntityId = entityId;
         req.ObjectId = _stopTriggerId;
         req.Callback = [this](bool success)
-        {
-            _state = AudioSystemTriggerState::Stopped;
-        };
+        { _state = AudioSystemTriggerState::Stopped; };
 
         if (sync)
             AudioSystem::Get()->SendRequestSync(std::move(req));
@@ -273,13 +300,11 @@ void AudioTriggerScript::RequestStop(bool sync)
     {
         // No stop trigger — send a raw StopEvent.
         AudioRequest req;
-        req.Type = AudioRequestType::StopEvent;
+        req.Type     = AudioRequestType::StopEvent;
         req.EntityId = entityId;
         req.ObjectId = _playTriggerId;
         req.Callback = [this](bool success)
-        {
-            _state = AudioSystemTriggerState::Stopped;
-        };
+        { _state = AudioSystemTriggerState::Stopped; };
 
         if (sync)
             AudioSystem::Get()->SendRequestSync(std::move(req));
@@ -289,7 +314,7 @@ void AudioTriggerScript::RequestStop(bool sync)
 }
 
 // ============================================================================
-//  RequestUnload  (private)
+//  RequestUnload
 // ============================================================================
 
 void AudioTriggerScript::RequestUnload(bool sync)
@@ -303,13 +328,11 @@ void AudioTriggerScript::RequestUnload(bool sync)
     _state = AudioSystemTriggerState::Unloading;
 
     AudioRequest req;
-    req.Type = AudioRequestType::UnloadTrigger;
+    req.Type     = AudioRequestType::UnloadTrigger;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = _playTriggerId;
     req.Callback = [this](bool success)
-    {
-        _state = AudioSystemTriggerState::Invalid;
-    };
+    { _state = AudioSystemTriggerState::Invalid; };
 
     if (sync)
         AudioSystem::Get()->SendRequestSync(std::move(req));
@@ -318,7 +341,7 @@ void AudioTriggerScript::RequestUnload(bool sync)
 }
 
 // ============================================================================
-//  UpdateObstructionOcclusion  (private)
+//  UpdateObstructionOcclusion
 // ============================================================================
 
 void AudioTriggerScript::UpdateObstructionOcclusion()
@@ -326,8 +349,7 @@ void AudioTriggerScript::UpdateObstructionOcclusion()
     if (ObstructionType == AudioSystemSoundObstructionType::None)
         return;
 
-    const AudioListenerActor* listener =
-        AudioSystem::Get()->GetWorldModule().GetDefaultListener();
+    const AudioListenerActor* listener = AudioSystem::Get()->GetWorld().GetDefaultListener();
     if (listener == nullptr)
         return;
 
@@ -341,13 +363,13 @@ void AudioTriggerScript::UpdateObstructionOcclusion()
 
     // Smooth toward the targets.
     _currentObstruction = Math::Lerp(_currentObstruction, _targetObstruction, k_ObstructionSmoothingFactor);
-    _currentOcclusion   = Math::Lerp(_currentOcclusion,   _targetOcclusion,   k_ObstructionSmoothingFactor);
+    _currentOcclusion   = Math::Lerp(_currentOcclusion, _targetOcclusion, k_ObstructionSmoothingFactor);
 
     if (_proxy == nullptr)
         return;
 
     AudioRequest req;
-    req.Type = AudioRequestType::SetObstructionOcclusion;
+    req.Type        = AudioRequestType::SetObstructionOcclusion;
     req.EntityId    = _proxy->GetEntityId();
     req.Obstruction = _currentObstruction;
     req.Occlusion   = _currentOcclusion;
@@ -355,7 +377,7 @@ void AudioTriggerScript::UpdateObstructionOcclusion()
 }
 
 // ============================================================================
-//  ComputeObstructionOcclusion  (private)
+//  ComputeObstructionOcclusion
 // ============================================================================
 
 void AudioTriggerScript::ComputeObstructionOcclusion(float& outObstruction, float& outOcclusion) const
@@ -367,8 +389,7 @@ void AudioTriggerScript::ComputeObstructionOcclusion(float& outObstruction, floa
     if (owner == nullptr)
         return;
 
-    const AudioListenerActor* listener =
-        AudioSystem::Get()->GetWorldModule().GetDefaultListener();
+    const AudioListenerActor* listener = AudioSystem::Get()->GetWorld().GetDefaultListener();
     if (listener == nullptr)
         return;
 
@@ -385,22 +406,20 @@ void AudioTriggerScript::ComputeObstructionOcclusion(float& outObstruction, floa
     if (ObstructionType == AudioSystemSoundObstructionType::SingleRay)
     {
         const bool blocked = CastRay(sourcePos, direction, distance);
-        outOcclusion   = blocked ? 1.0f : 0.0f;
-        outObstruction = 0.0f;
+        outOcclusion       = blocked ? 1.0f : 0.0f;
+        outObstruction     = 0.0f;
     }
     else if (ObstructionType == AudioSystemSoundObstructionType::MultipleRay)
     {
         // Build two perpendicular axes for the offset rays.
         const Vector3 right = Vector3::Cross(direction, Vector3::Up);
-        const Vector3 perp  = right.IsZero() ?
-            Vector3::Cross(direction, Vector3::Right) : right;
+        const Vector3 perp  = right.IsZero() ? Vector3::Cross(direction, Vector3::Right) : right;
 
         const Vector3 perpNorm = Vector3::Normalize(perp);
         const Vector3 upNorm   = Vector3::Normalize(Vector3::Cross(direction, perpNorm));
 
         // Five rays: centre, +right, -right, +up, -up.
-        const Vector3 offsets[k_MultiRayCount] =
-        {
+        const Vector3 offsets[k_MultiRayCount] = {
             Vector3::Zero,
             perpNorm * k_MultiRayOffsetRadius,
             -perpNorm * k_MultiRayOffsetRadius,
@@ -408,16 +427,16 @@ void AudioTriggerScript::ComputeObstructionOcclusion(float& outObstruction, floa
             -upNorm * k_MultiRayOffsetRadius,
         };
 
-        int32 hitCount        = 0;
-        bool  centreBlocked   = false;
-        int32 sideHitCount    = 0;
+        int32 hitCount      = 0;
+        bool  centreBlocked = false;
+        int32 sideHitCount  = 0;
 
         for (int32 i = 0; i < k_MultiRayCount; ++i)
         {
-            const Vector3 origin    = sourcePos + offsets[i];
-            const Vector3 rayDir    = Vector3::Normalize(listenerPos - origin);
-            const float   rayDist   = Vector3::Distance(origin, listenerPos);
-            const bool    blocked   = CastRay(origin, rayDir, rayDist);
+            const Vector3 origin  = sourcePos + offsets[i];
+            const Vector3 rayDir  = Vector3::Normalize(listenerPos - origin);
+            const float   rayDist = Vector3::Distance(origin, listenerPos);
+            const bool    blocked = CastRay(origin, rayDir, rayDist);
 
             if (blocked)
             {
@@ -443,12 +462,12 @@ void AudioTriggerScript::ComputeObstructionOcclusion(float& outObstruction, floa
 }
 
 // ============================================================================
-//  CastRay  (private)
+//  CastRay
 // ============================================================================
 
 bool AudioTriggerScript::CastRay(const Vector3& start, const Vector3& direction, float distance) const
 {
-    RayCastHit hit;
+    RayCastHit   hit;
     const uint32 layerMask = 1u << OcclusionCollisionLayer;
     return Physics::RayCast(start, direction, hit, distance, layerMask);
 }

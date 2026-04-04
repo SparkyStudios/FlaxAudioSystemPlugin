@@ -1,48 +1,54 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
-#include <Engine/Threading/IRunnable.h>
 #include <Engine/Platform/Thread.h>
-
-// ============================================================================
-//  AudioThread
-//
-//  A dedicated thread that drives the audio system's request processing loop.
-//  Implements the Flax IRunnable interface and is owned by AudioSystem.
-//
-//  The run loop:
-//    1. Wait on _processingSignal (released by AudioSystem once per frame).
-//    2. Call AudioSystem::UpdateInternal().
-//    3. Notify _mainSignal so blocking callers can unblock.
-//    4. Repeat while _keepRunning is true.
-// ============================================================================
+#include <Engine/Threading/IRunnable.h>
 
 class AudioSystem;
 
-/// \brief Runnable that drives the audio request processing loop on a
-///        dedicated thread.
+/// <summary>
+/// Runnable that drives the audio request processing loop on a dedicated thread.
+/// </summary>
 class AUDIOSYSTEM_API AudioThread : public IRunnable
 {
-public:
+  public:
     AudioThread() = default;
 
+    /// <summary>
     /// Start the background thread.
-    /// \return true on success; false if the thread could not be created.
+    /// </summary>
+    /// <returns>true on success; false if the thread could not be created.</returns>
     bool Start();
 
+    /// <summary>
     /// Signal the thread to stop and block until it exits.
+    /// </summary>
     void RequestStop();
 
     // -- IRunnable -----------------------------------------------------------
     String ToString() const override;
-    int32 Run() override;
-    void Stop() override;
-    void Exit() override;
-    void AfterWork(bool wasKilled) override;
+    int32  Run() override;
+    void   Stop() override;
+    void   Exit() override;
+    void   AfterWork(bool wasKilled) override;
 
-private:
+  private:
     friend class AudioSystem;
 
-    AudioSystem* _audioSystem = nullptr;
-    Thread* _thread = nullptr;
+    AudioSystem*  _audioSystem = nullptr;
+    Thread*       _thread      = nullptr;
     volatile bool _keepRunning = true;
 };

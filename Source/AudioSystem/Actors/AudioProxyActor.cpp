@@ -1,10 +1,25 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "AudioProxyActor.h"
+
 #include <Engine/Core/Log.h>
 #include <Engine/Core/Math/Quaternion.h>
 #include <Engine/Engine/Time.h>
 #include <Engine/Level/Scene/SceneRendering.h>
 #include <Engine/Scripting/Scripting.h>
 
-#include "AudioProxyActor.h"
 #include "../Core/AudioSystem.h"
 #include "../Core/AudioSystemRequests.h"
 
@@ -12,8 +27,8 @@
 //  Static state
 // ============================================================================
 
-// Entity IDs below 1000 are reserved for internal / listener use.
-AudioSystemDataID AudioProxyActor::_nextEntityId = 1000;
+// Entity IDs
+AudioSystemDataID AudioProxyActor::_nextEntityId = 2;
 
 AudioProxyActor::AudioProxyActor(const SpawnParams& params)
     : Actor(params)
@@ -51,7 +66,7 @@ void AudioProxyActor::OnBeginPlay()
     Actor::OnBeginPlay();
 
     // Allocate a unique entity ID (main-thread only — no atomics required).
-    _entityId = ++_nextEntityId;
+    _entityId        = ++_nextEntityId;
     _hasLastPosition = false;
     _transformDirty  = true;
 
@@ -64,7 +79,7 @@ void AudioProxyActor::OnBeginPlay()
     // Bind the per-frame update to receive Scripting::Update callbacks.
     Scripting::Update.Bind<AudioProxyActor, &AudioProxyActor::OnFrameUpdate>(this);
 
-    AudioSystem::Get()->GetWorldModule().AddProxy(this);
+    AudioSystem::Get()->GetWorld().AddProxy(this);
 }
 
 // ============================================================================
@@ -73,7 +88,7 @@ void AudioProxyActor::OnBeginPlay()
 
 void AudioProxyActor::OnEndPlay()
 {
-    AudioSystem::Get()->GetWorldModule().RemoveProxy(this);
+    AudioSystem::Get()->GetWorld().RemoveProxy(this);
 
     // Unbind the per-frame update before tearing down any state.
     Scripting::Update.Unbind<AudioProxyActor, &AudioProxyActor::OnFrameUpdate>(this);
@@ -112,6 +127,7 @@ void AudioProxyActor::OnFrameUpdate()
 {
     if (_entityId == INVALID_AUDIO_SYSTEM_ID)
         return;
+
     if (!_transformDirty)
         return;
 
@@ -122,8 +138,8 @@ void AudioProxyActor::OnFrameUpdate()
 
     // Derive velocity from the delta between the last recorded position and
     // the current position, divided by the elapsed frame time.
-    Vector3 velocity = Vector3::Zero;
-    const float dt = Time::GetDeltaTime();
+    Vector3     velocity = Vector3::Zero;
+    const float dt       = Time::GetDeltaTime();
     if (_hasLastPosition && dt > ZeroTolerance)
         velocity = (pos - _lastPosition) / dt;
 

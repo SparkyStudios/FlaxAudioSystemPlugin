@@ -1,7 +1,22 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "AudioBoxEnvironmentActor.h"
+
 #include <Engine/Core/Math/Math.h>
 #include <Engine/Core/Math/Vector3.h>
 
-#include "AudioBoxEnvironmentActor.h"
 #include "AudioProxyActor.h"
 
 AudioBoxEnvironmentActor::AudioBoxEnvironmentActor(const SpawnParams& params)
@@ -23,7 +38,7 @@ float AudioBoxEnvironmentActor::GetEnvironmentAmount(const AudioProxyActor* prox
     // Transform the proxy world position into this Actor's local space so
     // the box test is always axis-aligned regardless of Actor rotation/scale.
     const Vector3 localPos = GetTransform().WorldToLocal(proxyWorldPos);
-    const Vector3 absPos = Vector3(Math::Abs(localPos.X), Math::Abs(localPos.Y), Math::Abs(localPos.Z));
+    const Vector3 absPos   = Vector3(Math::Abs(localPos.X), Math::Abs(localPos.Y), Math::Abs(localPos.Z));
 
     // Clamp MaxExtents so each axis is at least as large as HalfExtents.
     const Vector3 outerExtents = Vector3::Max(MaxExtents, HalfExtents);
@@ -55,7 +70,7 @@ float AudioBoxEnvironmentActor::GetEnvironmentAmount(const AudioProxyActor* prox
                 break;
             }
             const float factor = 1.0f - ((pos - inner) / range);
-            minFactor = Math::Min(minFactor, factor);
+            minFactor          = Math::Min(minFactor, factor);
         }
     }
 
@@ -75,7 +90,7 @@ static constexpr float WiresDimAlpha = 0.35f;
 
 void AudioBoxEnvironmentActor::OnDebugDraw()
 {
-    const Color dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
+    const Color   dimColor     = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
     const Vector3 outerExtents = Vector3::Max(MaxExtents, HalfExtents);
 
     // Inner box (full send boundary).

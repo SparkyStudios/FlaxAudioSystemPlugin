@@ -1,7 +1,22 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "AudioSphereEnvironmentActor.h"
+
 #include <Engine/Core/Math/Math.h>
 #include <Engine/Core/Math/Vector3.h>
 
-#include "AudioSphereEnvironmentActor.h"
 #include "AudioProxyActor.h"
 
 AudioSphereEnvironmentActor::AudioSphereEnvironmentActor(const SpawnParams& params)
@@ -54,8 +69,8 @@ static constexpr float WiresDimAlpha = 0.35f;
 
 void AudioSphereEnvironmentActor::OnDebugDraw()
 {
-    const Color dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
-    const Vector3 center = GetPosition();
+    const Color   dimColor = EnvironmentColor.AlphaMultiplied(WiresDimAlpha);
+    const Vector3 center   = GetPosition();
 
     // Inner sphere (full send boundary).
     DEBUG_DRAW_WIRE_SPHERE(BoundingSphere(center, Radius), dimColor, 0, true);

@@ -1,13 +1,27 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include "AudioAnimationScript.h"
+
 #include <Engine/Core/Log.h>
 #include <Engine/Level/Actor.h>
 #include <Engine/Level/Actors/AnimatedModel.h>
 #include <Engine/Scripting/ScriptingObject.h>
 
-#include "AudioAnimationScript.h"
 #include "AudioTriggerScript.h"
 
-AudioAnimEvent::AudioAnimEvent(const SpawnParams& params)
-    : AnimEvent(params)
+AudioAnimEvent::AudioAnimEvent(const SpawnParams& params) : AnimEvent(params)
 {
 }
 
@@ -39,7 +53,7 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
     }
 
     // First, check whether there is an AudioAnimationScript on the proxy
-    // that can remap the trigger name via EventTriggerMap.
+    // that can remap the trigger name via EventTriggerMappings.
     AudioAnimationScript* dispatcher = proxyActor->GetScript<AudioAnimationScript>();
     if (dispatcher != nullptr)
     {
@@ -62,7 +76,8 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
         }
     }
 
-    LOG(Warning, "[AudioAnimEvent] OnEvent: No AudioTriggerScript with PlayTriggerName '{0}' found on proxy Actor '{1}'.",
+    LOG(Warning,
+        "[AudioAnimEvent] OnEvent: No AudioTriggerScript with PlayTriggerName '{0}' found on proxy Actor '{1}'.",
         TriggerName, proxyActor->GetName());
 }
 
@@ -70,8 +85,7 @@ void AudioAnimEvent::OnEvent(AnimatedModel* actor, Animation* anim, float time, 
 //  AudioAnimationScript — OnEnable
 // ============================================================================
 
-AudioAnimationScript::AudioAnimationScript(const SpawnParams& params)
-    : AudioProxyDependentScript(params)
+AudioAnimationScript::AudioAnimationScript(const SpawnParams& params) : AudioProxyDependentScript(params)
 {
 }
 
@@ -90,7 +104,8 @@ void AudioAnimationScript::OnEnable()
     _animatedModel = owner->GetChild<AnimatedModel>();
     if (_animatedModel == nullptr)
     {
-        LOG(Warning, "[AudioAnimationScript] OnEnable: No AnimatedModel found on Actor '{0}'. Animation events will not fire.",
+        LOG(Warning,
+            "[AudioAnimationScript] OnEnable: No AnimatedModel found on Actor '{0}'. Animation events will not fire.",
             owner->GetName());
     }
 }
@@ -130,12 +145,17 @@ void AudioAnimationScript::DispatchEvent(const StringView& eventName)
     if (owner == nullptr)
         return;
 
-    // Resolve the play trigger name: check EventTriggerMap first, then fall
+    // Resolve the play trigger name: check EventTriggerMappings first, then fall
     // back to using the event name directly.
     String resolvedTriggerName(eventName);
-    const String* mapped = EventTriggerMap.TryGet(String(eventName));
-    if (mapped != nullptr && mapped->HasChars())
-        resolvedTriggerName = *mapped;
+    for (const AudioAnimationTriggerMapping& mapping : EventTriggerMappings)
+    {
+        if (mapping.EventName == eventName && mapping.TriggerName.HasChars())
+        {
+            resolvedTriggerName = mapping.TriggerName;
+            break;
+        }
+    }
 
     // Find the sibling AudioTriggerScript with the matching PlayTriggerName.
     const Array<Script*>& scripts = owner->Scripts;
@@ -152,6 +172,7 @@ void AudioAnimationScript::DispatchEvent(const StringView& eventName)
         }
     }
 
-    LOG(Warning, "[AudioAnimationScript] DispatchEvent: No sibling AudioTriggerScript with PlayTriggerName '{0}' found on Actor '{1}'.",
+    LOG(Warning,
+        "[AudioAnimationScript] DispatchEvent: No sibling AudioTriggerScript with PlayTriggerName '{0}' found on Actor '{1}'.",
         resolvedTriggerName, owner->GetName());
 }

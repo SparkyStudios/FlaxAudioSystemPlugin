@@ -1,3 +1,17 @@
+// Copyright (c) 2026-present Sparky Studios. All rights reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 #pragma once
 
 #include <Engine/Scripting/Script.h>
@@ -7,67 +21,67 @@
 // Forward declarations
 class AudioProxyActor;
 
-// ============================================================================
-//  AudioSystemScript — abstract base for all audio scripts
-//
-//  Script-based audio components (trigger, RTPC, switch-state, animation)
-//  derive from this class. Actor-based components (proxy, listener,
-//  environment zones) derive directly from Actor or AudioSystemEnvironmentActor.
-//  It is never instantiated directly.
-// ============================================================================
-
-/// \brief Abstract base class for all AudioSystem script components.
+/// <summary>
+/// Abstract base class for all AudioSystem scripts.
 ///
 /// Derived classes must implement OnUpdate(). All audio scripts that need
 /// per-frame processing inherit from this class.
-API_CLASS(Abstract) class AUDIOSYSTEM_API AudioSystemScript : public Script
+/// </summary>
+API_CLASS(Abstract)
+class AUDIOSYSTEM_API AudioSystemScript : public Script
 {
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioSystemScript);
 
-public:
-    explicit AudioSystemScript(const SpawnParams& params) : Script(params) {}
+  public:
+    explicit AudioSystemScript(const SpawnParams& params) : Script(params)
+    {
+    }
 
-protected:
+  protected:
+    /// <summary>
     /// Called every frame when the component is active. Must be implemented by subclasses.
+    /// </summary>
     void OnUpdate() override = 0;
 };
 
-// ============================================================================
-//  AudioProxyDependentScript — base for components that need an
-//  AudioProxyActor sibling on the same Actor.
-//
-//  OnEnable locates the sibling proxy automatically. If none is found the
-//  component disables itself and logs a warning.
-// ============================================================================
-
-/// \brief Abstract base for audio components that require a sibling AudioProxyActor.
+/// <summary>
+/// Abstract base for audio scripts that require to be attached on a AudioProxyActor.
 ///
-/// Resolves the sibling proxy in OnEnable and releases the reference in OnDisable.
+/// Resolves the parent proxy in OnEnable and releases the reference in OnDisable.
 /// Subclasses can access the proxy via _proxy and the entity ID via GetEntityId().
-API_CLASS(Abstract) class AUDIOSYSTEM_API AudioProxyDependentScript
-    : public AudioSystemScript
+/// </summary>
+API_CLASS(Abstract)
+class AUDIOSYSTEM_API AudioProxyDependentScript : public AudioSystemScript
 {
     API_AUTO_SERIALIZATION();
     DECLARE_SCRIPTING_TYPE_NO_SPAWN(AudioProxyDependentScript);
 
-public:
-    explicit AudioProxyDependentScript(const SpawnParams& params) : AudioSystemScript(params) {}
+  public:
+    explicit AudioProxyDependentScript(const SpawnParams& params) : AudioSystemScript(params)
+    {
+    }
 
-    /// Called when this component becomes active.
-    /// Locates the sibling AudioProxyActor on the owner Actor.
+    /// <summary>
+    /// Called when this script becomes active.
+    /// Locates the parent AudioProxyActor on the owner Actor.
     /// Disables itself (with a logged warning) if no proxy is found.
+    /// </summary>
     void OnEnable() override;
 
-    /// Called when this component becomes inactive.
+    /// <summary>
+    /// Called when this script becomes inactive.
     /// Clears the cached proxy pointer.
+    /// </summary>
     void OnDisable() override;
 
-protected:
-    /// \return The AudioSystemDataID assigned by the sibling proxy.
-    ///         Returns INVALID_AUDIO_SYSTEM_ID if no proxy has been resolved.
+  protected:
+    /// <returns>The AudioSystemDataID assigned by the parent proxy. Returns INVALID_AUDIO_SYSTEM_ID if no proxy has
+    /// been resolved.</returns>
     AudioSystemDataID GetEntityId() const;
 
-    /// Cached pointer to the sibling AudioProxyActor resolved in OnEnable.
+    /// <summary>
+    /// Cached pointer to the parent AudioProxyActor resolved in OnEnable.
+    /// </summary>
     AudioProxyActor* _proxy = nullptr;
 };

@@ -46,10 +46,9 @@ class AUDIOSYSTEM_API AudioSystemEnvironmentActor : public Actor
     // ========================================================================
 
     /// <summary>
-    /// Name of the environment (aux bus / reverb send) as defined in the
-    /// audio control collection.
+    /// Name of the environment (aux bus / reverb send) as registered by the audio middleware.
     /// </summary>
-    API_FIELD(Attributes = "EditorOrder(0), Tooltip(\"Name of the environment (aux bus) as defined in the control collection.\")")
+    API_FIELD(Attributes = "EditorOrder(0), Tooltip(\"Name of the environment (aux bus) as registered by the audio middleware.\")")
     String EnvironmentName;
 
     // ========================================================================

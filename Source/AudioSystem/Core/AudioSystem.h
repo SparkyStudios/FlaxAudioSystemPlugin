@@ -149,7 +149,6 @@ class AUDIOSYSTEM_API AudioSystem
     AudioSystemDataID GetTriggerId(StringView name) const;
     AudioSystemDataID GetRtpcId(StringView name) const;
     AudioSystemDataID GetSwitchId(StringView name) const;
-    AudioSystemDataID GetSwitchStateId(StringView name) const;
     AudioSystemDataID GetSwitchStateId(StringView switchName, StringView stateName) const;
     AudioSystemDataID GetEnvironmentId(StringView name) const;
     AudioSystemDataID GetBankId(StringView name) const;

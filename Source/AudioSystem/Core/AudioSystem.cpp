@@ -298,11 +298,6 @@ AudioSystemDataID AudioSystem::GetSwitchId(StringView name) const
     return _atl.GetSwitchId(name);
 }
 
-AudioSystemDataID AudioSystem::GetSwitchStateId(StringView name) const
-{
-    return _atl.GetSwitchStateId(name);
-}
-
 AudioSystemDataID AudioSystem::GetSwitchStateId(StringView switchName, StringView stateName) const
 {
     return _atl.GetSwitchStateId(switchName, stateName);

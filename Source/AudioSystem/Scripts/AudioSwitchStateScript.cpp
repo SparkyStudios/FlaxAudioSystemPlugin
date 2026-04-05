@@ -35,9 +35,16 @@ void AudioSwitchStateScript::OnEnable()
     if (_proxy == nullptr)
         return;
 
-    // Apply the initial switch state if one is configured.
-    if (SwitchStateName.HasChars())
-        SetState(SwitchStateName);
+    if (SwitchStateName.IsEmpty())
+        return;
+
+    if (SwitchName.IsEmpty())
+    {
+        LOG(Warning, "[AudioSwitchStateScript] OnEnable: SwitchName is empty. Initial state '{0}' will not be applied.", SwitchStateName);
+        return;
+    }
+
+    SetState(SwitchStateName);
 }
 
 // ============================================================================
@@ -66,23 +73,40 @@ void AudioSwitchStateScript::OnDisable()
 
 void AudioSwitchStateScript::SetState(const StringView& stateName, bool sync)
 {
+    SetStateForSwitch(SwitchName, stateName, sync);
+}
+
+// ============================================================================
+//  SetStateForSwitch
+// ============================================================================
+
+void AudioSwitchStateScript::SetStateForSwitch(const StringView& switchName, const StringView& stateName, bool sync)
+{
     if (_proxy == nullptr)
     {
-        LOG(Warning, "[AudioSwitchStateScript] SetState: proxy is not available (script may be disabled).");
+        LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: proxy is not available (script may be disabled).");
+        return;
+    }
+
+    if (switchName.IsEmpty())
+    {
+        LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: switchName is empty. Request ignored.");
         return;
     }
 
     if (stateName.IsEmpty())
     {
-        LOG(Warning, "[AudioSwitchStateScript] SetState: stateName is empty. Request ignored.");
+        LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: stateName is empty. Request ignored.");
         return;
     }
 
-    const AudioSystemDataID stateId = AudioSystem::Get()->GetSwitchStateId(stateName);
+    const String switchNameString(switchName);
+    const String stateNameString(stateName);
+    const AudioSystemDataID stateId = AudioSystem::Get()->GetSwitchStateId(switchName, stateName);
 
     if (stateId == INVALID_AUDIO_SYSTEM_ID)
     {
-        LOG(Warning, "[AudioSwitchStateScript] SetState: switch state '{0}' could not be resolved.", String(stateName));
+        LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: switch '{0}' state '{1}' could not be resolved.", switchNameString, stateNameString);
         return;
     }
 
@@ -90,15 +114,15 @@ void AudioSwitchStateScript::SetState(const StringView& stateName, bool sync)
     req.Type     = AudioRequestType::SetSwitchState;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = stateId;
-    req.Callback = [this, stateName](bool success)
+    req.Callback = [this, stateNameString](bool success)
     {
         if (!success)
         {
-            LOG(Warning, "[AudioSwitchStateScript] SetState: failed to set switch state '{0}'.", String(stateName));
+            LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: failed to set switch state '{0}'.", stateNameString);
             return;
         }
 
-        _currentStateName = stateName;
+        _currentStateName = stateNameString;
     };
 
     if (sync)

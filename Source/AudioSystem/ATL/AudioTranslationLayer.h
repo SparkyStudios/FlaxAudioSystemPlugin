@@ -197,9 +197,6 @@ class AUDIOSYSTEM_API AudioTranslationLayer
     /// <returns>The ID of the named switch, or INVALID_AUDIO_SYSTEM_ID.</returns>
     AudioSystemDataID GetSwitchId(StringView name) const;
 
-    /// <returns>The ID of the named switch-state, or INVALID_AUDIO_SYSTEM_ID.</returns>
-    AudioSystemDataID GetSwitchStateId(StringView name) const;
-
     /// <returns>The ID of the named switch-state within the specified switch, or INVALID_AUDIO_SYSTEM_ID.</returns>
     AudioSystemDataID GetSwitchStateId(StringView switchName, StringView stateName) const;
 

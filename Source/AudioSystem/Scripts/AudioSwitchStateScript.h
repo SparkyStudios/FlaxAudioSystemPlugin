@@ -25,8 +25,9 @@
 ///
 /// Requires to be attached to a AudioProxyActor.
 ///
-/// The switch state specified in SwitchStateName is applied when the script
-/// becomes active. Call SetState() to change the active state at runtime.
+/// The switch state specified in SwitchStateName is applied within SwitchName
+/// when the script becomes active. Call SetState() to use the configured
+/// SwitchName, or SetStateForSwitch() to target an explicit switch at runtime.
 /// </summary>
 API_CLASS()
 class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript
@@ -40,9 +41,15 @@ class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript
     // ========================================================================
 
     /// <summary>
+    /// The switch name that owns the state to activate when this component becomes active.
+    /// </summary>
+    API_FIELD(Attributes = "EditorOrder(0), Tooltip(\"The switch name that owns the state to activate on init.\")")
+    String SwitchName;
+
+    /// <summary>
     /// The switch state name to activate when this component becomes active.
     /// </summary>
-    API_FIELD(Attributes = "EditorOrder(0), Tooltip(\"The switch state name to activate on init.\")")
+    API_FIELD(Attributes = "EditorOrder(1), Tooltip(\"The switch state name to activate on init.\")")
     String SwitchStateName;
 
     // ========================================================================
@@ -50,7 +57,8 @@ class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript
     // ========================================================================
 
     /// <summary>
-    /// Resolves the proxy and applies SwitchStateName if non-empty.
+    /// Resolves the proxy and applies SwitchStateName if SwitchName and
+    /// SwitchStateName are configured.
     /// </summary>
     void OnEnable() override;
 
@@ -69,12 +77,22 @@ class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript
     // ========================================================================
 
     /// <summary>
-    /// Resolve stateName to an ID and activate it on the entity.
+    /// Resolve stateName within the configured SwitchName and activate it on
+    /// the entity.
     /// </summary>
     /// <param name="stateName">Name of the switch state to activate.</param>
     /// <param name="sync">When true, the request blocks the calling thread.</param>
     API_FUNCTION()
     void SetState(const StringView& stateName, bool sync = false);
+
+    /// <summary>
+    /// Resolve stateName within switchName and activate it on the entity.
+    /// </summary>
+    /// <param name="switchName">Name of the switch that owns the state.</param>
+    /// <param name="stateName">Name of the switch state to activate.</param>
+    /// <param name="sync">When true, the request blocks the calling thread.</param>
+    API_FUNCTION()
+    void SetStateForSwitch(const StringView& switchName, const StringView& stateName, bool sync = false);
 
     /// <returns>The name of the last switch state successfully submitted.</returns>
     API_FUNCTION()

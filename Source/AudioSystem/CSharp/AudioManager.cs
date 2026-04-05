@@ -99,7 +99,8 @@ namespace AudioSystem
         }
 
         /// <summary>
-        /// Set a switch state on a specific actor.
+        /// Set a switch state on a specific actor using the first available
+        /// AudioSwitchStateScript on that proxy.
         /// </summary>
         public static void SetSwitchState(Actor actor, string stateName)
         {
@@ -108,7 +109,7 @@ namespace AudioSystem
             var proxy = actor as AudioProxyActor ?? actor.GetChild<AudioProxyActor>();
             if (proxy == null)
             {
-                Debug.LogWarning($"[AudioManager] No AudioProxyActor found on or under '{actor.Name}'.");
+                Debug.LogWarning($"[AudioManager] No AudioProxyActor found on or under {actor.Name}.");
                 return;
             }
 
@@ -119,7 +120,45 @@ namespace AudioSystem
                 return;
             }
 
-            Debug.LogWarning($"[AudioManager] No AudioSwitchStateScript found on '{proxy.Name}'.");
+            Debug.LogWarning($"[AudioManager] No AudioSwitchStateScript found on {proxy.Name}.");
+        }
+
+        /// <summary>
+        /// Set a switch state on a specific actor for an explicit switch name.
+        /// </summary>
+        public static void SetSwitchState(Actor actor, string switchName, string stateName)
+        {
+            if (actor == null) return;
+
+            var proxy = actor as AudioProxyActor ?? actor.GetChild<AudioProxyActor>();
+            if (proxy == null)
+            {
+                Debug.LogWarning($"[AudioManager] No AudioProxyActor found on or under {actor.Name}.");
+                return;
+            }
+
+            var switches = proxy.GetScripts<AudioSwitchStateScript>();
+            AudioSwitchStateScript firstSwitch = null;
+
+            foreach (var sw in switches)
+            {
+                if (firstSwitch == null)
+                    firstSwitch = sw;
+
+                if (sw.SwitchName == switchName)
+                {
+                    sw.SetStateForSwitch(switchName, stateName);
+                    return;
+                }
+            }
+
+            if (firstSwitch != null)
+            {
+                firstSwitch.SetStateForSwitch(switchName, stateName);
+                return;
+            }
+
+            Debug.LogWarning($"[AudioManager] No AudioSwitchStateScript found on {proxy.Name}.");
         }
     }
 }

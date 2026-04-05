@@ -1064,13 +1064,6 @@ AudioSystemDataID AudioTranslationLayer::GetSwitchId(StringView name) const
     return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
-AudioSystemDataID AudioTranslationLayer::GetSwitchStateId(StringView name) const
-{
-    const uint32             nameHash = HashName(name);
-    const AudioSystemDataID* id       = _switchStateNameMap.TryGet(nameHash);
-    return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
-}
-
 AudioSystemDataID AudioTranslationLayer::GetSwitchStateId(StringView switchName, StringView stateName) const
 {
     if (switchName.IsEmpty() || stateName.IsEmpty())

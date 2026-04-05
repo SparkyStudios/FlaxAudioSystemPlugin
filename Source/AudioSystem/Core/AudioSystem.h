@@ -126,6 +126,7 @@ class AUDIOSYSTEM_API AudioSystem
 
     bool RegisterTrigger(AudioSystemDataID id, const StringView& name, AudioSystemTriggerData* data);
     bool RegisterRtpc(AudioSystemDataID id, const StringView& name, AudioSystemRtpcData* data);
+    bool RegisterSwitch(AudioSystemDataID id, const StringView& name, AudioSystemSwitchData* data);
     bool RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data);
     bool RegisterEnvironment(AudioSystemDataID id, const StringView& name, AudioSystemEnvironmentData* data);
     bool RegisterSoundBank(AudioSystemDataID id, const StringView& name, AudioSystemBankData* data);
@@ -136,6 +137,7 @@ class AUDIOSYSTEM_API AudioSystem
 
     bool UnregisterTrigger(AudioSystemDataID id);
     bool UnregisterRtpc(AudioSystemDataID id);
+    bool UnregisterSwitch(AudioSystemDataID id);
     bool UnregisterSwitchState(AudioSystemDataID id);
     bool UnregisterEnvironment(AudioSystemDataID id);
     bool UnregisterSoundBank(AudioSystemDataID id);
@@ -146,7 +148,9 @@ class AUDIOSYSTEM_API AudioSystem
 
     AudioSystemDataID GetTriggerId(StringView name) const;
     AudioSystemDataID GetRtpcId(StringView name) const;
+    AudioSystemDataID GetSwitchId(StringView name) const;
     AudioSystemDataID GetSwitchStateId(StringView name) const;
+    AudioSystemDataID GetSwitchStateId(StringView switchName, StringView stateName) const;
     AudioSystemDataID GetEnvironmentId(StringView name) const;
     AudioSystemDataID GetBankId(StringView name) const;
 

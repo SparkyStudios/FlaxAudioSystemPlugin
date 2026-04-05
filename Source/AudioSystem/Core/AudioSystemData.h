@@ -251,6 +251,15 @@ class AUDIOSYSTEM_API AudioSystemRtpcData
 };
 
 /// <summary>
+/// Opaque base for a switch-container descriptor.
+/// </summary>
+class AUDIOSYSTEM_API AudioSystemSwitchData
+{
+  public:
+    virtual ~AudioSystemSwitchData() = default;
+};
+
+/// <summary>
 /// Opaque base for a switch-state descriptor (a specific value of a switch/state).
 /// </summary>
 class AUDIOSYSTEM_API AudioSystemSwitchStateData

@@ -151,6 +151,19 @@ void AudioTranslationLayer::Shutdown()
     }
     _rtpcs.Clear();
 
+    // --- Switches -------------------------------------------------------
+    for (auto& kv : _switches)
+    {
+        ATLSwitch* sw = kv.Value;
+        if (sw != nullptr)
+        {
+            if (sw->pData != nullptr)
+                Delete(sw->pData);
+            Delete(sw);
+        }
+    }
+    _switches.Clear();
+
     // --- Switch states --------------------------------------------------
     for (auto& kv : _switchStates)
     {
@@ -765,6 +778,31 @@ bool AudioTranslationLayer::RegisterRtpc(AudioSystemDataID id, const StringView&
     return true;
 }
 
+bool AudioTranslationLayer::RegisterSwitch(AudioSystemDataID id, const StringView& name, AudioSystemSwitchData* data)
+{
+    if (id == INVALID_AUDIO_SYSTEM_ID || data == nullptr)
+    {
+        LOG(Error, "[ATL] RegisterSwitch: invalid id or null data.");
+        return false;
+    }
+
+    if (_switches.ContainsKey(id))
+    {
+        LOG(Warning, "[ATL] RegisterSwitch: switch {0} already registered.", id);
+        return false;
+    }
+
+    ATLSwitch* sw = New<ATLSwitch>();
+    sw->Id        = id;
+    sw->pData     = data;
+    _switches.Add(id, sw);
+
+    if (name.HasChars())
+        _switchNameMap.Add(HashName(name), id);
+
+    return true;
+}
+
 bool AudioTranslationLayer::RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data)
 {
     if (id == INVALID_AUDIO_SYSTEM_ID || data == nullptr)
@@ -897,6 +935,32 @@ bool AudioTranslationLayer::UnregisterRtpc(AudioSystemDataID id)
     return true;
 }
 
+bool AudioTranslationLayer::UnregisterSwitch(AudioSystemDataID id)
+{
+    ATLSwitch* sw = nullptr;
+    if (!_switches.TryGet(id, sw) || sw == nullptr)
+    {
+        LOG(Warning, "[ATL] UnregisterSwitch: switch {0} not found.", id);
+        return false;
+    }
+
+    if (sw->pData != nullptr)
+        Delete(sw->pData);
+
+    for (auto& kv : _switchNameMap)
+    {
+        if (kv.Value == id)
+        {
+            _switchNameMap.Remove(kv.Key);
+            break;
+        }
+    }
+
+    _switches.Remove(id);
+    Delete(sw);
+    return true;
+}
+
 bool AudioTranslationLayer::UnregisterSwitchState(AudioSystemDataID id)
 {
     ATLSwitchState* ss = nullptr;
@@ -993,10 +1057,27 @@ AudioSystemDataID AudioTranslationLayer::GetRtpcId(StringView name) const
     return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
+AudioSystemDataID AudioTranslationLayer::GetSwitchId(StringView name) const
+{
+    const uint32             nameHash = HashName(name);
+    const AudioSystemDataID* id       = _switchNameMap.TryGet(nameHash);
+    return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
+}
+
 AudioSystemDataID AudioTranslationLayer::GetSwitchStateId(StringView name) const
 {
     const uint32             nameHash = HashName(name);
     const AudioSystemDataID* id       = _switchStateNameMap.TryGet(nameHash);
+    return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
+}
+
+AudioSystemDataID AudioTranslationLayer::GetSwitchStateId(StringView switchName, StringView stateName) const
+{
+    if (switchName.IsEmpty() || stateName.IsEmpty())
+        return INVALID_AUDIO_SYSTEM_ID;
+
+    const String             qualifiedName = String(switchName) + TEXT("/") + String(stateName);
+    const AudioSystemDataID* id            = _switchStateNameMap.TryGet(HashName(qualifiedName));
     return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
 
@@ -1031,6 +1112,12 @@ void AudioTranslationLayer::ClearAllMaps()
         Delete(kv.Value);
     for (auto& kv : _rtpcs)
         Delete(kv.Value);
+    for (auto& kv : _switches)
+    {
+        if (kv.Value != nullptr && kv.Value->pData != nullptr)
+            Delete(kv.Value->pData);
+        Delete(kv.Value);
+    }
     for (auto& kv : _switchStates)
         Delete(kv.Value);
     for (auto& kv : _environments)
@@ -1044,6 +1131,7 @@ void AudioTranslationLayer::ClearAllMaps()
     _events.Clear();
     _triggers.Clear();
     _rtpcs.Clear();
+    _switches.Clear();
     _switchStates.Clear();
     _environments.Clear();
     _listeners.Clear();
@@ -1051,6 +1139,7 @@ void AudioTranslationLayer::ClearAllMaps()
 
     _triggerNameMap.Clear();
     _rtpcNameMap.Clear();
+    _switchNameMap.Clear();
     _switchStateNameMap.Clear();
     _environmentNameMap.Clear();
     _bankNameMap.Clear();

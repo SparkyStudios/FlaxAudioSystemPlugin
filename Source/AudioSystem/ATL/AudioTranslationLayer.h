@@ -124,6 +124,11 @@ class AUDIOSYSTEM_API AudioTranslationLayer
     bool RegisterRtpc(AudioSystemDataID id, const StringView& name, AudioSystemRtpcData* data);
 
     /// <summary>
+    /// Register a switch control. The ATL takes ownership of data.
+    /// </summary>
+    bool RegisterSwitch(AudioSystemDataID id, const StringView& name, AudioSystemSwitchData* data);
+
+    /// <summary>
     /// Register a switch-state control. The ATL takes ownership of data.
     /// </summary>
     bool RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data);
@@ -156,6 +161,11 @@ class AUDIOSYSTEM_API AudioTranslationLayer
     bool UnregisterRtpc(AudioSystemDataID id);
 
     /// <summary>
+    /// Unregister a switch and destroy its data.
+    /// </summary>
+    bool UnregisterSwitch(AudioSystemDataID id);
+
+    /// <summary>
     /// Unregister a switch-state and destroy its middleware data.
     /// </summary>
     bool UnregisterSwitchState(AudioSystemDataID id);
@@ -184,8 +194,14 @@ class AUDIOSYSTEM_API AudioTranslationLayer
     /// <returns>The ID of the named RTPC, or INVALID_AUDIO_SYSTEM_ID.</returns>
     AudioSystemDataID GetRtpcId(StringView name) const;
 
+    /// <returns>The ID of the named switch, or INVALID_AUDIO_SYSTEM_ID.</returns>
+    AudioSystemDataID GetSwitchId(StringView name) const;
+
     /// <returns>The ID of the named switch-state, or INVALID_AUDIO_SYSTEM_ID.</returns>
     AudioSystemDataID GetSwitchStateId(StringView name) const;
+
+    /// <returns>The ID of the named switch-state within the specified switch, or INVALID_AUDIO_SYSTEM_ID.</returns>
+    AudioSystemDataID GetSwitchStateId(StringView switchName, StringView stateName) const;
 
     /// <returns>The ID of the named environment, or INVALID_AUDIO_SYSTEM_ID.</returns>
     AudioSystemDataID GetEnvironmentId(StringView name) const;
@@ -240,6 +256,7 @@ class AUDIOSYSTEM_API AudioTranslationLayer
     ATLTriggerMap     _triggers;
     ATLEventMap       _events;
     ATLRtpcMap        _rtpcs;
+    ATLSwitchMap      _switches;
     ATLSwitchStateMap _switchStates;
     ATLEnvironmentMap _environments;
     ATLSoundBankMap   _banks;
@@ -249,6 +266,7 @@ class AUDIOSYSTEM_API AudioTranslationLayer
     /// </summary>
     Dictionary<uint32, AudioSystemDataID> _triggerNameMap;
     Dictionary<uint32, AudioSystemDataID> _rtpcNameMap;
+    Dictionary<uint32, AudioSystemDataID> _switchNameMap;
     Dictionary<uint32, AudioSystemDataID> _switchStateNameMap;
     Dictionary<uint32, AudioSystemDataID> _environmentNameMap;
     Dictionary<uint32, AudioSystemDataID> _bankNameMap;

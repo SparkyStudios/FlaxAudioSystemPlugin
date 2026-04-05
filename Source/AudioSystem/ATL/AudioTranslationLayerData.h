@@ -98,6 +98,14 @@ struct ATLRtpc final : ATLControl
 };
 
 /// <summary>
+/// ATL wrapper for a switch container.
+/// </summary>
+struct ATLSwitch final : ATLControl
+{
+    AudioSystemSwitchData* pData = nullptr;
+};
+
+/// <summary>
 /// ATL wrapper for a discrete switch-state value.
 /// </summary>
 struct ATLSwitchState final : ATLControl
@@ -133,6 +141,7 @@ using ATLListenerMap    = Dictionary<AudioSystemDataID, ATLListener*>;
 using ATLTriggerMap     = Dictionary<AudioSystemDataID, ATLTrigger*>;
 using ATLEventMap       = Dictionary<AudioSystemDataID, ATLEvent*>;
 using ATLRtpcMap        = Dictionary<AudioSystemDataID, ATLRtpc*>;
+using ATLSwitchMap      = Dictionary<AudioSystemDataID, ATLSwitch*>;
 using ATLSwitchStateMap = Dictionary<AudioSystemDataID, ATLSwitchState*>;
 using ATLEnvironmentMap = Dictionary<AudioSystemDataID, ATLEnvironment*>;
 using ATLSoundBankMap   = Dictionary<AudioSystemDataID, ATLSoundBank*>;

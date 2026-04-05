@@ -225,6 +225,11 @@ bool AudioSystem::RegisterRtpc(AudioSystemDataID id, const StringView& name, Aud
     return _atl.RegisterRtpc(id, name, data);
 }
 
+bool AudioSystem::RegisterSwitch(AudioSystemDataID id, const StringView& name, AudioSystemSwitchData* data)
+{
+    return _atl.RegisterSwitch(id, name, data);
+}
+
 bool AudioSystem::RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data)
 {
     return _atl.RegisterSwitchState(id, name, data);
@@ -252,6 +257,11 @@ bool AudioSystem::UnregisterTrigger(AudioSystemDataID id)
 bool AudioSystem::UnregisterRtpc(AudioSystemDataID id)
 {
     return _atl.UnregisterRtpc(id);
+}
+
+bool AudioSystem::UnregisterSwitch(AudioSystemDataID id)
+{
+    return _atl.UnregisterSwitch(id);
 }
 
 bool AudioSystem::UnregisterSwitchState(AudioSystemDataID id)
@@ -283,9 +293,19 @@ AudioSystemDataID AudioSystem::GetRtpcId(StringView name) const
     return _atl.GetRtpcId(name);
 }
 
+AudioSystemDataID AudioSystem::GetSwitchId(StringView name) const
+{
+    return _atl.GetSwitchId(name);
+}
+
 AudioSystemDataID AudioSystem::GetSwitchStateId(StringView name) const
 {
     return _atl.GetSwitchStateId(name);
+}
+
+AudioSystemDataID AudioSystem::GetSwitchStateId(StringView switchName, StringView stateName) const
+{
+    return _atl.GetSwitchStateId(switchName, stateName);
 }
 
 AudioSystemDataID AudioSystem::GetEnvironmentId(StringView name) const

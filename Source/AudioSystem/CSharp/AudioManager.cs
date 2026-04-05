@@ -99,8 +99,9 @@ namespace AudioSystem
         }
 
         /// <summary>
-        /// Set a switch state on a specific actor using the first available
-        /// AudioSwitchStateScript on that proxy.
+        /// Set a switch state on a specific actor.
+        /// Uses the only available AudioSwitchStateScript, or warns when the
+        /// proxy contains multiple switch scripts and the target switch is ambiguous.
         /// </summary>
         public static void SetSwitchState(Actor actor, string stateName)
         {
@@ -113,10 +114,25 @@ namespace AudioSystem
                 return;
             }
 
+            AudioSwitchStateScript resolvedSwitch = null;
             var switches = proxy.GetScripts<AudioSwitchStateScript>();
             foreach (var sw in switches)
             {
-                sw.SetState(stateName);
+                if (sw == null)
+                    continue;
+
+                if (resolvedSwitch != null)
+                {
+                    Debug.LogWarning($"[AudioManager] Multiple AudioSwitchStateScript components found on '{proxy.Name}'. Use SetSwitchState(actor, switchName, stateName) to disambiguate state '{stateName}'.");
+                    return;
+                }
+
+                resolvedSwitch = sw;
+            }
+
+            if (resolvedSwitch != null)
+            {
+                resolvedSwitch.SetState(stateName);
                 return;
             }
 
@@ -125,6 +141,7 @@ namespace AudioSystem
 
         /// <summary>
         /// Set a switch state on a specific actor for an explicit switch name.
+        /// Requires a matching AudioSwitchStateScript and warns when none exists.
         /// </summary>
         public static void SetSwitchState(Actor actor, string switchName, string stateName)
         {
@@ -138,12 +155,10 @@ namespace AudioSystem
             }
 
             var switches = proxy.GetScripts<AudioSwitchStateScript>();
-            AudioSwitchStateScript firstSwitch = null;
-
             foreach (var sw in switches)
             {
-                if (firstSwitch == null)
-                    firstSwitch = sw;
+                if (sw == null)
+                    continue;
 
                 if (sw.SwitchName == switchName)
                 {
@@ -152,13 +167,7 @@ namespace AudioSystem
                 }
             }
 
-            if (firstSwitch != null)
-            {
-                firstSwitch.SetStateForSwitch(switchName, stateName);
-                return;
-            }
-
-            Debug.LogWarning($"[AudioManager] No AudioSwitchStateScript found on {proxy.Name}.");
+            Debug.LogWarning($"[AudioManager] No AudioSwitchStateScript with switch name '{switchName}' found on '{proxy.Name}'.");
         }
     }
 }

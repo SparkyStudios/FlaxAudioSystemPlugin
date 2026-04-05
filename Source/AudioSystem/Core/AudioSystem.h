@@ -113,8 +113,9 @@ class AUDIOSYSTEM_API AudioSystem
 
     /// <summary>
     /// Submit a request and block the calling thread until it is processed.
+    /// Returns true when the audio thread reports a successful request result.
     /// </summary>
-    void SendRequestSync(AudioRequest&& request);
+    bool SendRequestSync(AudioRequest&& request);
 
     // ========================================================================
     //  Control registration (synchronous, delegates to ATL)
@@ -261,6 +262,7 @@ class AUDIOSYSTEM_API AudioSystem
     /// Used together with _mainSignal to guard against spurious wakeups.
     /// </summary>
     bool _blockingDone = false;
+    bool _blockingSuccess = false;
 
     bool _initialized          = false;
     bool _masterPaused         = false;

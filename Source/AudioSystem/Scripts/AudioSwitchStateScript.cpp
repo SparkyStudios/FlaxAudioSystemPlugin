@@ -114,7 +114,23 @@ void AudioSwitchStateScript::SetStateForSwitch(const StringView& switchName, con
     req.Type     = AudioRequestType::SetSwitchState;
     req.EntityId = _proxy->GetEntityId();
     req.ObjectId = stateId;
-    req.Callback = [this, stateNameString](bool success)
+    if (sync)
+    {
+        if (AudioSystem::Get()->SendRequestSync(std::move(req)))
+        {
+            SwitchName        = switchNameString;
+            SwitchStateName   = stateNameString;
+            _currentStateName = stateNameString;
+        }
+        else
+        {
+            LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: failed to set switch state '{0}'.", stateNameString);
+        }
+
+        return;
+    }
+
+    req.Callback = [this, switchNameString, stateNameString](bool success)
     {
         if (!success)
         {
@@ -122,13 +138,12 @@ void AudioSwitchStateScript::SetStateForSwitch(const StringView& switchName, con
             return;
         }
 
+        SwitchName        = switchNameString;
+        SwitchStateName   = stateNameString;
         _currentStateName = stateNameString;
     };
 
-    if (sync)
-        AudioSystem::Get()->SendRequestSync(std::move(req));
-    else
-        AudioSystem::Get()->SendRequest(std::move(req));
+    AudioSystem::Get()->SendRequest(std::move(req));
 }
 
 // ============================================================================

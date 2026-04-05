@@ -180,17 +180,18 @@ void AudioSystem::SendRequests(Array<AudioRequest>& requests)
     }
 }
 
-void AudioSystem::SendRequestSync(AudioRequest&& request)
+bool AudioSystem::SendRequestSync(AudioRequest&& request)
 {
     if (!_initialized)
     {
         LOG(Warning, "[AudioSystem] SendRequestSync: system not initialized, dropping request.");
-        return;
+        return false;
     }
 
     {
         ScopeLock lock(_mainMutex);
-        _blockingDone = false;
+        _blockingDone    = false;
+        _blockingSuccess = false;
     }
 
     {
@@ -208,6 +209,8 @@ void AudioSystem::SendRequestSync(AudioRequest&& request)
         {
             _mainSignal.Wait(_mainMutex);
         }
+
+        return _blockingSuccess;
     }
 }
 
@@ -574,6 +577,7 @@ void AudioSystem::ProcessBlockingRequests()
         Function<void(bool)>   callback = MoveTemp(req.Callback);
         const AudioRequestType type     = req.Type;
         const bool             success  = _atl.ProcessRequest(MoveTemp(req), true);
+        _blockingSuccess                = success;
 
         if (callback.IsBinded())
         {

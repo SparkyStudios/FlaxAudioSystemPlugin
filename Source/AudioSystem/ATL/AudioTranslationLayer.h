@@ -131,7 +131,7 @@ class AUDIOSYSTEM_API AudioTranslationLayer
     /// <summary>
     /// Register a switch-state control. The ATL takes ownership of data.
     /// </summary>
-    bool RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data);
+    bool RegisterSwitchState(AudioSystemDataID id, const StringView& switchName, const StringView& stateName, AudioSystemSwitchStateData* data);
 
     /// <summary>
     /// Register an environment control. The ATL takes ownership of data.

@@ -160,7 +160,7 @@ namespace AudioSystem
                 if (sw == null)
                     continue;
 
-                if (sw.SwitchName == switchName)
+                if (sw.Switch == switchName)
                 {
                     sw.SetStateForSwitch(switchName, stateName);
                     return;

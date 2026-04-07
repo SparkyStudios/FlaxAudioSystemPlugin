@@ -39,6 +39,14 @@ static uint32 HashName(const StringView& name)
     return GetHash(String(name));
 }
 
+/// <summary>
+/// Build the qualified ATL lookup name for a switch state.
+/// </summary>
+static String BuildSwitchStateQualifiedName(StringView switchName, StringView stateName)
+{
+    return String(switchName) + TEXT("/") + String(stateName);
+}
+
 // ============================================================================
 //  Lifecycle
 // ============================================================================
@@ -803,11 +811,17 @@ bool AudioTranslationLayer::RegisterSwitch(AudioSystemDataID id, const StringVie
     return true;
 }
 
-bool AudioTranslationLayer::RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data)
+bool AudioTranslationLayer::RegisterSwitchState(AudioSystemDataID id, const StringView& switchName, const StringView& stateName, AudioSystemSwitchStateData* data)
 {
     if (id == INVALID_AUDIO_SYSTEM_ID || data == nullptr)
     {
         LOG(Error, "[ATL] RegisterSwitchState: invalid id or null data.");
+        return false;
+    }
+
+    if (switchName.IsEmpty() || stateName.IsEmpty())
+    {
+        LOG(Error, "[ATL] RegisterSwitchState: switchName and stateName are both required.");
         return false;
     }
 
@@ -817,13 +831,20 @@ bool AudioTranslationLayer::RegisterSwitchState(AudioSystemDataID id, const Stri
         return false;
     }
 
+    const String            qualifiedName = BuildSwitchStateQualifiedName(switchName, stateName);
+    const AudioSystemDataID nameHash      = HashName(qualifiedName);
+
+    if (_switchStateNameMap.ContainsKey(nameHash))
+    {
+        LOG(Warning, "[ATL] RegisterSwitchState: qualified name '{0}' already mapped.", qualifiedName);
+        return false;
+    }
+
     ATLSwitchState* ss = New<ATLSwitchState>();
     ss->Id             = id;
     ss->pData          = data;
     _switchStates.Add(id, ss);
-
-    if (name.HasChars())
-        _switchStateNameMap.Add(HashName(name), id);
+    _switchStateNameMap.Add(nameHash, id);
 
     return true;
 }
@@ -1069,7 +1090,7 @@ AudioSystemDataID AudioTranslationLayer::GetSwitchStateId(StringView switchName,
     if (switchName.IsEmpty() || stateName.IsEmpty())
         return INVALID_AUDIO_SYSTEM_ID;
 
-    const String             qualifiedName = String(switchName) + TEXT("/") + String(stateName);
+    const String             qualifiedName = BuildSwitchStateQualifiedName(switchName, stateName);
     const AudioSystemDataID* id            = _switchStateNameMap.TryGet(HashName(qualifiedName));
     return (id != nullptr) ? *id : INVALID_AUDIO_SYSTEM_ID;
 }
@@ -1106,11 +1127,7 @@ void AudioTranslationLayer::ClearAllMaps()
     for (auto& kv : _rtpcs)
         Delete(kv.Value);
     for (auto& kv : _switches)
-    {
-        if (kv.Value != nullptr && kv.Value->pData != nullptr)
-            Delete(kv.Value->pData);
         Delete(kv.Value);
-    }
     for (auto& kv : _switchStates)
         Delete(kv.Value);
     for (auto& kv : _environments)

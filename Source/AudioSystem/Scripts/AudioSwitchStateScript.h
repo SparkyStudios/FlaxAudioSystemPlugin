@@ -25,9 +25,9 @@
 ///
 /// Requires to be attached to a AudioProxyActor.
 ///
-/// The switch state specified in SwitchStateName is applied within SwitchName
+/// The switch state specified in DefaultSwitchState is applied within Switch
 /// when the script becomes active. Call SetState() to use the configured
-/// SwitchName, or SetStateForSwitch() to target an explicit switch at runtime.
+/// Switch, or SetStateForSwitch() to target an explicit switch at runtime.
 /// </summary>
 API_CLASS()
 class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript
@@ -44,21 +44,20 @@ class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript
     /// The switch name that owns the state to activate when this component becomes active.
     /// </summary>
     API_FIELD(Attributes = "EditorOrder(0), Tooltip(\"The switch name that owns the state to activate on init.\")")
-    String SwitchName;
+    String Switch;
 
     /// <summary>
     /// The switch state name to activate when this component becomes active.
     /// </summary>
     API_FIELD(Attributes = "EditorOrder(1), Tooltip(\"The switch state name to activate on init.\")")
-    String SwitchStateName;
+    String DefaultSwitchState;
 
     // ========================================================================
     //  Script lifecycle overrides
     // ========================================================================
 
     /// <summary>
-    /// Resolves the proxy and applies SwitchStateName if SwitchName and
-    /// SwitchStateName are configured.
+    /// Resolves the proxy and applies DefaultSwitchState if Switch and DefaultSwitchState are configured.
     /// </summary>
     void OnEnable() override;
 
@@ -77,7 +76,7 @@ class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript
     // ========================================================================
 
     /// <summary>
-    /// Resolve stateName within the configured SwitchName and activate it on
+    /// Resolve stateName within the configured Switch and activate it on
     /// the entity.
     /// </summary>
     /// <param name="stateName">Name of the switch state to activate.</param>

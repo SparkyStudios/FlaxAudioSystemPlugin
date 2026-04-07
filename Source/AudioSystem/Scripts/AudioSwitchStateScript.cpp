@@ -35,16 +35,16 @@ void AudioSwitchStateScript::OnEnable()
     if (_proxy == nullptr)
         return;
 
-    if (SwitchStateName.IsEmpty())
+    if (DefaultSwitchState.IsEmpty())
         return;
 
-    if (SwitchName.IsEmpty())
+    if (Switch.IsEmpty())
     {
-        LOG(Warning, "[AudioSwitchStateScript] OnEnable: SwitchName is empty. Initial state '{0}' will not be applied.", SwitchStateName);
+        LOG(Warning, "[AudioSwitchStateScript] OnEnable: Switch is empty. Initial state '{0}' will not be applied.", DefaultSwitchState);
         return;
     }
 
-    SetState(SwitchStateName);
+    SetState(DefaultSwitchState);
 }
 
 // ============================================================================
@@ -73,7 +73,7 @@ void AudioSwitchStateScript::OnDisable()
 
 void AudioSwitchStateScript::SetState(const StringView& stateName, bool sync)
 {
-    SetStateForSwitch(SwitchName, stateName, sync);
+    SetStateForSwitch(Switch, stateName, sync);
 }
 
 // ============================================================================
@@ -90,13 +90,13 @@ void AudioSwitchStateScript::SetStateForSwitch(const StringView& switchName, con
 
     if (switchName.IsEmpty())
     {
-        LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: switchName is empty. Request ignored.");
+        LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: switch name is empty. Request ignored.");
         return;
     }
 
     if (stateName.IsEmpty())
     {
-        LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: stateName is empty. Request ignored.");
+        LOG(Warning, "[AudioSwitchStateScript] SetStateForSwitch: state name is empty. Request ignored.");
         return;
     }
 
@@ -118,8 +118,8 @@ void AudioSwitchStateScript::SetStateForSwitch(const StringView& switchName, con
     {
         if (AudioSystem::Get()->SendRequestSync(std::move(req)))
         {
-            SwitchName        = switchNameString;
-            SwitchStateName   = stateNameString;
+            Switch        = switchNameString;
+            DefaultSwitchState   = stateNameString;
             _currentStateName = stateNameString;
         }
         else
@@ -138,8 +138,8 @@ void AudioSwitchStateScript::SetStateForSwitch(const StringView& switchName, con
             return;
         }
 
-        SwitchName        = switchNameString;
-        SwitchStateName   = stateNameString;
+        Switch        = switchNameString;
+        DefaultSwitchState   = stateNameString;
         _currentStateName = stateNameString;
     };
 

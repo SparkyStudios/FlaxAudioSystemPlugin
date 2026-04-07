@@ -233,9 +233,9 @@ bool AudioSystem::RegisterSwitch(AudioSystemDataID id, const StringView& name, A
     return _atl.RegisterSwitch(id, name, data);
 }
 
-bool AudioSystem::RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data)
+bool AudioSystem::RegisterSwitchState(AudioSystemDataID id, const StringView& switchName, const StringView& stateName, AudioSystemSwitchStateData* data)
 {
-    return _atl.RegisterSwitchState(id, name, data);
+    return _atl.RegisterSwitchState(id, switchName, stateName, data);
 }
 
 bool AudioSystem::RegisterEnvironment(AudioSystemDataID id, const StringView& name, AudioSystemEnvironmentData* data)

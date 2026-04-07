@@ -128,7 +128,7 @@ class AUDIOSYSTEM_API AudioSystem
     bool RegisterTrigger(AudioSystemDataID id, const StringView& name, AudioSystemTriggerData* data);
     bool RegisterRtpc(AudioSystemDataID id, const StringView& name, AudioSystemRtpcData* data);
     bool RegisterSwitch(AudioSystemDataID id, const StringView& name, AudioSystemSwitchData* data);
-    bool RegisterSwitchState(AudioSystemDataID id, const StringView& name, AudioSystemSwitchStateData* data);
+    bool RegisterSwitchState(AudioSystemDataID id, const StringView& switchName, const StringView& stateName, AudioSystemSwitchStateData* data);
     bool RegisterEnvironment(AudioSystemDataID id, const StringView& name, AudioSystemEnvironmentData* data);
     bool RegisterSoundBank(AudioSystemDataID id, const StringView& name, AudioSystemBankData* data);
 

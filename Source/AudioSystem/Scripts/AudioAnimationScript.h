@@ -87,7 +87,7 @@ class AUDIOSYSTEM_API AudioAnimEvent : public AnimEvent
 /// If EventTriggerMappings is empty, AudioAnimEvent still works directly using
 /// TriggerName as the AudioTriggerScript PlayTriggerName.
 /// </summary>
-API_CLASS()
+API_CLASS(Attributes = "FlaxEngine.Category(\"Audio System\")")
 class AUDIOSYSTEM_API AudioAnimationScript : public AudioProxyDependentScript
 {
     API_AUTO_SERIALIZATION();

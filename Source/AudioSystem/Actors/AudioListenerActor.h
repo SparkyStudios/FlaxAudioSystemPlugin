@@ -29,7 +29,7 @@
 /// for position and orientation, and propagates the result to the middleware
 /// each frame.
 /// </summary>
-API_CLASS(Attributes = "ActorContextMenu(\"New/Audio/Audio Listener\")")
+API_CLASS(Attributes = "ActorContextMenu(\"New/Audio System/Audio Listener\")")
 class AUDIOSYSTEM_API AudioListenerActor : public Actor
 {
     API_AUTO_SERIALIZATION();

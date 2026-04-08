@@ -29,7 +29,7 @@
 /// when the script becomes active. Call SetState() to use the configured
 /// Switch, or SetStateForSwitch() to target an explicit switch at runtime.
 /// </summary>
-API_CLASS()
+API_CLASS(Attributes = "FlaxEngine.Category(\"Audio System\")")
 class AUDIOSYSTEM_API AudioSwitchStateScript : public AudioProxyDependentScript
 {
     API_AUTO_SERIALIZATION();

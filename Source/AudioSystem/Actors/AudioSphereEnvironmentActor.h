@@ -23,7 +23,7 @@
 /// Radius receive full send (1.0). A linear falloff between Radius and
 /// MaxDistance blends the wet-send from 1.0 to 0.0.
 /// </summary>
-API_CLASS(Attributes = "ActorContextMenu(\"New/Audio/Audio Sphere Environment\")")
+API_CLASS(Attributes = "ActorContextMenu(\"New/Audio System/Audio Sphere Environment\")")
 class AUDIOSYSTEM_API AudioSphereEnvironmentActor : public AudioSystemEnvironmentActor
 {
     API_AUTO_SERIALIZATION();

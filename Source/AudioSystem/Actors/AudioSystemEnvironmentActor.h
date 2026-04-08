@@ -30,7 +30,7 @@ class AudioProxyActor;
 /// with the AudioWorld so that the per-frame update can push
 /// wet-send amounts to nearby proxies.
 /// </summary>
-API_CLASS(Abstract, Attributes = "ActorContextMenu(\"New/Audio\")")
+API_CLASS(Abstract, Attributes = "ActorContextMenu(\"New/Audio System\")")
 class AUDIOSYSTEM_API AudioSystemEnvironmentActor : public Actor
 {
     API_AUTO_SERIALIZATION();

@@ -51,7 +51,7 @@ constexpr float k_MultiRayOffsetRadius = 0.25f;
 /// optionally performs physics ray casts each frame to compute the
 /// obstruction and occlusion values sent to the audio middleware.
 /// </summary>
-API_CLASS()
+API_CLASS(Attributes = "FlaxEngine.Category(\"Audio System\")")
 class AUDIOSYSTEM_API AudioTriggerScript : public AudioProxyDependentScript
 {
     API_AUTO_SERIALIZATION();

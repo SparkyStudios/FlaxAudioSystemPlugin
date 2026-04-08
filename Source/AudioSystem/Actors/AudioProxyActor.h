@@ -28,7 +28,7 @@
 /// Environment components update per-environment send amounts via
 /// SetEnvironmentAmount / GetEnvironmentAmount.
 /// </summary>
-API_CLASS(Attributes = "ActorContextMenu(\"New/Audio/Audio Proxy\")")
+API_CLASS(Attributes = "ActorContextMenu(\"New/Audio System/Audio Proxy\")")
 class AUDIOSYSTEM_API AudioProxyActor : public Actor
 {
     API_AUTO_SERIALIZATION();

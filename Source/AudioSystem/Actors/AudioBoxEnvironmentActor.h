@@ -25,7 +25,7 @@
 /// both in the Actor's local space.  A per-axis linear falloff is applied
 /// between the two boxes.
 /// </summary>
-API_CLASS(Attributes = "ActorContextMenu(\"New/Audio/Audio Box Environment\")")
+API_CLASS(Attributes = "ActorContextMenu(\"New/Audio System/Audio Box Environment\")")
 class AUDIOSYSTEM_API AudioBoxEnvironmentActor : public AudioSystemEnvironmentActor
 {
     API_AUTO_SERIALIZATION();

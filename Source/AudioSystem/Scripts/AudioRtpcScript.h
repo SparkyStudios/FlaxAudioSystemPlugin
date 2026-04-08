@@ -27,7 +27,7 @@
 /// The initial value is pushed when the component becomes active.
 /// Calling ResetValue() or disabling the component restores the default.
 /// </summary>
-API_CLASS()
+API_CLASS(Attributes = "FlaxEngine.Category(\"Audio System\")")
 class AUDIOSYSTEM_API AudioRtpcScript : public AudioProxyDependentScript
 {
     API_AUTO_SERIALIZATION();

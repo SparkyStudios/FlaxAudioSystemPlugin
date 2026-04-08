@@ -100,8 +100,8 @@ void AudioSwitchStateScript::SetStateForSwitch(const StringView& switchName, con
         return;
     }
 
-    const String switchNameString(switchName);
-    const String stateNameString(stateName);
+    const String            switchNameString(switchName);
+    const String            stateNameString(stateName);
     const AudioSystemDataID stateId = AudioSystem::Get()->GetSwitchStateId(switchName, stateName);
 
     if (stateId == INVALID_AUDIO_SYSTEM_ID)
@@ -118,9 +118,9 @@ void AudioSwitchStateScript::SetStateForSwitch(const StringView& switchName, con
     {
         if (AudioSystem::Get()->SendRequestSync(std::move(req)))
         {
-            Switch        = switchNameString;
-            DefaultSwitchState   = stateNameString;
-            _currentStateName = stateNameString;
+            Switch             = switchNameString;
+            DefaultSwitchState = stateNameString;
+            _currentStateName  = stateNameString;
         }
         else
         {
@@ -138,9 +138,9 @@ void AudioSwitchStateScript::SetStateForSwitch(const StringView& switchName, con
             return;
         }
 
-        Switch        = switchNameString;
-        DefaultSwitchState   = stateNameString;
-        _currentStateName = stateNameString;
+        Switch             = switchNameString;
+        DefaultSwitchState = stateNameString;
+        _currentStateName  = stateNameString;
     };
 
     AudioSystem::Get()->SendRequest(std::move(req));

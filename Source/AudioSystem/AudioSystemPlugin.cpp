@@ -17,8 +17,6 @@
 #include <Engine/Engine/Engine.h>
 #include <Engine/Scripting/Scripting.h>
 
-#include "Core/AudioSystem.h"
-
 bool AudioSystemPlugin::_initialized = false;
 
 AudioSystemPlugin::AudioSystemPlugin(const SpawnParams& params) : GamePlugin(params)
@@ -37,32 +35,13 @@ void AudioSystemPlugin::Initialize()
     if (_initialized)
         return;
 
-    AudioSystem* audioSystem = AudioSystem::Get();
-    if (audioSystem == nullptr)
-        return;
-
-    // Hook into the engine update loop so the audio system is ticked every frame.
-    Engine::LateUpdate.Bind<AudioSystem, &AudioSystem::UpdateSound>(audioSystem);
     _initialized = true;
 }
 
 void AudioSystemPlugin::Deinitialize()
 {
-    if (!_initialized)
-    {
-        GamePlugin::Deinitialize();
-        return;
-    }
-
-    AudioSystem* audioSystem = AudioSystem::Get();
-    if (audioSystem != nullptr)
-    {
-        Engine::LateUpdate.Unbind<AudioSystem, &AudioSystem::UpdateSound>(audioSystem);
-        audioSystem->Shutdown();
-    }
-
-    AudioSystem::Destroy();
-    _initialized = false;
+    if (_initialized)
+        _initialized = false;
 
     GamePlugin::Deinitialize();
 }

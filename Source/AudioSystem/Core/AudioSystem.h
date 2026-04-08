@@ -261,7 +261,7 @@ class AUDIOSYSTEM_API AudioSystem
     /// Flag set by the audio thread after processing a blocking request.
     /// Used together with _mainSignal to guard against spurious wakeups.
     /// </summary>
-    bool _blockingDone = false;
+    bool _blockingDone    = false;
     bool _blockingSuccess = false;
 
     bool _initialized          = false;

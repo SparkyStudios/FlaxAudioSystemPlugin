@@ -15,6 +15,7 @@
 #include "AudioSystem.h"
 
 #include <Engine/Core/Log.h>
+#include <Engine/Engine/Engine.h>
 #include <Engine/Threading/Threading.h>
 
 #include "AudioThread.h"
@@ -79,6 +80,9 @@ bool AudioSystem::Startup()
     StartAudioThread();
     _initialized = true;
 
+    // Hook into the engine update loop so the audio system is ticked every frame.
+    Engine::LateUpdate.Bind<AudioSystem, &AudioSystem::UpdateSound>(this);
+
     LOG(Info, "[AudioSystem] Startup complete.");
     return true;
 }
@@ -92,6 +96,8 @@ void AudioSystem::Shutdown()
     }
 
     LOG(Info, "[AudioSystem] Shutting down...");
+
+    Engine::LateUpdate.Unbind<AudioSystem, &AudioSystem::UpdateSound>(this);
 
     _initialized = false;
     StopAudioThread();
